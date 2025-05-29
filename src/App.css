@@ -1,0 +1,22 @@
+.Toastify__toast {
+  border-left: none !important;
+}
+.invalid {
+  color: #e85347;
+  font-size: 11px;
+  font-style: italic;
+}
+.spinner-xs {
+  width: 18px !important;
+  height: 18px !important;
+}
+/* .inspiration-para p {
+  margin: 0px !important;
+  padding: 0px !important;
+} */
+.login{
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

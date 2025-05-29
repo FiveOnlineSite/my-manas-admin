@@ -1,0 +1,556 @@
+import React, { useContext, useState } from "react";
+import {
+  Block,
+  BlockHead,
+  BlockBetween,
+  BlockHeadContent,
+  BlockTitle,
+  BlockDes,
+  Button,
+  Icon,
+} from "../../components/Component";
+import {
+  Modal,
+  ModalBody,
+  Form,
+  Col,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from "reactstrap";
+import { useForm, Controller } from "react-hook-form";
+import {
+  DataTableHead,
+  DataTableRow,
+  DataTableItem,
+} from "../../components/table/DataTable";
+import Content from "../../layout/content/Content";
+import Head from "../../layout/head/Head";
+import TooltipComponent from "../../components/tooltip/Tooltip";
+import { NewsAndEventsContext } from "./NewsAndEventsContext";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { toast } from "react-toastify";
+
+const NewsAndEvents = () => {
+  const { contextData } = useContext(NewsAndEventsContext);
+  const [data, setData] = contextData;
+  const [modal, setModal] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    uploadDate: "",
+    type: "News",
+    image: null,
+    excerpt: "",
+    content: "",
+    metaTitle: "",
+    metaDescription: "",
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    control,
+    setValue,
+    trigger,
+  } = useForm();
+
+  const toggleModal = (editItem = null) => {
+    if (editItem) {
+      setEditId(editItem.id);
+      setFormData(editItem);
+
+      // Set form values for react-hook-form
+      setValue("title", editItem.title);
+      setValue("uploadDate", editItem.uploadDate);
+      setValue("type", editItem.type);
+      setValue("excerpt", editItem.excerpt);
+      setValue("content", editItem.content);
+      setValue("metaTitle", editItem.metaTitle);
+      setValue("metaDescription", editItem.metaDescription);
+      setValue("image", editItem.image);
+    } else {
+      resetForm();
+      setEditId(null);
+    }
+    setModal(!modal);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      uploadDate: "",
+      type: "News",
+      image: null,
+      excerpt: "",
+      content: "",
+      metaTitle: "",
+      metaDescription: "",
+    });
+    reset();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setValue("image", file, { shouldValidate: true });
+      trigger("image"); // Trigger validation after image upload
+    } else {
+      setFormData({ ...formData, image: null });
+      setValue("image", null, { shouldValidate: true });
+      trigger("image"); // Trigger validation after image removal
+    }
+  };
+
+  const handleImageRemove = () => {
+    setFormData({ ...formData, image: null });
+    setValue("image", null, { shouldValidate: true });
+    trigger("image"); // Trigger validation after image removal
+  };
+
+  const onSubmit = () => {
+    // Check if all required fields are filled out
+
+    // if (
+    //   !formData.title.trim() ||
+    //   !formData.uploadDate ||
+    //   !formData.type ||
+    //   !formData.excerpt.trim() ||
+    //   !formData.content.trim() ||
+    //   !formData.metaTitle.trim() ||
+    //   !formData.metaDescription.trim() ||
+    //   !formData.image
+    // ) {
+    //   return;
+    // }
+
+    if (editId !== null) {
+      const updated = data.map((item) =>
+        item.id === editId ? { ...formData, id: editId } : item
+      );
+      setData(updated);
+      toast.success("Content updated successfully!");
+    } else {
+      const newItem = {
+        ...formData,
+        id: data.length ? Math.max(...data.map((d) => d.id)) + 1 : 1,
+      };
+      setData([newItem, ...data]);
+      toast.success("Content added successfully!");
+    }
+    toggleModal();
+  };
+
+  return (
+    <>
+      <Head title='News & Events' />
+      <Content>
+        <BlockHead size='sm'>
+          <BlockBetween>
+            <BlockHeadContent>
+              <BlockTitle tag='h3' page>
+                News & Events
+              </BlockTitle>
+              <BlockDes className='text-soft'>
+                <p>Manage all your news and events from here.</p>
+              </BlockDes>
+            </BlockHeadContent>
+            <BlockHeadContent>
+              <Button
+                color='primary'
+                className='btn-icon'
+                onClick={() => toggleModal()}
+              >
+                <Icon name='plus' />
+              </Button>
+            </BlockHeadContent>
+          </BlockBetween>
+        </BlockHead>
+
+        <Block>
+          <div className='nk-tb-list is-separate is-medium mb-3'>
+            <DataTableHead>
+              <DataTableRow>
+                <span>Title</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Date</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Type</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Excerpt</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Content</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Meta Title</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Meta Desc</span>
+              </DataTableRow>
+              <DataTableRow className='nk-tb-col-tools text-end'>
+                <UncontrolledDropdown>
+                  <DropdownToggle
+                    color='tranparent'
+                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                  >
+                    <Icon name='more-h' />
+                  </DropdownToggle>
+                  <DropdownMenu end>
+                    <ul className='link-list-opt no-bdr'>
+                      <li>
+                        <DropdownItem
+                          tag='a'
+                          href='#'
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // Add delete functionality if needed
+                          }}
+                        >
+                          <Icon name='na' />
+                          <span>Remove Selected</span>
+                        </DropdownItem>
+                      </li>
+                    </ul>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </DataTableRow>
+            </DataTableHead>
+
+            {data.map((item) => (
+              <DataTableItem key={item.id}>
+                <DataTableRow>
+                  <span>{item.title}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.uploadDate}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.type}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.excerpt}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.content}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.metaTitle}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.metaDescription}</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools'>
+                  <ul className='nk-tb-actions gx-1'>
+                    <li
+                      className='nk-tb-action-hidden'
+                      onClick={() => toggleModal(item)}
+                    >
+                      <TooltipComponent
+                        tag='a'
+                        containerClassName='btn btn-trigger btn-icon'
+                        id={"edit" + item.id}
+                        icon='edit-alt-fill'
+                        direction='top'
+                        text='Edit'
+                      />
+                    </li>
+                  </ul>
+                </DataTableRow>
+              </DataTableItem>
+            ))}
+          </div>
+        </Block>
+
+        <Modal
+          isOpen={modal}
+          toggle={() => toggleModal()}
+          className='modal-dialog-centered'
+          size='lg'
+        >
+          <ModalBody>
+            <a
+              href='#cancel'
+              onClick={(e) => {
+                e.preventDefault();
+                toggleModal();
+              }}
+              className='close'
+            >
+              <Icon name='cross-sm' />
+            </a>
+            <div className='p-2'>
+              <h5 className='title'>
+                {editId ? "Edit News/Event" : "Add News/Event"}
+              </h5>
+              <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
+                <Col md='12'>
+                  <label className='form-label'>Title</label>
+                  <input
+                    className='form-control'
+                    {...register("title", { required: "Title is required" })}
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                  />
+                  {errors.title && (
+                    <span className='invalid'>{errors.title.message}</span>
+                  )}
+                </Col>
+
+                <Col md='6'>
+                  <label className='form-label'>Upload Date</label>
+                  <input
+                    type='date'
+                    className='form-control'
+                    {...register("uploadDate", {
+                      required: "Upload date is required",
+                    })}
+                    value={formData.uploadDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, uploadDate: e.target.value })
+                    }
+                  />
+                  {errors.uploadDate && (
+                    <span className='invalid'>{errors.uploadDate.message}</span>
+                  )}
+                </Col>
+
+                <Col md='6'>
+                  <label className='form-label'>Type</label>
+                  <select
+                    className='form-control'
+                    {...register("type", { required: "Type is required" })}
+                    value={formData.type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
+                  >
+                    <option value='News'>News</option>
+                    <option value='Event'>Event</option>
+                  </select>
+                </Col>
+
+                <Col
+                  md='12'
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
+                  <label className='form-label'>Image (Max 500KB)</label>
+
+                  {!formData.image ? (
+                    <input
+                      className='form-control'
+                      type='file'
+                      accept='image/*'
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file && file.size > 512000) {
+                          setFormData({ ...formData, image: file });
+                          setValue("image", null, { shouldValidate: true });
+                        } else {
+                          setFormData({ ...formData, image: file });
+                          setValue("image", file, { shouldValidate: true });
+                        }
+
+                        setValue("image", file, { shouldValidate: true });
+                        setFormData({ ...formData, image: file });
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className='image-preview-wrapper'
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "flex-start",
+                        gap: "12px",
+                        marginTop: "8px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "inline-block",
+                        }}
+                      >
+                        <img
+                          src={
+                            typeof formData.image === "string"
+                              ? formData.image
+                              : URL.createObjectURL(formData.image)
+                          }
+                          alt={formData.altText}
+                          style={{
+                            width: "150px",
+                            height: "auto",
+                            objectFit: "contain",
+                            borderRadius: "4px",
+                            border: "1px solid #ddd",
+                            padding: "4px",
+                            backgroundColor: "#fff",
+                          }}
+                        />
+                        <Button
+                          size='sm'
+                          color='danger'
+                          className='btn-icon'
+                          style={{
+                            position: "absolute",
+                            top: "-8px",
+                            right: "-8px",
+                            borderRadius: "50%",
+                            lineHeight: "1",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            zIndex: 10,
+                            height: "20px",
+                            width: "20px",
+                          }}
+                          onClick={() => {
+                            setFormData({ ...formData, image: null });
+                            setValue("image", null, { shouldValidate: true });
+                          }}
+                        >
+                          <Icon name='cross' />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <input
+                    type='hidden'
+                    {...register("image", {
+                      required: !editId ? "Required" : false,
+                      validate: {
+                        fileSize: (file) => {
+                          if (!file) return !editId ? "Required" : true;
+                          if (typeof file === "string") return true;
+                          return (
+                            file.size <= 512000 ||
+                            "Image must be less than 500KB"
+                          );
+                        },
+                      },
+                    })}
+                  />
+
+                  {errors.image && (
+                    <span className='invalid'>{errors.image.message}</span>
+                  )}
+                </Col>
+
+                <Col md='12'>
+                  <label className='form-label'>Excerpt</label>
+                  <textarea
+                    className='form-control'
+                    {...register("excerpt", {
+                      required: "Excerpt is required",
+                    })}
+                    value={formData.excerpt}
+                    onChange={(e) =>
+                      setFormData({ ...formData, excerpt: e.target.value })
+                    }
+                  />
+                  {errors.excerpt && (
+                    <span className='invalid'>{errors.excerpt.message}</span>
+                  )}
+                </Col>
+
+                <Col md='12'>
+                  <label className='form-label'>Content</label>
+                  <Controller
+                    name='content'
+                    control={control}
+                    rules={{ required: "Content is required" }}
+                    render={({ field }) => (
+                      <ReactQuill
+                        theme='snow'
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  {errors.content && (
+                    <span className='invalid'>{errors.content.message}</span>
+                  )}
+                </Col>
+
+                <Col md='12'>
+                  <label className='form-label'>Meta Title</label>
+                  <input
+                    className='form-control'
+                    {...register("metaTitle", {
+                      required: "Meta Title is required",
+                    })}
+                    value={formData.metaTitle}
+                    onChange={(e) =>
+                      setFormData({ ...formData, metaTitle: e.target.value })
+                    }
+                  />
+                  {errors.metaTitle && (
+                    <span className='invalid'>{errors.metaTitle.message}</span>
+                  )}
+                </Col>
+
+                <Col md='12'>
+                  <label className='form-label'>Meta Description</label>
+                  <Controller
+                    name='metaDescription'
+                    control={control}
+                    rules={{ required: "Meta Description is required" }}
+                    render={({ field }) => (
+                      <ReactQuill
+                        theme='snow'
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  {errors.metaDescription && (
+                    <span className='invalid'>
+                      {errors.metaDescription.message}
+                    </span>
+                  )}
+                </Col>
+
+                <Col size='12'>
+                  <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
+                    <li>
+                      <Button color='primary' size='md' type='submit'>
+                        Submit
+                      </Button>
+                    </li>
+                    <li>
+                      <a
+                        href='#cancel'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleModal();
+                        }}
+                        className='link link-light'
+                      >
+                        Cancel
+                      </a>
+                    </li>
+                  </ul>
+                </Col>
+              </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+      </Content>
+    </>
+  );
+};
+
+export default NewsAndEvents;

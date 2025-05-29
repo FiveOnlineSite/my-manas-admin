@@ -1,0 +1,350 @@
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Block,
+  BlockHead,
+  BlockBetween,
+  BlockHeadContent,
+  BlockTitle,
+  BlockDes,
+  Button,
+  Icon,
+} from "../../components/Component";
+import {
+  Modal,
+  ModalBody,
+  Form,
+  Col,
+  Row,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from "reactstrap";
+import { useForm } from "react-hook-form";
+import {
+  DataTableHead,
+  DataTableRow,
+  DataTableItem,
+} from "../../components/table/DataTable";
+import Content from "../../layout/content/Content";
+import Head from "../../layout/head/Head";
+import { DonateNowContext } from "./DonateNowContext";
+import TooltipComponent from "../../components/tooltip/Tooltip";
+import { toast } from "react-toastify";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "../../api/api";
+
+const DonateNow = () => {
+  const { contextData } = useContext(DonateNowContext);
+  const [data, setData] = contextData;
+  const [modal, setModal] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    buttonText: "",
+    buttonLink: "",
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  useEffect(() => {
+    fetchDonateData();
+  }, []);
+
+  const fetchDonateData = async () => {
+    const res = await getRequest("/masterdonate");
+    if (res.success) {
+      setData(res.data);
+    }
+  };
+
+  const toggleModal = (editItem = null) => {
+    if (editItem) {
+      setEditId(editItem._id);
+      setFormData(editItem);
+    } else {
+      resetForm();
+      setEditId(null);
+    }
+    setModal(!modal);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      buttonText: "",
+      buttonLink: "",
+    });
+    reset();
+  };
+
+  const onSubmit = async () => {
+    try {
+      if (editId !== null) {
+        const res = await putRequest(`/masterdonate/${editId}`, formData);
+        if (res.success) {
+          const updatedData = data.map((item) =>
+            item._id === editId ? res.data : item
+          );
+          setData(updatedData);
+          toast.success("Updated successfully!");
+        } else {
+          toast.error("Update failed.");
+        }
+      } else {
+        const res = await postRequest("/masterdonate", formData);
+        if (res.success) {
+          setData([res.data, ...data]);
+          toast.success("Added successfully!");
+        } else {
+          toast.error("Addition failed.");
+        }
+      }
+      toggleModal();
+    } catch {
+      toast.error("Something went wrong.");
+    }
+  };
+
+  const selectorDeleteUser = () => {
+    const updated = data.filter((item) => !item.checked);
+    setData(updated);
+  };
+
+  const onDeleteClick = async (id) => {
+    const res = await deleteRequest(`/masterdonate/${id}`);
+    if (res.success) {
+      setData(data.filter((item) => item._id !== id));
+      toast.success("Deleted successfully!");
+    } else {
+      toast.error("Failed to delete.");
+    }
+  };
+
+  return (
+    <>
+      <Head title='Donate Now' />
+      <Content>
+        <BlockHead size='sm'>
+          <BlockBetween>
+            <BlockHeadContent>
+              <BlockTitle tag='h3' page>
+                Donate Now Section
+              </BlockTitle>
+              <BlockDes className='text-soft'>
+                <p>Manage your donation section here.</p>
+              </BlockDes>
+            </BlockHeadContent>
+            <BlockHeadContent>
+              <Button
+                color='primary'
+                className='btn-icon'
+                onClick={() => toggleModal()}
+              >
+                <Icon name='plus' />
+              </Button>
+            </BlockHeadContent>
+          </BlockBetween>
+        </BlockHead>
+
+        <Block>
+          <div className='nk-tb-list is-separate is-medium mb-3'>
+            <DataTableHead>
+              <DataTableRow>
+                <span>Title</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Button Text</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>Button Link</span>
+              </DataTableRow>
+              <DataTableRow className='nk-tb-col-tools text-end'>
+                <UncontrolledDropdown>
+                  <DropdownToggle
+                    color='tranparent'
+                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                  >
+                    <Icon name='more-h' />
+                  </DropdownToggle>
+                  <DropdownMenu end>
+                    <ul className='link-list-opt no-bdr'>
+                      <li>
+                        <DropdownItem
+                          tag='a'
+                          href='#'
+                          onClick={(e) => {
+                            e.preventDefault();
+                            selectorDeleteUser();
+                          }}
+                        >
+                          <Icon name='na' />
+                          <span>Remove Selected</span>
+                        </DropdownItem>
+                      </li>
+                    </ul>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </DataTableRow>
+            </DataTableHead>
+
+            {data.map((item) => (
+              <DataTableItem key={item._id}>
+                <DataTableRow>
+                  <span>{item.title}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.buttonText}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <a
+                    href={item.buttonLink}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    {item.buttonLink}
+                  </a>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools'>
+                  <ul className='nk-tb-actions gx-1'>
+                    <li
+                      className='nk-tb-action-hidden'
+                      onClick={() => toggleModal(item)}
+                    >
+                      <TooltipComponent
+                        tag='a'
+                        containerClassName='btn btn-trigger btn-icon'
+                        id={"edit" + item._id}
+                        icon='edit-alt-fill'
+                        direction='top'
+                        text='Edit'
+                      />
+                    </li>
+                    <li onClick={() => onDeleteClick(item._id)}>
+                      <TooltipComponent
+                        tag='a'
+                        containerClassName='btn btn-trigger btn-icon'
+                        id={"delete" + item._id}
+                        icon='trash-fill'
+                        direction='top'
+                        text='Delete'
+                      />
+                    </li>
+                  </ul>
+                </DataTableRow>
+              </DataTableItem>
+            ))}
+          </div>
+        </Block>
+
+        <Modal
+          isOpen={modal}
+          toggle={() => toggleModal()}
+          className='modal-dialog-centered'
+          size='lg'
+        >
+          <ModalBody>
+            <a
+              href='#cancel'
+              onClick={(e) => {
+                e.preventDefault();
+                toggleModal();
+              }}
+              className='close'
+            >
+              <Icon name='cross-sm' />
+            </a>
+            <div className='p-2'>
+              <h5 className='title'>
+                {editId ? "Edit Donate Now" : "Add Donate Now"}
+              </h5>
+              <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
+                <Col md='12'>
+                  <label className='form-label'>Title</label>
+                  <input
+                    className='form-control'
+                    {...register("title", { required: "Title is required" })}
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                  />
+                  {errors.title && (
+                    <span className='invalid'>{errors.title.message}</span>
+                  )}
+                </Col>
+
+                <Col md='12'>
+                  <label className='form-label'>Button Text</label>
+                  <input
+                    className='form-control'
+                    {...register("buttonText", {
+                      required: "Button text is required",
+                    })}
+                    value={formData.buttonText}
+                    onChange={(e) =>
+                      setFormData({ ...formData, buttonText: e.target.value })
+                    }
+                  />
+                  {errors.buttonText && (
+                    <span className='invalid'>{errors.buttonText.message}</span>
+                  )}
+                </Col>
+
+                <Col md='12'>
+                  <label className='form-label'>Button Link</label>
+                  <input
+                    className='form-control'
+                    {...register("buttonLink", {
+                      required: "Button link is required",
+                    })}
+                    value={formData.buttonLink}
+                    onChange={(e) =>
+                      setFormData({ ...formData, buttonLink: e.target.value })
+                    }
+                  />
+                  {errors.buttonLink && (
+                    <span className='invalid'>{errors.buttonLink.message}</span>
+                  )}
+                </Col>
+
+                <Col size='12'>
+                  <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
+                    <li>
+                      <Button color='primary' size='md' type='submit'>
+                        Submit
+                      </Button>
+                    </li>
+                    <li>
+                      <a
+                        href='#cancel'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleModal();
+                        }}
+                        className='link link-light'
+                      >
+                        Cancel
+                      </a>
+                    </li>
+                  </ul>
+                </Col>
+              </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+      </Content>
+    </>
+  );
+};
+
+export default DonateNow;

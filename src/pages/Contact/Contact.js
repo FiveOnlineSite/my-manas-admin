@@ -1,0 +1,426 @@
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Block,
+  BlockHead,
+  BlockBetween,
+  BlockHeadContent,
+  BlockTitle,
+  BlockDes,
+  Button,
+  Icon,
+} from "../../components/Component";
+import {
+  Modal,
+  ModalBody,
+  Form,
+  Col,
+  DropdownMenu,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownItem,
+} from "reactstrap";
+import { useForm } from "react-hook-form";
+import {
+  DataTableHead,
+  DataTableRow,
+  DataTableItem,
+} from "../../components/table/DataTable";
+import Content from "../../layout/content/Content";
+import Head from "../../layout/head/Head";
+import TooltipComponent from "../../components/tooltip/Tooltip";
+import { ContactContext } from "./ContactContext";
+import { toast } from "react-toastify";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "../../api/api";
+
+const Contact = () => {
+  const { contextData } = useContext(ContactContext);
+  const [data, setData] = contextData;
+  const [modal, setModal] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    india: {
+      email: "",
+      address: "",
+    },
+    usa: {
+      email: "",
+      address: "",
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const res = await getRequest("/contact/page");
+    if (res.success) {
+      setData(res.data);
+    } else {
+      // toast.error("Failed to fetch contact data.");
+    }
+  };
+
+  const toggleModal = (editItem = null) => {
+    if (editItem) {
+      setEditId(editItem._id);
+      setFormData({
+        title: editItem.title || "",
+        india: {
+          email: editItem.india?.email || "",
+          address: editItem.india?.address || "",
+        },
+        usa: {
+          email: editItem.usa?.email || "",
+          address: editItem.usa?.address || "",
+        },
+      });
+    } else {
+      resetForm();
+      setEditId(null);
+    }
+    setModal(!modal);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      india: { email: "", address: "" },
+      usa: { email: "", address: "" },
+    });
+    reset();
+  };
+
+  const selectorDeleteUser = () => {
+    const updated = data.filter((item) => !item.checked);
+    setData(updated);
+  };
+
+  const onSubmit = async () => {
+    const payload = { ...formData };
+
+    try {
+      let res;
+      if (editId !== null) {
+        res = await putRequest(`/contact/page/${editId}`, payload);
+        if (res.success) {
+          const updatedData = data.map((item) =>
+            item._id === editId ? res.data : item
+          );
+          setData(updatedData);
+          toast.success("Contact updated successfully!");
+        } else {
+          toast.error("Update failed.");
+        }
+      } else {
+        res = await postRequest("/contact/page", payload);
+        if (res.success) {
+          setData([res.data, ...data]);
+          toast.success("Contact added successfully!");
+        } else {
+          toast.error("Creation failed.");
+        }
+      }
+      toggleModal();
+    } catch (err) {
+      toast.error("An error occurred.");
+    }
+  };
+
+  const onDeleteClick = async (id) => {
+    const res = await deleteRequest(`/contact/page/${id}`);
+    if (res.success) {
+      setData(data.filter((item) => item._id !== id));
+      toast.success("Deleted successfully!");
+    } else {
+      toast.error("Failed to delete.");
+    }
+  };
+
+  return (
+    <>
+      <Head title='Contact Info Section' />
+      <Content>
+        <BlockHead size='sm'>
+          <BlockBetween>
+            <BlockHeadContent>
+              <BlockTitle tag='h3' page>
+                Contact Information Section
+              </BlockTitle>
+              <BlockDes className='text-soft'>
+                <p>Manage your Contact Information content items here.</p>
+              </BlockDes>
+            </BlockHeadContent>
+            <BlockHeadContent>
+              <Button
+                color='primary'
+                className='btn-icon'
+                onClick={() => toggleModal()}
+              >
+                <Icon name='plus' />
+              </Button>
+            </BlockHeadContent>
+          </BlockBetween>
+        </BlockHead>
+
+        <Block>
+          <div className='nk-tb-list is-separate is-medium mb-3'>
+            <DataTableHead>
+              <DataTableRow>
+                <span>Title</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>India Email</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>India Address</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>USA Email</span>
+              </DataTableRow>
+              <DataTableRow>
+                <span>USA Address</span>
+              </DataTableRow>
+              <DataTableRow className='nk-tb-col-tools text-end'>
+                <UncontrolledDropdown>
+                  <DropdownToggle
+                    color='tranparent'
+                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                  >
+                    <Icon name='more-h' />
+                  </DropdownToggle>
+                  <DropdownMenu end>
+                    <ul className='link-list-opt no-bdr'>
+                      <li>
+                        <DropdownItem
+                          tag='a'
+                          href='#'
+                          onClick={(e) => {
+                            e.preventDefault();
+                            selectorDeleteUser();
+                          }}
+                        >
+                          <Icon name='na' />
+                          <span>Remove Selected</span>
+                        </DropdownItem>
+                      </li>
+                    </ul>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </DataTableRow>
+            </DataTableHead>
+
+            {data.map((item) => (
+              <DataTableItem key={item._id}>
+                <DataTableRow>
+                  <span>{item.title}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.india?.email}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.india?.address}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.usa?.email}</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>{item.usa?.address}</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools'>
+                  <ul className='nk-tb-actions gx-1'>
+                    <li
+                      className='nk-tb-action-hidden'
+                      onClick={() => toggleModal(item)}
+                    >
+                      <TooltipComponent
+                        tag='a'
+                        containerClassName='btn btn-trigger btn-icon'
+                        id={"edit" + item._id}
+                        icon='edit-alt-fill'
+                        direction='top'
+                        text='Edit'
+                      />
+                    </li>
+                    <li onClick={() => onDeleteClick(item._id)}>
+                      <TooltipComponent
+                        tag='a'
+                        containerClassName='btn btn-trigger btn-icon'
+                        id={"delete" + item._id}
+                        icon='trash-fill'
+                        direction='top'
+                        text='Delete'
+                      />
+                    </li>
+                  </ul>
+                </DataTableRow>
+              </DataTableItem>
+            ))}
+          </div>
+        </Block>
+
+        <Modal
+          isOpen={modal}
+          toggle={() => toggleModal()}
+          className='modal-dialog-centered'
+          size='lg'
+        >
+          <ModalBody>
+            <a
+              href='#cancel'
+              onClick={(e) => {
+                e.preventDefault();
+                toggleModal();
+              }}
+              className='close'
+            >
+              <Icon name='cross-sm' />
+            </a>
+            <div className='p-2'>
+              <h5 className='title'>
+                {editId ? "Edit Contact Info" : "Add Contact Info"}
+              </h5>
+              <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
+                <Col md='12'>
+                  <label className='form-label'>Give Title</label>
+                  <input
+                    className='form-control'
+                    {...register("title", { required: "Title is required" })}
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                  />
+                  {errors.title && (
+                    <span className='invalid'>{errors.title.message}</span>
+                  )}
+                </Col>
+
+                <Col md='6'>
+                  <label className='form-label'>India Email</label>
+                  <input
+                    type='email'
+                    className='form-control'
+                    {...register("indiaEmail", {
+                      required: "India Email is required",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Invalid email format",
+                      },
+                    })}
+                    value={formData.india.email}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        india: { ...formData.india, email: e.target.value },
+                      })
+                    }
+                  />
+                </Col>
+
+                <Col md='6'>
+                  <label className='form-label'>India Address</label>
+                  <textarea
+                    className='form-control'
+                    {...register("indiaAddress", {
+                      required: "India Address is required",
+                    })}
+                    value={formData.india.address}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        india: { ...formData.india, address: e.target.value },
+                      })
+                    }
+                  />
+                </Col>
+
+                <Col md='6'>
+                  <label className='form-label'>USA Email</label>
+                  <input
+                    type='email'
+                    className='form-control'
+                    {...register("usaEmail", {
+                      required: "USA Email is required",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Invalid email format",
+                      },
+                    })}
+                    value={formData.usa.email}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        usa: { ...formData.usa, email: e.target.value },
+                      })
+                    }
+                  />
+                  {errors.usaEmail && (
+                    <span className='invalid'>{errors.usaEmail.message}</span>
+                  )}
+                </Col>
+
+                <Col md='6'>
+                  <label className='form-label'>USA Address</label>
+                  <textarea
+                    className='form-control'
+                    {...register("usaAddress", {
+                      required: "USA Address is required",
+                    })}
+                    value={formData.usa.address}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        usa: { ...formData.usa, address: e.target.value },
+                      })
+                    }
+                  />
+                  {errors.usaAddress && (
+                    <span className='invalid'>{errors.usaAddress.message}</span>
+                  )}
+                </Col>
+
+                <Col size='12'>
+                  <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
+                    <li>
+                      <Button color='primary' size='md' type='submit'>
+                        Submit
+                      </Button>
+                    </li>
+                    <li>
+                      <a
+                        href='#cancel'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleModal();
+                        }}
+                        className='link link-light'
+                      >
+                        Cancel
+                      </a>
+                    </li>
+                  </ul>
+                </Col>
+              </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+      </Content>
+    </>
+  );
+};
+
+export default Contact;
