@@ -37,10 +37,13 @@ import {
   postFormData,
   putRequest,
 } from "../../api/api";
+import { Spinner } from "reactstrap";
 
 const Testimonials = () => {
   const { contextData } = useContext(TestimonialsContext);
   const [data, setData] = contextData;
+  const [submitting, setSubmitting] = useState(false);
+
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -106,6 +109,8 @@ const Testimonials = () => {
   };
 
   const onSubmit = async () => {
+    setSubmitting(true);
+
     const formPayload = new FormData();
     formPayload.append("name", formData.name);
     formPayload.append("designation", formData.designation);
@@ -135,6 +140,7 @@ const Testimonials = () => {
         }
       }
       toggleModal();
+      setSubmitting(false);
     } catch (err) {
       toast.error("Something went wrong.");
     }
@@ -367,6 +373,8 @@ const Testimonials = () => {
                           src={
                             typeof formData.image === "string"
                               ? formData.image
+                              : formData.image.url
+                              ? formData.image.url
                               : URL.createObjectURL(formData.image)
                           }
                           alt={formData.altText}
@@ -427,8 +435,14 @@ const Testimonials = () => {
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
-                      <Button color='primary' size='md' type='submit'>
-                        Submit
+                      <Button
+                        color='primary'
+                        size='md'
+                        type='submit'
+                        disabled={submitting}
+                      >
+                        {editId ? "Update" : "Add"}
+                        {submitting && <Spinner className='spinner-xs' />}
                       </Button>
                     </li>
                     <li>

@@ -94,6 +94,13 @@ const AppProcess = () => {
     if (editItem) {
       setEditId(editItem._id);
       setFormData(editItem);
+      reset({
+        title: editItem.title || "",
+        description: editItem.description || "",
+        buttonText: editItem.buttonText || "",
+        buttonLink: editItem.buttonLink || "",
+        image: editItem.image || null,
+      });
     } else {
       resetForm();
       setEditId(null);
@@ -102,16 +109,17 @@ const AppProcess = () => {
   };
 
   const resetForm = () => {
-    setFormData({
+    const empty = {
       title: "",
       description: "",
       image: null,
       buttonText: "",
       buttonLink: "",
-    });
-    reset();
+    };
+    setFormData(empty);
+    reset(empty);
   };
-
+  
   const selectorDeleteUser = () => {
     const updated = data.filter((item) => !item.checked);
     setData(updated);

@@ -81,9 +81,23 @@ const Scholarship = () => {
   const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
-      setFormData(editItem);
-      setValue("image1", editItem.image1);
-      setValue("image2", editItem.image2);
+      setFormData({
+        subtitle: editItem.subtitle,
+        title: editItem.title,
+        description: editItem.description,
+        image1: editItem.image1,
+        image2: editItem.image2,
+        buttonText: editItem.buttonText,
+        buttonLink: editItem.buttonLink,
+      });
+      setValue("subtitle", editItem.subtitle || "");
+      setValue("title", editItem.title || "");
+      setValue("description", editItem.description || ""); // <- IMPORTANT
+      setValue("buttonText", editItem.buttonText || "");
+      setValue("buttonLink", editItem.buttonLink || "");
+      setValue("image1", editItem.image1 || null);
+      setValue("image2", editItem.image2 || null);
+      
     } else {
       resetForm();
       setEditId(null);

@@ -106,6 +106,7 @@ const DonateAchievements = () => {
     updatedItems[index][field] = value;
     setFormData({ ...formData, items: updatedItems });
   };
+  
 
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
@@ -364,7 +365,61 @@ const DonateAchievements = () => {
                         accept='image/*'
                         onChange={(e) => handleImageChange(e, index)}
                       />
+                      {item.image && (
+                        <div
+                          style={{
+                            position: "relative",
+                            display: "inline-block",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <img
+                            src={
+                              typeof item.image === "string"
+                                ? item.image
+                                : item.image?.url
+                                ? item.image.url
+                                : URL.createObjectURL(item.image)
+                            }
+                            alt={item.altText || "Preview"}
+                            style={{
+                              width: "150px",
+                              height: "auto",
+                              objectFit: "contain",
+                              borderRadius: "4px",
+                              border: "1px solid #ddd",
+                              padding: "4px",
+                              backgroundColor: "#fff",
+                            }}
+                          />
+                          <Button
+                            size='sm'
+                            color='danger'
+                            className='btn-icon'
+                            style={{
+                              position: "absolute",
+                              top: "-8px",
+                              right: "-8px",
+                              borderRadius: "50%",
+                              lineHeight: "1",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                              zIndex: 10,
+                              height: "20px",
+                              width: "20px",
+                            }}
+                            onClick={() =>
+                              handleItemChange(index, "image", null)
+                            }
+                          >
+                            <Icon name='cross' />
+                          </Button>
+                        </div>
+                      )}
                     </Col>
+
                     <Col md='12'>
                       <label className='form-label'>Alt Text</label>
                       <input
@@ -385,15 +440,18 @@ const DonateAchievements = () => {
                   </div>
                 ))}
 
-                <Button
-                  color='primary'
-                  size='sm'
-                  onClick={(e) => {
-                    addItem(e);
-                  }}
-                >
-                  Add More Item
-                </Button>
+                <div>
+                  <Button
+                    style={{ width: "auto" }}
+                    color='primary'
+                    size='sm'
+                    onClick={(e) => {
+                      addItem(e);
+                    }}
+                  >
+                    Add More Item
+                  </Button>
+                </div>
 
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>

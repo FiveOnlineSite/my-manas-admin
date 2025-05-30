@@ -38,8 +38,7 @@ import {
 } from "../../api/api";
 
 const ContactForm = () => {
-  const { contextData } = useContext(ContactFormContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -182,13 +181,13 @@ const ContactForm = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>

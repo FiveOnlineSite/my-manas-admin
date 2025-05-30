@@ -22,7 +22,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "reactstrap";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   DataTableHead,
   DataTableRow,
@@ -60,6 +60,7 @@ const OurGoal = () => {
     setValue,
     trigger,
     reset,
+    control,
   } = useForm();
 
   const fetchData = async () => {
@@ -84,11 +85,15 @@ const OurGoal = () => {
         images: goal.images || [], // Ensure array exists
       }));
 
-      setFormData({
+      const editData = {
         title: editItem.title,
         description: editItem.description,
         additionalItems: normalizedItems,
-      });
+      };
+  
+
+      setFormData(editData);
+      reset(editData);
     } else {
       resetForm();
       setEditId(null);
@@ -97,13 +102,15 @@ const OurGoal = () => {
   };
 
   const resetForm = () => {
-    setFormData({
+    const empty = {
       title: "",
       description: "",
-      additionalItems: [{ image: null, title: "", description: "" }],
-    });
-    reset();
+      additionalItems: [{ title: "", description: "", images: [] }],
+    };
+    setFormData(empty);
+    reset(empty); // ✅ sync with form
   };
+  
 
   const selectorDeleteUser = () => {
     const updated = data.filter((item) => !item.checked);
@@ -393,18 +400,25 @@ const OurGoal = () => {
                 </Col>
                 <Col md='12'>
                   <label className='form-label'>Main Description</label>
-                  <ReactQuill
-                    theme='snow'
-                    value={formData.description}
-                    onChange={(value) => {
-                      handleInputChange(value, undefined, "description");
-                      setValue("description", value); // Set manually
-                      trigger("description"); // Trigger validation
-                    }}
+                  <Controller
+                    name='description'
+                    control={control}
+                    defaultValue={formData.description || ""}
+                    rules={{ required: "Main Description is required" }}
+                    render={({ field }) => (
+                      <ReactQuill
+                        theme='snow'
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value); // this updates the form state
+                          handleInputChange(value, undefined, "description"); // optional: keep your local state updated
+                        }}
+                      />
+                    )}
                   />
                   {errors.description && (
                     <span className='invalid'>
-                      Main Description is required
+                      {errors.description.message}
                     </span>
                   )}
                 </Col>
@@ -435,17 +449,23 @@ const OurGoal = () => {
                         <label className='form-label'>
                           Additional Description
                         </label>
-                        <ReactQuill
-                          theme='snow'
-                          value={additional.description}
-                          onChange={(value) => {
-                            handleInputChange(value, index, "description");
-                            setValue(
-                              `additionalItems.${index}.description`,
-                              value
-                            );
-                            trigger(`additionalItems.${index}.description`);
+                        <Controller
+                          name={`additionalItems.${index}.description`}
+                          control={control}
+                          defaultValue={additional.description || ""}
+                          rules={{
+                            required: "Additional Description is required",
                           }}
+                          render={({ field }) => (
+                            <ReactQuill
+                              theme='snow'
+                              value={field.value}
+                              onChange={(value) => {
+                                field.onChange(value);
+                                handleInputChange(value, index, "description");
+                              }}
+                            />
+                          )}
                         />
                         {errors?.additionalItems?.[index]?.description && (
                           <span className='invalid'>

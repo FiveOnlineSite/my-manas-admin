@@ -187,9 +187,10 @@ const OurMission = () => {
         }
       }
       toggleModal();
-      setSubmitting(false);
     } catch {
       toast.error("An error occurred.");
+    } finally {
+      setSubmitting(false);
     }
   };
 

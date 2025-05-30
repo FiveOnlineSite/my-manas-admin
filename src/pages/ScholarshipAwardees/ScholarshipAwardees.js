@@ -47,6 +47,8 @@ const ScholarshipAwardees = () => {
 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
+
   const [formData, setFormData] = useState({
     title: "",
     awardees: [
@@ -119,10 +121,10 @@ const ScholarshipAwardees = () => {
 
   const handleFileChange = (e, index) => {
     const file = e.target.files[0];
-    if (file && file.size > 512000) {
-      alert("Image must be less than 500KB");
-      return;
-    }
+    // if (file && file.size > 512000) {
+    //   alert("Image must be less than 500KB");
+    //   return;
+    // }
     handleAwardeeChange(index, "image", file);
   };
 
@@ -451,17 +453,84 @@ const ScholarshipAwardees = () => {
                         }
                       />
                     </Col>
-                    <Col md='12'>
+                    <Col
+                      md='12'
+                      style={{ display: "flex", flexDirection: "column" }}
+                    >
                       <label className='form-label'>
                         Image Upload (Max 500KB)
                       </label>
-                      <input
-                        className='form-control'
-                        type='file'
-                        accept='image/*'
-                        onChange={(e) => handleFileChange(e, index)}
-                      />
+                      {!awardee.image ? (
+                        <input
+                          className='form-control'
+                          type='file'
+                          accept='image/*'
+                          onChange={(e) => handleFileChange(e, index)}
+                        />
+                      ) : (
+                        <div
+                          className='image-preview-wrapper'
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "flex-start",
+                            gap: "12px",
+                            marginTop: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: "relative",
+                              display: "inline-block",
+                            }}
+                          >
+                            <img
+                              src={
+                                typeof awardee.image === "string"
+                                  ? awardee.image
+                                  : awardee.image.url
+                                  ? awardee.image.url
+                                  : URL.createObjectURL(awardee.image)
+                              }
+                              alt={awardee.name}
+                              style={{
+                                width: "150px",
+                                height: "auto",
+                                objectFit: "contain",
+                                borderRadius: "4px",
+                                border: "1px solid #ddd",
+                                padding: "4px",
+                                backgroundColor: "#fff",
+                              }}
+                            />
+                            <Button
+                              size='sm'
+                              color='danger'
+                              className='btn-icon'
+                              style={{
+                                position: "absolute",
+                                top: "-8px",
+                                right: "-8px",
+                                borderRadius: "50%",
+                                lineHeight: "1",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                zIndex: 10,
+                                height: "20px",
+                                width: "20px",
+                              }}
+                              onClick={() =>
+                                handleAwardeeChange(index, "image", null)
+                              }
+                            >
+                              <Icon name='cross' />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </Col>
+
                     <Button
                       color='danger'
                       size='sm'

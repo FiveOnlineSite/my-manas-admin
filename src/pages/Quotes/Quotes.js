@@ -36,10 +36,12 @@ import {
   postRequest,
   putRequest,
 } from "../../api/api";
+import { Spinner } from "reactstrap";
 
 const Quotes = () => {
   const { contextData } = useContext(QuotesContext);
   const [data, setData] = contextData;
+  const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -95,6 +97,8 @@ const Quotes = () => {
   };
 
   const onSubmit = async () => {
+    setSubmitting(true);
+
     try {
       let res;
       if (editId !== null) {
@@ -112,6 +116,7 @@ const Quotes = () => {
         }
       }
       toggleModal();
+      setSubmitting(false);
     } catch {
       toast.error("Something went wrong.");
     }
@@ -280,12 +285,12 @@ const Quotes = () => {
                     <option value=''>Select Page</option>
                     <option value='home'>home</option>
                     <option value='about'>about</option>
-                    <option value='services'>donate</option>
-                    <option value='contact'>scholarship</option>
-                    <option value='contact'>academy</option>
+                    <option value='donate'>donate</option>
+                    <option value='scholarship'>scholarship</option>
+                    <option value='academy'>academy</option>
                     <option value='contact'>contact</option>
-                    <option value='contact'>vidhyavanam</option>
-                    <option value='contact'>news</option>
+                    <option value='vidhyavanam'>vidhyavanam</option>
+                    <option value='news'>news</option>
                   </select>
                   {errors.page && (
                     <span className='invalid'>{errors.page.message}</span>
@@ -333,8 +338,14 @@ const Quotes = () => {
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
-                      <Button color='primary' size='md' type='submit'>
-                        Submit
+                      <Button
+                        color='primary'
+                        size='md'
+                        type='submit'
+                        disabled={submitting}
+                      >
+                        {editId ? "Update" : "Add"}
+                        {submitting && <Spinner className='spinner-xs' />}
                       </Button>
                     </li>
                     <li>

@@ -474,6 +474,8 @@ const OurModel = () => {
                             src={
                               typeof iconItem.icon === "string"
                                 ? iconItem.icon
+                                : iconItem.icon.url
+                                ? iconItem.icon.url
                                 : URL.createObjectURL(iconItem.icon)
                             }
                             alt='icon preview'

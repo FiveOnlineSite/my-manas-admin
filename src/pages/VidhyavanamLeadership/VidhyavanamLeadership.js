@@ -192,6 +192,8 @@ const VidhyavanamLeadership = () => {
         }
       } catch (err) {
         toast.error("An error occurred during submission");
+      } finally {
+        setSubmitting(false);
       }
     };
   
@@ -444,14 +446,17 @@ const VidhyavanamLeadership = () => {
                   </div>
                 ))}
 
-                <Button
-                  color='primary'
-                  size='sm'
-                  type='button'
-                  onClick={addMember}
-                >
-                  Add More Member
-                </Button>
+                <div>
+                  <Button
+                  style={{width:"auto"}}
+                    color='primary'
+                    size='sm'
+                    type='button'
+                    onClick={addMember}
+                  >
+                    Add More Member
+                  </Button>
+                </div>
 
                 <Col size='12' className='mt-3'>
                   <Button

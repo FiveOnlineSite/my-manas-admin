@@ -38,12 +38,11 @@ import {
 } from "../../api/api";
 import { Spinner } from "reactstrap";
 
-
 const ScopeBanner = () => {
   const { contextData } = useContext(ScopeBannerContext);
   const [data, setData] = contextData;
-    const [submitting, setSubmitting] = useState(false);
-  
+  const [submitting, setSubmitting] = useState(false);
+
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -85,6 +84,8 @@ const ScopeBanner = () => {
     if (editItem) {
       setEditId(editItem._id);
       setFormData(editItem);
+      setValue("image", editItem.image?.url || "existing");
+      setValue("altText", editItem.image?.altText || "");
     } else {
       resetForm();
       setEditId(null);
@@ -164,7 +165,6 @@ const ScopeBanner = () => {
 
     toggleModal();
     setSubmitting(false);
-
   };
 
   const onDeleteClick = async (id) => {

@@ -84,7 +84,7 @@ const Achievements = () => {
           ? editItem.items.map((item) => ({
               title: item.title || "",
               description: item.description || "",
-              image: item.image?.url || "",
+              image: item.image?.url ? { url: item.image.url } : null,
               altText: item.image?.altText || "",
             }))
           : [],
@@ -359,15 +359,82 @@ const Achievements = () => {
                         }
                       />
                     </Col>
-                    <Col md='12'>
-                      <label className='form-label'>Image</label>
-                      <input
-                        className='form-control'
-                        type='file'
-                        accept='image/*'
-                        onChange={(e) => handleImageChange(e, index)}
-                      />
+                    <Col
+                      md='12'
+                      style={{ display: "flex", flexDirection: "column" }}
+                    >
+                      <label className='form-label'>Image Upload</label>
+                      {!item.image ? (
+                        <input
+                          className='form-control'
+                          type='file'
+                          accept='image/*'
+                          onChange={(e) => handleImageChange(e, index)}
+                        />
+                      ) : (
+                        <div
+                          className='image-preview-wrapper'
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "flex-start",
+                            gap: "12px",
+                            marginTop: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: "relative",
+                              display: "inline-block",
+                            }}
+                          >
+                            <img
+                              src={
+                                item.image instanceof File
+                                  ? URL.createObjectURL(item.image)
+                                  : typeof item.image === "string"
+                                  ? item.image
+                                  : item.image?.url || ""
+                              }
+                              alt={item.altText || "Image"}
+                              style={{
+                                width: "150px",
+                                height: "auto",
+                                objectFit: "contain",
+                                borderRadius: "4px",
+                                border: "1px solid #ddd",
+                                padding: "4px",
+                                backgroundColor: "#fff",
+                              }}
+                            />
+                            <Button
+                              size='sm'
+                              color='danger'
+                              className='btn-icon'
+                              style={{
+                                position: "absolute",
+                                top: "-8px",
+                                right: "-8px",
+                                borderRadius: "50%",
+                                lineHeight: "1",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                zIndex: 10,
+                                height: "20px",
+                                width: "20px",
+                              }}
+                              onClick={() =>
+                                handleItemChange(index, "image", null)
+                              }
+                            >
+                              <Icon name='cross' />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </Col>
+
                     <Col md='12'>
                       <label className='form-label'>Alt Text</label>
                       <input

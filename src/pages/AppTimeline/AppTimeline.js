@@ -41,8 +41,8 @@ import { Spinner } from "reactstrap";
 const AppTimeline = () => {
   const { contextData } = useContext(AppTimelineContext);
   const [data, setData] = contextData;
-    const [submitting, setSubmitting] = useState(false);
-  
+  const [submitting, setSubmitting] = useState(false);
+
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -117,39 +117,47 @@ const AppTimeline = () => {
   const onSubmit = async () => {
     setSubmitting(true);
 
-    if (!(await trigger())) return;
+    const isValid = await trigger();
+    if (!isValid) {
+      setSubmitting(false);
+      return;
+    }
 
     const payload = {
       title: formData.title,
       items: formData.items.map((e) => ({ title: e.title, date: e.date })),
     };
 
-    if (editId) {
-      const res = await putRequest(
-        `/scholarships/application-timeline/${editId}`,
-        payload
-      );
-      if (res.success) {
-        toast.success("Timeline updated!");
-        fetchTimelineData();
-        toggleModal();
-      } else {
-        toast.error(res.message);
-      }
-    } else {
-      const res = await postRequest(
-        "/scholarships/application-timeline",
-        payload
-      );
-      if (res.success) {
-        toast.success("Timeline created!");
-        fetchTimelineData();
-        toggleModal();
-        setSubmitting(false);
+    try {
+      let res;
 
+      if (editId) {
+        res = await putRequest(
+          `/scholarships/application-timeline/${editId}`,
+          payload
+        );
+        if (res.success) {
+          toast.success("Timeline updated!");
+        } else {
+          toast.error(res.message);
+          return;
+        }
       } else {
-        toast.error(res.message);
+        res = await postRequest("/scholarships/application-timeline", payload);
+        if (res.success) {
+          toast.success("Timeline created!");
+        } else {
+          toast.error(res.message);
+          return;
+        }
       }
+
+      fetchTimelineData();
+      toggleModal();
+    } catch (err) {
+      toast.error("Something went wrong!");
+    } finally {
+      setSubmitting(false);
     }
   };
 

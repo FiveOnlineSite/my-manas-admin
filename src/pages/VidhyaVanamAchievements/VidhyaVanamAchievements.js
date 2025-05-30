@@ -389,15 +389,18 @@ const VidhyaVanamAchievements = () => {
                   </div>
                 ))}
 
-                <Button
-                  color='primary'
-                  size='sm'
-                  onClick={(e) => {
-                    addItem(e);
-                  }}
-                >
-                  Add More Item
-                </Button>
+                <div>
+                  <Button
+                  style={{width:"auto"}}
+                    color='primary'
+                    size='sm'
+                    onClick={(e) => {
+                      addItem(e);
+                    }}
+                  >
+                    Add More Item
+                  </Button>
+                </div>
 
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>

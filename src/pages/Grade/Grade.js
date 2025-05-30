@@ -79,10 +79,18 @@ const Grade = () => {
 
   const toggleModal = (editItem = null) => {
     if (editItem) {
-      setEditId(editItem.id);
-      setFormData(editItem);
-      setValue("description", editItem.description);
-      setValue("icon", editItem.icon);
+      setEditId(editItem._id);
+      // setFormData(editItem);
+      setFormData({
+        title: editItem.title || "",
+        description: editItem.description || "",
+        icon: editItem.icon || null,
+        altText: editItem.icon?.altText || "",
+      });
+      setValue("title", editItem.title || "");
+      setValue("description", editItem.description || "");
+      setValue("icon", editItem.icon || null);
+      setValue("altText", editItem.icon?.altText || "");
     } else {
       resetForm();
       setEditId(null);
@@ -157,7 +165,6 @@ const Grade = () => {
       }
       toggleModal();
       setSubmitting(false);
-
     } catch (error) {
       toast.error("An error occurred while submitting.");
     }
@@ -275,7 +282,7 @@ const Grade = () => {
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
-                          id={"edit" + item.id}
+                          id={"edit" + item._id}
                           icon='edit-alt-fill'
                           direction='top'
                           text='Edit'
@@ -441,11 +448,19 @@ const Grade = () => {
                     {...register("icon", {
                       required: "Icon is required",
                       validate: {
-                        fileSize: (file) =>
-                          file instanceof File
-                            ? file.size <= 102400 ||
+                        fileSize: (file) => {
+                          if (!file) return "Icon is required";
+                          if (file instanceof File) {
+                            return (
+                              file.size <= 102400 ||
                               "Icon must be less than 100KB"
-                            : typeof file === "string" || "Icon is required",
+                            );
+                          }
+                          if (typeof file === "string" || file?.url) {
+                            return true;
+                          }
+                          return "Invalid icon format";
+                        },
                       },
                     })}
                   />

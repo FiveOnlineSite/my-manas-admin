@@ -30,6 +30,8 @@ import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { ContactContext } from "./ContactContext";
 import { toast } from "react-toastify";
+import { Spinner } from "reactstrap";
+
 import {
   deleteRequest,
   getRequest,
@@ -40,6 +42,7 @@ import {
 const Contact = () => {
   const { contextData } = useContext(ContactContext);
   const [data, setData] = contextData;
+  const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -110,6 +113,8 @@ const Contact = () => {
   };
 
   const onSubmit = async () => {
+    setSubmitting(true);
+
     const payload = { ...formData };
 
     try {
@@ -135,6 +140,7 @@ const Contact = () => {
         }
       }
       toggleModal();
+      setSubmitting(false);
     } catch (err) {
       toast.error("An error occurred.");
     }
@@ -396,8 +402,14 @@ const Contact = () => {
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
-                      <Button color='primary' size='md' type='submit'>
-                        Submit
+                      <Button
+                        color='primary'
+                        size='md'
+                        type='submit'
+                        disabled={submitting}
+                      >
+                        {editId ? "Update" : "Add"}
+                        {submitting && <Spinner className='spinner-xs' />}
                       </Button>
                     </li>
                     <li>

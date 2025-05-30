@@ -33,7 +33,6 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Spinner } from "reactstrap";
 
-
 import { toast } from "react-toastify";
 import {
   deleteRequest,
@@ -45,7 +44,7 @@ import {
 const AboutUs = () => {
   const { contextData } = useContext(AboutContext);
   const [data, setData] = contextData;
-    const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -72,7 +71,7 @@ const AboutUs = () => {
   // toggleModal function
   const toggleModal = (editItem = null) => {
     if (editItem) {
-      setEditId(editItem._id); 
+      setEditId(editItem._id);
       setFormData(editItem);
       setValue("description", editItem.description);
     } else {
@@ -525,6 +524,7 @@ const AboutUs = () => {
                         href='#cancel'
                         onClick={(e) => {
                           e.preventDefault();
+                          setSubmitting(false);
                           toggleModal();
                         }}
                         className='link link-light'

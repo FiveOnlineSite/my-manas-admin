@@ -97,11 +97,11 @@ const VidhyaVanamHistory = () => {
   
     const handleFileChange = (e) => {
       const file = e.target.files[0];
-      if (file && file.size > 512000) {
-        // alert("Image must be less than 500KB");
+      // if (file && file.size > 512000) {
+      //   // alert("Image must be less than 500KB");
   
-        return;
-      }
+      //   return;
+      // }
       setFormData({ ...formData, logo: file });
     };
   
@@ -333,10 +333,10 @@ const VidhyaVanamHistory = () => {
                     control={control}
                     rules={{
                       required: !editId && "Logo is required",
-                      validate: (file) =>
-                        !file ||
-                        file.size <= 512000 ||
-                        "Image must be less than 500KB",
+                      // validate: (file) =>
+                      //   !file ||
+                      //   file.size <= 512000 ||
+                      //   "Image must be less than 500KB",
                     }}
                     defaultValue={formData.logo}
                     render={({ field: { onChange } }) => (

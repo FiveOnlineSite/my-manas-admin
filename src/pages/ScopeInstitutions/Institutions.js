@@ -21,7 +21,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "reactstrap";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   DataTableHead,
   DataTableRow,
@@ -64,6 +64,7 @@ const Institutions = () => {
     setError,
     clearErrors,
     trigger,
+    control,
   } = useForm();
 
   useEffect(() => {
@@ -85,6 +86,8 @@ const Institutions = () => {
     if (editItem) {
       setEditId(editItem._id);
       setFormData(editItem);
+      setValue("description", editItem.description || "");
+      setValue("image", editItem.image || null);
     } else {
       resetForm();
       setEditId(null);
@@ -373,9 +376,21 @@ const Institutions = () => {
                 </Col>
                 <Col md='12'>
                   <label className='form-label'>Description</label>
-                  <ReactQuill
-                    value={formData.description}
-                    onChange={handleDescriptionChange}
+                  <Controller
+                    name='description'
+                    control={control}
+                    rules={{ required: "Description is required" }}
+                    defaultValue={formData.description}
+                    render={({ field }) => (
+                      <ReactQuill
+                        theme='snow'
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value); // update form value
+                          setFormData({ ...formData, description: value }); // sync with local state if needed
+                        }}
+                      />
+                    )}
                   />
                   {errors.description && (
                     <span className='invalid'>

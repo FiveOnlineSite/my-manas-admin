@@ -37,6 +37,7 @@ import {
   postFormData,
   putRequest,
 } from "../../api/api";
+import { Spinner } from "reactstrap";
 
 const MasterBanner = () => {
   const { contextData } = useContext(MasterBannerContext);
@@ -66,12 +67,12 @@ const MasterBanner = () => {
     }
   };
 
-  React.useEffect(() => {
-    register("description", { required: "Required" });
-    register("image", { required: "Image is required" }); // Add image required validation
-    register("buttonText", { required: "buttonText is required" }); // Add image required validation
-    register("buttonLink", { required: "buttonLink is required" }); // Add image required validation
-  }, [register]);
+  // React.useEffect(() => {
+  //   register("description", { required: "Required" });
+  //   register("image", { required: "Image is required" }); // Add image required validation
+  //   register("buttonText", { required: "buttonText is required" }); // Add image required validation
+  //   register("buttonLink", { required: "buttonLink is required" }); // Add image required validation
+  // }, [register]);
 
   const [formData, setFormData] = useState({
     page: "",
@@ -112,11 +113,11 @@ const MasterBanner = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size > 512000) {
-      alert("Image must be less than 500KB");
-      setValue("image", null, { shouldValidate: true });
-      return;
-    }
+    // if (file && file.size > 512000) {
+    //   alert("Image must be less than 500KB");
+    //   setValue("image", null, { shouldValidate: true });
+    //   return;
+    // }
     setFormData({ ...formData, image: file });
     // Reset the image error message if the file is valid
     setValue("image", file, { shouldValidate: true });
@@ -377,7 +378,7 @@ const MasterBanner = () => {
                   <label className='form-label'>Page</label>
                   <select
                     className='form-control'
-                    {...register("page", { required: "Required" })}
+                    // {...register("page", { required: "Required" })}
                     name='page'
                     value={formData.page}
                     onChange={handleInputChange}
@@ -385,12 +386,13 @@ const MasterBanner = () => {
                     <option value=''>Select Page</option>
                     <option value='home'>home</option>
                     <option value='about'>about</option>
-                    <option value='services'>donate</option>
-                    <option value='contact'>scholarship</option>
-                    <option value='contact'>academy</option>
+                    <option value='donate'>donate</option>
+                    <option value='instituions'>instituions</option>
+                    <option value='scholarship'>scholarship</option>
+                    <option value='academy'>academy</option>
                     <option value='contact'>contact</option>
-                    <option value='contact'>vidhyavanam</option>
-                    <option value='contact'>news</option>
+                    <option value='vidhyavanam'>vidhyavanam</option>
+                    <option value='news'>news</option>
                   </select>
                   {errors.page && (
                     <span className='invalid'>{errors.page.message}</span>
@@ -400,7 +402,7 @@ const MasterBanner = () => {
                   <label className='form-label'>Subtitle</label>
                   <input
                     className='form-control'
-                    {...register("subtitle", { required: "Required" })}
+                    // {...register("subtitle", { required: "Required" })}
                     name='subtitle'
                     value={formData.subtitle}
                     onChange={handleInputChange}
@@ -413,7 +415,7 @@ const MasterBanner = () => {
                   <label className='form-label'>Title</label>
                   <input
                     className='form-control'
-                    {...register("title", { required: "Required" })}
+                    // {...register("title", { required: "Required" })}
                     name='title'
                     value={formData.title}
                     onChange={handleInputChange}
@@ -513,7 +515,7 @@ const MasterBanner = () => {
                   <label className='form-label'>Alt Text</label>
                   <input
                     className='form-control'
-                    {...register("altText", { required: "Required" })}
+                    // {...register("altText", { required: "Required" })}
                     name='altText'
                     value={formData.altText}
                     onChange={handleInputChange}
@@ -527,7 +529,7 @@ const MasterBanner = () => {
                   <label className='form-label'>Button Text</label>
                   <input
                     className='form-control'
-                    {...register("buttonText", { required: "Required" })}
+                    // {...register("buttonText", { required: "Required" })}
                     name='buttonText'
                     value={formData.buttonText}
                     onChange={handleInputChange}
@@ -541,7 +543,7 @@ const MasterBanner = () => {
                   <label className='form-label'>Button Link</label>
                   <input
                     className='form-control'
-                    {...register("buttonLink", { required: "Required" })}
+                    // {...register("buttonLink", { required: "Required" })}
                     name='buttonLink'
                     value={formData.buttonLink}
                     onChange={handleInputChange}
@@ -554,8 +556,14 @@ const MasterBanner = () => {
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
-                      <Button color='primary' size='md' type='submit'>
-                        Submit
+                      <Button
+                        color='primary'
+                        size='md'
+                        type='submit'
+                        disabled={submitting}
+                      >
+                        {editId ? "Update" : "Add"}
+                        {submitting && <Spinner className='spinner-xs' />}
                       </Button>
                     </li>
                     <li>

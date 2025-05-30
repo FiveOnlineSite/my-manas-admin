@@ -39,10 +39,12 @@ import {
   postRequest,
   putRequest,
 } from "../../api/api";
+import { Spinner } from "reactstrap";
 
 const Contribution = () => {
   const { contextData } = useContext(ContributionContext);
   const [data, setData] = contextData;
+  const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -104,6 +106,8 @@ const Contribution = () => {
   };
 
   const onSubmit = async () => {
+    setSubmitting(true);
+
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = "Main title is required";
 
@@ -134,6 +138,7 @@ const Contribution = () => {
         setData(updatedData);
         toast.success(`${editId ? "Updated" : "Created"} successfully!`);
         toggleModal();
+        setSubmitting(false);
       } else {
         toast.error("Save failed");
       }
@@ -360,8 +365,14 @@ const Contribution = () => {
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
-                      <Button color='primary' size='md' type='submit'>
-                        Submit
+                      <Button
+                        color='primary'
+                        size='md'
+                        type='submit'
+                        disabled={submitting}
+                      >
+                        {editId ? "Update" : "Add"}
+                        {submitting && <Spinner className='spinner-xs' />}
                       </Button>
                     </li>
                     <li>

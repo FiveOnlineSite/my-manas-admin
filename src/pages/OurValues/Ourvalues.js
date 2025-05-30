@@ -79,6 +79,7 @@ const OurValues = () => {
   const toggleModal = (item = null) => {
     setIconErrors([]);
     setValuesErrors([]);
+
     if (item) {
       setFormData({
         title: item.title || "",
@@ -92,9 +93,12 @@ const OurValues = () => {
           : [{ title: "", description: "", valueIcon: null }],
       });
       setEditId(item._id);
+
+      setValue("description", item.description || "");
     } else {
       resetForm();
     }
+
     setModal(!modal);
   };
 
@@ -464,6 +468,7 @@ const OurValues = () => {
                     <Col md='12'>
                       <label className='form-label'>Value Description</label>
                       <Controller
+                        defaultValue={value.description || ""}
                         name={`values[${index}].description`} // ✅ Now it's dynamic per index
                         control={control}
                         rules={{ required: "Value Description is required" }}

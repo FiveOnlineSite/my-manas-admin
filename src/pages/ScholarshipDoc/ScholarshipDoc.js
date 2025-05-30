@@ -19,7 +19,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "reactstrap";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   DataTableHead,
   DataTableRow,
@@ -61,6 +61,7 @@ const ScholarshipDoc = () => {
     clearErrors,
     setValue,
     trigger,
+    control,
   } = useForm();
 
   useEffect(() => {
@@ -80,6 +81,9 @@ const ScholarshipDoc = () => {
     if (editItem) {
       setEditId(editItem._id);
       setFormData(editItem);
+      setValue("title", editItem.title);
+      setValue("description", editItem.description);
+      setValue("image", editItem.image || null);
     } else {
       resetForm();
       setEditId(null);
@@ -406,17 +410,26 @@ const ScholarshipDoc = () => {
 
                 <Col md='12'>
                   <label className='form-label'>Description</label>
-                  <ReactQuill
-                    theme='snow'
-                    value={formData.description}
-                    onChange={(value) => {
-                      setFormData({ ...formData, description: value });
-                      setValue("description", value);
-                      trigger("description");
-                    }}
+                  <Controller
+                    name='description'
+                    control={control}
+                    defaultValue={formData.description || ""}
+                    rules={{ required: "Description is required" }}
+                    render={({ field }) => (
+                      <ReactQuill
+                        theme='snow'
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value);
+                          setFormData({ ...formData, description: value });
+                        }}
+                      />
+                    )}
                   />
                   {errors.description && (
-                    <span className='invalid'>Description is required</span>
+                    <span className='invalid'>
+                      {errors.description.message}
+                    </span>
                   )}
                 </Col>
 

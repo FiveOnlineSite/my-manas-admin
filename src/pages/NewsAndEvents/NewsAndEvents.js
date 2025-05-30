@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Block,
   BlockHead,
@@ -32,16 +32,25 @@ import { NewsAndEventsContext } from "./NewsAndEventsContext";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
+import {
+  deleteRequest,
+  getRequest,
+  postFormData,
+  putRequest,
+} from "../../api/api";
+import { Spinner } from "reactstrap";
 
 const NewsAndEvents = () => {
   const { contextData } = useContext(NewsAndEventsContext);
   const [data, setData] = contextData;
+  const [submitting, setSubmitting] = useState(false);
+
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     uploadDate: "",
-    type: "News",
+    type: "news",
     image: null,
     excerpt: "",
     content: "",
@@ -59,9 +68,20 @@ const NewsAndEvents = () => {
     trigger,
   } = useForm();
 
+  useEffect(() => {
+    fetchNewsEvents();
+  }, []);
+
+  const fetchNewsEvents = async () => {
+    const res = await getRequest("/newsEvents");
+    if (res.success) {
+      setData(res.data);
+    }
+  };
+
   const toggleModal = (editItem = null) => {
     if (editItem) {
-      setEditId(editItem.id);
+      setEditId(editItem._id);
       setFormData(editItem);
 
       // Set form values for react-hook-form
@@ -113,37 +133,58 @@ const NewsAndEvents = () => {
     trigger("image"); // Trigger validation after image removal
   };
 
-  const onSubmit = () => {
-    // Check if all required fields are filled out
+  const onSubmit = async (values) => {
+    setSubmitting(true);
 
-    // if (
-    //   !formData.title.trim() ||
-    //   !formData.uploadDate ||
-    //   !formData.type ||
-    //   !formData.excerpt.trim() ||
-    //   !formData.content.trim() ||
-    //   !formData.metaTitle.trim() ||
-    //   !formData.metaDescription.trim() ||
-    //   !formData.image
-    // ) {
-    //   return;
-    // }
-
-    if (editId !== null) {
-      const updated = data.map((item) =>
-        item.id === editId ? { ...formData, id: editId } : item
-      );
-      setData(updated);
-      toast.success("Content updated successfully!");
-    } else {
-      const newItem = {
-        ...formData,
-        id: data.length ? Math.max(...data.map((d) => d.id)) + 1 : 1,
-      };
-      setData([newItem, ...data]);
-      toast.success("Content added successfully!");
+    const formPayload = new FormData();
+    formPayload.append("title", values.title);
+    formPayload.append("uploadDate", values.uploadDate);
+    formPayload.append("type", values.type.toLowerCase());
+    formPayload.append("excerpt", values.excerpt);
+    formPayload.append("content", values.content);
+    formPayload.append("metaTitle", values.metaTitle);
+    formPayload.append("metaDescription", values.metaDescription);
+    if (formData.image instanceof File) {
+      formPayload.append("image", values.image);
     }
-    toggleModal();
+
+    try {
+      let res;
+      if (editId !== null) {
+        res = await putRequest(`/newsEvents/${editId}`, formPayload);
+        if (res.success) {
+          const updated = data.map((item) =>
+            item._id === editId ? res.data : item
+          );
+          setData(updated);
+          toast.success("Content updated successfully!");
+        } else {
+          toast.error("Update failed.");
+        }
+      } else {
+        res = await postFormData("/newsEvents", formPayload);
+        if (res.success) {
+          setData([res.data, ...data]);
+          toast.success("Content added successfully!");
+        } else {
+          toast.error("Creation failed.");
+        }
+      }
+      toggleModal();
+      setSubmitting(false);
+    } catch (err) {
+      toast.error("Something went wrong.");
+    }
+  };
+
+  const onDeleteClick = async (id) => {
+    const res = await deleteRequest(`/newsEvents/${id}`);
+    if (res.success) {
+      setData(data.filter((item) => item._id !== id));
+      toast.success("Deleted successfully!");
+    } else {
+      toast.error("Failed to delete.");
+    }
   };
 
   return (
@@ -184,6 +225,10 @@ const NewsAndEvents = () => {
               <DataTableRow>
                 <span>Type</span>
               </DataTableRow>
+              <DataTableRow>
+                <span>Image</span>
+              </DataTableRow>
+
               <DataTableRow>
                 <span>Excerpt</span>
               </DataTableRow>
@@ -226,16 +271,40 @@ const NewsAndEvents = () => {
             </DataTableHead>
 
             {data.map((item) => (
-              <DataTableItem key={item.id}>
+              <DataTableItem key={item._id}>
                 <DataTableRow>
                   <span>{item.title}</span>
                 </DataTableRow>
                 <DataTableRow>
-                  <span>{item.uploadDate}</span>
+                  <span>
+                    {item.uploadDate
+                      ? new Date(item.uploadDate)
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, ".")
+                      : "-"}
+                  </span>
                 </DataTableRow>
+
                 <DataTableRow>
                   <span>{item.type}</span>
                 </DataTableRow>
+                <DataTableRow>
+                  {item.image?.url ? (
+                    <img
+                      src={item.image.url}
+                      alt={item.image.altText || "Image"}
+                      style={{
+                        width: "60px",
+                        height: "40px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  ) : (
+                    <span>No Image</span>
+                  )}
+                </DataTableRow>
+
                 <DataTableRow>
                   <span>{item.excerpt}</span>
                 </DataTableRow>
@@ -257,10 +326,20 @@ const NewsAndEvents = () => {
                       <TooltipComponent
                         tag='a'
                         containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item.id}
+                        id={"edit" + item._id}
                         icon='edit-alt-fill'
                         direction='top'
                         text='Edit'
+                      />
+                    </li>
+                    <li onClick={() => onDeleteClick(item._id)}>
+                      <TooltipComponent
+                        tag='a'
+                        containerClassName='btn btn-trigger btn-icon'
+                        id={"delete" + item._id}
+                        icon='trash-fill'
+                        direction='top'
+                        text='Delete'
                       />
                     </li>
                   </ul>
@@ -385,6 +464,8 @@ const NewsAndEvents = () => {
                           src={
                             typeof formData.image === "string"
                               ? formData.image
+                              : formData.image.url
+                              ? formData.image.url
                               : URL.createObjectURL(formData.image)
                           }
                           alt={formData.altText}
@@ -435,10 +516,10 @@ const NewsAndEvents = () => {
                         fileSize: (file) => {
                           if (!file) return !editId ? "Required" : true;
                           if (typeof file === "string") return true;
-                          return (
-                            file.size <= 512000 ||
-                            "Image must be less than 500KB"
-                          );
+                          // return (
+                          //   file.size <= 512000 ||
+                          //   "Image must be less than 500KB"
+                          // );
                         },
                       },
                     })}
@@ -526,8 +607,14 @@ const NewsAndEvents = () => {
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
-                      <Button color='primary' size='md' type='submit'>
-                        Submit
+                      <Button
+                        color='primary'
+                        size='md'
+                        type='submit'
+                        disabled={submitting}
+                      >
+                        {editId ? "Update" : "Add"}
+                        {submitting && <Spinner className='spinner-xs' />}
                       </Button>
                     </li>
                     <li>

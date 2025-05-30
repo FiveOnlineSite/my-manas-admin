@@ -83,7 +83,7 @@ const ScholarshipOverview = () => {
   const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
-      setFormData({ description: editItem.description || "" }); // Ensure description is always a string
+      reset({ description: editItem.description || "" });// Ensure description is always a string
     } else {
       resetForm();
       setEditId(null);
