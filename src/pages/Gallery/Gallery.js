@@ -60,10 +60,14 @@ const Gallery = () => {
   } = useForm();
 
   const toggleModal = (editItem = null) => {
-    setFileError(""); // Reset file error on modal toggle
+    setFileError("");
     if (editItem) {
       setEditId(editItem._id);
       setFormData(editItem);
+      setFormData({
+        file: editItem.url,
+        altText: editItem.altText,
+      });
     } else {
       resetForm();
       setEditId(null);
@@ -348,19 +352,53 @@ const Gallery = () => {
                           display: "inline-block",
                         }}
                       >
-                        <img
-                          src={URL.createObjectURL(formData.file)}
-                          alt={formData.altText}
-                          style={{
-                            width: "150px",
-                            height: "auto",
-                            objectFit: "contain",
-                            borderRadius: "4px",
-                            border: "1px solid #ddd",
-                            padding: "4px",
-                            backgroundColor: "#fff",
-                          }}
-                        />
+                        {formData.file instanceof File ? (
+                          formData.file.type.startsWith("video") ? (
+                            <video
+                              src={URL.createObjectURL(formData.file)}
+                              width='150'
+                              controls
+                            />
+                          ) : (
+                            <img
+                              src={URL.createObjectURL(formData.file)}
+                              alt={formData.altText}
+                              style={{
+                                width: "150px",
+                                height: "auto",
+                                objectFit: "contain",
+                                borderRadius: "4px",
+                                border: "1px solid #ddd",
+                                padding: "4px",
+                                backgroundColor: "#fff",
+                              }}
+                            />
+                          )
+                        ) : typeof formData.file === "string" ||
+                          formData.file?.url ? (
+                          formData.file?.url?.match(/\.(mp4|webm)$/i) ? (
+                            <video
+                              src={formData.file.url || formData.file}
+                              width='150'
+                              controls
+                            />
+                          ) : (
+                            <img
+                              src={formData.file.url || formData.file}
+                              alt={formData.altText}
+                              style={{
+                                width: "150px",
+                                height: "auto",
+                                objectFit: "contain",
+                                borderRadius: "4px",
+                                border: "1px solid #ddd",
+                                padding: "4px",
+                                backgroundColor: "#fff",
+                              }}
+                            />
+                          )
+                        ) : null}
+
                         <Button
                           size='sm'
                           color='danger'
@@ -388,6 +426,7 @@ const Gallery = () => {
                       </div>
                     </div>
                   )}
+
                   {fileError && <span className='invalid'>{fileError}</span>}
                 </Col>
                 <Col md='12'>

@@ -74,7 +74,24 @@ const Facilities = () => {
   const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
-      setFormData({ ...editItem });
+      const resources = editItem.resources || {};
+      const initialData = {
+        title: editItem.title || "",
+        image: resources.image || null,
+        video: resources.video || null,
+        imageAltText: resources.imageAltText || "",
+        videoAltText: resources.videoAltText || "",
+        featuredImage: resources.featuredImage || null,
+        isFeatured: editItem.isFeatured || false,
+      };
+      setFormData(initialData);
+      setValue("title", initialData.title);
+      setValue("image", initialData.image);
+      setValue("video", initialData.video);
+      setValue("imageAltText", initialData.imageAltText);
+      setValue("videoAltText", initialData.videoAltText);
+      setValue("featuredImage", initialData.featuredImage);
+      setValue("isFeatured", initialData.isFeatured);
     } else {
       resetForm();
       setEditId(null);
@@ -434,7 +451,13 @@ const Facilities = () => {
                         }}
                       >
                         <img
-                          src={URL.createObjectURL(formData.image)}
+                          src={
+                            formData.image instanceof File
+                              ? URL.createObjectURL(formData.image)
+                              : typeof formData.image === "string"
+                              ? formData.image
+                              : formData.image?.url || ""
+                          }
                           alt='Preview'
                           style={{
                             width: "150px",
@@ -549,7 +572,15 @@ const Facilities = () => {
                             backgroundColor: "#fff",
                           }}
                         >
-                          <source src={URL.createObjectURL(formData.video)} />
+                          <source
+                            src={
+                              formData.video instanceof File
+                                ? URL.createObjectURL(formData.video)
+                                : typeof formData.video === "string"
+                                ? formData.video
+                                : formData.video?.url || ""
+                            }
+                          />
                           Your browser does not support the video tag.
                         </video>
                         <Button
@@ -647,7 +678,13 @@ const Facilities = () => {
                         }}
                       >
                         <img
-                          src={URL.createObjectURL(formData.featuredImage)}
+                          src={
+                            formData.featuredImage instanceof File
+                              ? URL.createObjectURL(formData.featuredImage)
+                              : typeof formData.featuredImage === "string"
+                              ? formData.featuredImage
+                              : formData.featuredImage?.url || ""
+                          }
                           alt='Featured Preview'
                           style={{
                             width: "150px",

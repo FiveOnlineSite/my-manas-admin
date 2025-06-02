@@ -40,12 +40,11 @@ import {
 } from "../../api/api";
 import { Spinner } from "reactstrap";
 
-
 const Overview = () => {
   const { contextData } = useContext(OverviewContext);
   const [data, setData] = contextData;
-    const [submitting, setSubmitting] = useState(false);
-  
+  const [submitting, setSubmitting] = useState(false);
+
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -95,7 +94,19 @@ const Overview = () => {
     clearErrors();
     if (item) {
       setEditId(item._id);
+
+      // ✅ Update react-hook-form
       reset({
+        title: item.title || "",
+        description1: item.description1 || "",
+        description2: item.description2 || "",
+        bodName: item.bodName || "",
+        bodImage: item.bodImage || null,
+        bodSignature: item.bodSignature || null,
+      });
+
+      // ✅ Also update formData for image previews
+      setFormData({
         title: item.title || "",
         description1: item.description1 || "",
         description2: item.description2 || "",
@@ -105,15 +116,21 @@ const Overview = () => {
       });
     } else {
       setEditId(null);
-      reset();
+      resetForm();
     }
-    setModal(!modal);
+    setModal(true);
   };
-
-  
 
   const resetForm = () => {
     setFormData({
+      title: "",
+      description1: "",
+      description2: "",
+      bodName: "",
+      bodImage: null,
+      bodSignature: null,
+    });
+    reset({
       title: "",
       description1: "",
       description2: "",
@@ -129,25 +146,24 @@ const Overview = () => {
     setData(updated);
   };
 
-const handleFileChange = (e, field) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleFileChange = (e, field) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  if (file.size > 512000) {
-    setError(field, {
-      type: "manual",
-      message: "File must be less than 500KB",
-    });
-    setValue(field, null);
-    setFormData((prev) => ({ ...prev, [field]: null })); // clear preview
-    return;
-  }
+    if (file.size > 512000) {
+      setError(field, {
+        type: "manual",
+        message: "File must be less than 500KB",
+      });
+      setValue(field, null);
+      setFormData((prev) => ({ ...prev, [field]: null })); // clear preview
+      return;
+    }
 
-  clearErrors(field);
-  setValue(field, file, { shouldValidate: true });
-  setFormData((prev) => ({ ...prev, [field]: file })); // 
-};
-
+    clearErrors(field);
+    setValue(field, file, { shouldValidate: true });
+    setFormData((prev) => ({ ...prev, [field]: file })); //
+  };
 
   const handleRemoveFile = (field) => {
     setValue(field, null, { shouldValidate: true });
@@ -168,7 +184,7 @@ const handleFileChange = (e, field) => {
     // Validate BOD images required
     setSubmitting(true);
 
-    if (!formValues.bodImage) {
+    if (!formValues.bodImage && !formData.bodImage?.url) {
       setError("bodImage", {
         type: "manual",
         message: "BOD Image is required",
@@ -221,9 +237,7 @@ const handleFileChange = (e, field) => {
       }
       resetForm();
       setModal(false);
-      toggleModal();
       setSubmitting(false);
-
     } catch {
       toast.error("An error occurred.");
     }
@@ -499,7 +513,11 @@ const handleFileChange = (e, field) => {
                       }}
                     >
                       <img
-                        src={URL.createObjectURL(formData.bodImage)}
+                        src={
+                          formData.bodImage instanceof File
+                            ? URL.createObjectURL(formData.bodImage)
+                            : formData.bodImage?.url
+                        }
                         alt='BOD'
                         style={{
                           width: "150px",
@@ -558,7 +576,11 @@ const handleFileChange = (e, field) => {
                       }}
                     >
                       <img
-                        src={URL.createObjectURL(formData.bodSignature)}
+                        src={
+                          formData.bodSignature instanceof File
+                            ? URL.createObjectURL(formData.bodSignature)
+                            : formData.bodSignature?.url
+                        }
                         alt='Signature'
                         style={{
                           width: "150px",

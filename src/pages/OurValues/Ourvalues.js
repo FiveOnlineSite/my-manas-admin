@@ -88,7 +88,7 @@ const OurValues = () => {
           ? item.values.map((v) => ({
               title: v.title,
               description: v.description,
-              valueIcon: v.valueIcon || null,
+              valueIcon: v.icon?.url || null,
             }))
           : [{ title: "", description: "", valueIcon: null }],
       });
@@ -345,13 +345,7 @@ const OurValues = () => {
                     <DataTableRow>
                       {value?.icon?.url ? (
                         <img
-                          src={
-                            value.valueIcon instanceof File
-                              ? URL.createObjectURL(value.valueIcon)
-                              : typeof value.valueIcon === "string"
-                              ? value.valueIcon
-                              : ""
-                          }
+                          src={value.icon.url}
                           alt='icon'
                           width={30}
                           height={30}
@@ -500,8 +494,13 @@ const OurValues = () => {
                         type='file'
                         accept='image/*'
                         {...register(`values[${index}].valueIcon`, {
-                          required: "Icon is required",
                           validate: {
+                            required: () =>
+                              typeof formData.values[index].valueIcon ===
+                                "string" ||
+                              formData.values[index].valueIcon instanceof File
+                                ? true
+                                : "Icon is required",
                             size: (file) =>
                               file && file.size > 102400
                                 ? "Icon size must be less than 100KB"

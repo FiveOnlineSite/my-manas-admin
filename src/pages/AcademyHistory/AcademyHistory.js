@@ -76,6 +76,12 @@ const AcademyHistory = () => {
     if (editItem) {
       setEditId(editItem._id);
       setFormData(editItem);
+      reset({
+        title: editItem.title || "",
+        altText: editItem.altText || "",
+        description: editItem.description || "",
+        logo: editItem.logo || null,
+      });
     } else {
       resetForm();
       setEditId(null);

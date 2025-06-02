@@ -147,7 +147,10 @@ const Achievements = () => {
       ({ title, description, image, altText }) => ({
         title,
         description,
-        image: { altText },
+        image: {
+          altText,
+          url: image instanceof File ? null : image?.url || image,
+        },
       })
     );
     console.log(formData, itemsData, "itemsDataaaaaaa");

@@ -32,9 +32,13 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import { VidhyaVanamHistoryContext } from "./VidhyaVanamHistoryContext";
-import { deleteRequest, getRequest, postFormData, putRequest } from "../../api/api";
+import {
+  deleteRequest,
+  getRequest,
+  postFormData,
+  putRequest,
+} from "../../api/api";
 import { Spinner } from "reactstrap";
-
 
 const VidhyaVanamHistory = () => {
   const { contextData } = useContext(VidhyaVanamHistoryContext);
@@ -57,107 +61,112 @@ const VidhyaVanamHistory = () => {
     control,
   } = useForm();
 
-    useEffect(() => {
-      fetchHistory();
-    }, []);
-  
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
   const fetchHistory = async () => {
-      const res = await getRequest("/vidhyavanam/history");
-      if (res.success) {
-        setData(res.data);
-      }
-    };
-  
+    const res = await getRequest("/vidhyavanam/history");
+    if (res.success) {
+      setData(res.data);
+    }
+  };
 
   const toggleModal = (editItem = null) => {
-      if (editItem) {
-        setEditId(editItem._id);
-        setFormData(editItem);
-      } else {
-        resetForm();
-        setEditId(null);
-      }
-      setModal(!modal);
-    };
-  
-    const resetForm = () => {
-      setFormData({
-        title: "",
-        logo: null,
-        altText: "",
-        description: "",
+    if (editItem) {
+      setEditId(editItem._id);
+      setFormData(editItem);
+      reset({
+        title: editItem.title || "",
+        altText: editItem.altText || "",
+        description: editItem.description || "",
+        logo: editItem.logo || null,
       });
-      reset();
-    };
-  
-    const selectorDeleteUser = () => {
-      const updated = data.filter((item) => !item.checked);
-      setData(updated);
-    };
-  
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      // if (file && file.size > 512000) {
-      //   // alert("Image must be less than 500KB");
-  
-      //   return;
-      // }
-      setFormData({ ...formData, logo: file });
-    };
-  
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
-    };
-  
-    const onSubmit = async () => {
-      setSubmitting(true);
-  
-      if (!formData.logo && !editId) {
-        toast.error("Logo is required");
-        return;
+    } else {
+      resetForm();
+      setEditId(null);
+    }
+    setModal(!modal);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      logo: null,
+      altText: "",
+      description: "",
+    });
+    reset();
+  };
+
+  const selectorDeleteUser = () => {
+    const updated = data.filter((item) => !item.checked);
+    setData(updated);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    // if (file && file.size > 512000) {
+    //   // alert("Image must be less than 500KB");
+
+    //   return;
+    // }
+    setFormData({ ...formData, logo: file });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const onSubmit = async () => {
+    setSubmitting(true);
+
+    if (!formData.logo && !editId) {
+      toast.error("Logo is required");
+      return;
+    }
+
+    const payload = new FormData();
+    payload.append("title", formData.title);
+    payload.append("description", formData.description);
+    payload.append("altText", formData.altText);
+    if (formData.logo instanceof File) {
+      payload.append("logo", formData.logo);
+    }
+
+    try {
+      let res;
+      if (editId) {
+        res = await putRequest(`/vidhyavanam/history/${editId}`, payload);
+      } else {
+        res = await postFormData("/vidhyavanam/history", payload);
       }
-  
-      const payload = new FormData();
-      payload.append("title", formData.title);
-      payload.append("description", formData.description);
-      payload.append("altText", formData.altText);
-      if (formData.logo instanceof File) {
-        payload.append("logo", formData.logo);
-      }
-  
-      try {
-        let res;
-        if (editId) {
-          res = await putRequest(`/vidhyavanam/history/${editId}`, payload);
-        } else {
-          res = await postFormData("/vidhyavanam/history", payload);
-        }
-  
-        if (res.success) {
-          toast.success(
-            editId ? "Updated successfully!" : "Created successfully!"
-          );
-          fetchHistory();
-          toggleModal();
-          setSubmitting(false);
-        } else {
-          toast.error(res.message);
-        }
-      } catch (err) {
-        toast.error("Submission failed.");
-      }
-    };
-  
-    const onDeleteClick = async (id) => {
-      const res = await deleteRequest(`/vidhyavanam/history/${id}`);
+
       if (res.success) {
-        toast.success("Deleted successfully!");
+        toast.success(
+          editId ? "Updated successfully!" : "Created successfully!"
+        );
         fetchHistory();
+        toggleModal();
+        setSubmitting(false);
       } else {
         toast.error(res.message);
       }
-    };
+    } catch (err) {
+      toast.error("Submission failed.");
+    }
+  };
+
+  const onDeleteClick = async (id) => {
+    const res = await deleteRequest(`/vidhyavanam/history/${id}`);
+    if (res.success) {
+      toast.success("Deleted successfully!");
+      fetchHistory();
+    } else {
+      toast.error(res.message);
+    }
+  };
 
   return (
     <>
