@@ -40,7 +40,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const LeadershipTeam = () => {
-  const [data, setData] =  useState([]);
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

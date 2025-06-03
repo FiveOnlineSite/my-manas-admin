@@ -106,7 +106,7 @@ const OurGoal = () => {
       additionalItems: [{ title: "", description: "", images: [] }],
     };
     setFormData(empty);
-    reset(empty); // ✅ sync with form
+    reset(empty); 
   };
   
 

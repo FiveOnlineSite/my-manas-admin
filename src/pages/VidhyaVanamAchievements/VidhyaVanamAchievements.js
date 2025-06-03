@@ -65,7 +65,7 @@ const VidhyaVanamAchievements = () => {
       console.log(res.data.data, "resfdfdfdf");
   
       if (res.success) {
-        // ✅ If it's an array, use as is; if it's an object, wrap in array
+        //  If it's an array, use as is; if it's an object, wrap in array
         // const result = Array.isArray(res.data) ? res.data : [res.data];
         setData(res?.data?.data);
       } else {

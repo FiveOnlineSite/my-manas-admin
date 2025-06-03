@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Block,
   BlockHead,
@@ -58,6 +58,10 @@ const DonateAchievements = () => {
     formState: { errors },
     reset,
   } = useForm();
+
+   useEffect(() => {
+        fetchData();
+      }, []);
 
   const fetchData = async () => {
     const res = await getRequest("/donate/achievements");
@@ -143,7 +147,10 @@ const DonateAchievements = () => {
       ({ title, description, image, altText }) => ({
         title,
         description,
-        image: { altText },
+        image: {
+          altText,
+          url: image instanceof File ? null : image?.url || image,
+        },
       })
     );
     console.log(formData, itemsData, "itemsDataaaaaaa");

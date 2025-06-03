@@ -461,7 +461,7 @@ const OurValues = () => {
                       <label className='form-label'>Value Description</label>
                       <Controller
                         defaultValue={value.description || ""}
-                        name={`values[${index}].description`} // ✅ Now it's dynamic per index
+                        name={`values[${index}].description`} 
                         control={control}
                         rules={{ required: "Value Description is required" }}
                         render={({ field }) => (
