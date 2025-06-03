@@ -27,7 +27,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { HowToApplyContext } from "./HowToApplyContext"; // New Context
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
 import {
@@ -39,8 +38,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const HowToApply = () => {
-  const { contextData } = useContext(HowToApplyContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

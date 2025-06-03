@@ -29,7 +29,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { OurValuesContext } from "./OurValuesContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import {
   deleteRequest,
@@ -41,8 +40,7 @@ import { toast } from "react-toastify";
 import { Spinner } from "reactstrap";
 
 const OurValues = () => {
-  const { contextData } = useContext(OurValuesContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [iconErrors, setIconErrors] = useState([]);

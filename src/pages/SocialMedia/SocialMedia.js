@@ -28,7 +28,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { SocialMediaLinksContext } from "./SocialMediaContext";
 import { toast } from "react-toastify";
 import {
   deleteRequest,
@@ -39,8 +38,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const SocialMediaLinks = () => {
-  const { contextData } = useContext(SocialMediaLinksContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

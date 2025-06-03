@@ -29,7 +29,6 @@ import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
-import { VidhyaVanamApplyContext } from "./VidhyaVanamApplyContext";
 import {
   deleteRequest,
   getRequest,
@@ -39,8 +38,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const VidhyaVanamApply = () => {
-  const { contextData } = useContext(VidhyaVanamApplyContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

@@ -36,11 +36,9 @@ import {
   postFormData,
   putRequest,
 } from "../../api/api";
-import { VidhyaVanamFacilitiesContext } from "./VidhyaVanamFacilitiesContext";
 
 const VidhyaVanamFacilities = () => {
-  const { contextData } = useContext(VidhyaVanamFacilitiesContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

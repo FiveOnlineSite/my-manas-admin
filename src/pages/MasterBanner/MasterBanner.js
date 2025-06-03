@@ -29,7 +29,6 @@ import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
-import { MasterBannerContext } from "./MasterBannerContext"; // assume this is created
 import { toast } from "react-toastify";
 import {
   deleteRequest,
@@ -40,8 +39,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const MasterBanner = () => {
-  const { contextData } = useContext(MasterBannerContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

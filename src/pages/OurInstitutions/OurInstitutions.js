@@ -27,7 +27,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { OurInstitutionsContext } from "./OurInstitutionsContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
 import { deleteRequest, getRequest, postFormData, putRequest } from "../../api/api";
@@ -35,8 +34,7 @@ import { Spinner } from "reactstrap";
 
 
 const OurInstitutions = () => {
-  const { contextData } = useContext(OurInstitutionsContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
     const [submitting, setSubmitting] = useState(false);
   
   const [modal, setModal] = useState(false);

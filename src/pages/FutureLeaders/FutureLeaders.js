@@ -29,7 +29,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { FutureLeadersContext } from "./FutureLeadersContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
 import { Spinner } from "reactstrap";
@@ -42,8 +41,7 @@ import {
 } from "../../api/api";
 
 const FutureLeaders = () => {
-  const { contextData } = useContext(FutureLeadersContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

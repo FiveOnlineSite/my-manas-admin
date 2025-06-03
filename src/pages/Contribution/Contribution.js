@@ -29,7 +29,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { ContributionContext } from "./ContributionContext";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
@@ -42,8 +41,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const Contribution = () => {
-  const { contextData } = useContext(ContributionContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

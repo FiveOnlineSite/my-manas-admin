@@ -28,7 +28,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { ContactContext } from "./ContactContext";
 import { toast } from "react-toastify";
 import { Spinner } from "reactstrap";
 
@@ -40,8 +39,7 @@ import {
 } from "../../api/api";
 
 const Contact = () => {
-  const { contextData } = useContext(ContactContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

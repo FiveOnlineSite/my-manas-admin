@@ -5,7 +5,6 @@ import {
   UncontrolledDropdown,
   DropdownItem,
 } from "reactstrap";
-import { UserContext } from "./UserContext";
 import EditModal from "./EditModal";
 import AddModal from "./AddModal";
 import {
@@ -38,7 +37,6 @@ import { toast } from "react-toastify";
 import { set } from "react-hook-form";
 
 const HomeBanner = () => {
-  const { contextData } = useContext(UserContext);
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 

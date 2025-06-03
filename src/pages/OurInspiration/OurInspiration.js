@@ -29,7 +29,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { OurInspirationContext } from "./OurInspirationContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import {
   deleteRequest,
@@ -42,8 +41,7 @@ import { Spinner } from "reactstrap";
 
 
 const OurInspirations = () => {
-  const { contextData } = useContext(OurInspirationContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
       const [submitting, setSubmitting] = useState(false);
   
   const [modal, setModal] = useState(false);

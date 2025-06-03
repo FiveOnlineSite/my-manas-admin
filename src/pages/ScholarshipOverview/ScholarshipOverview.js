@@ -27,7 +27,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { ScholarshipOverviewContext } from "./ScholarshipOverviewContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -37,8 +36,7 @@ import { Spinner } from "reactstrap";
 
 
 const ScholarshipOverview = () => {
-  const { contextData } = useContext(ScholarshipOverviewContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
     const [submitting, setSubmitting] = useState(false);
   
   const [modal, setModal] = useState(false);

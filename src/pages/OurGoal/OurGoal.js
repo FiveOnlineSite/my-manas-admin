@@ -31,7 +31,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { OurGoalContext } from "./OurGoalContext";
 import {
   deleteRequest,
   getRequest,
@@ -41,8 +40,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const OurGoal = () => {
-  const { contextData } = useContext(OurGoalContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

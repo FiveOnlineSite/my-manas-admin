@@ -28,7 +28,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { ScholarshipContext } from "./ScholarshipContext";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
@@ -37,8 +36,7 @@ import { Spinner } from "reactstrap";
 
 
 const Scholarship = () => {
-  const { contextData } = useContext(ScholarshipContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
     const [submitting, setSubmitting] = useState(false);
   
   const [modal, setModal] = useState(false);

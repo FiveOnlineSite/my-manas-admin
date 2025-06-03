@@ -28,7 +28,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { DonateNowContext } from "./DonateNowContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
 import {
@@ -41,8 +40,7 @@ import { Spinner } from "reactstrap";
 
 
 const DonateNow = () => {
-  const { contextData } = useContext(DonateNowContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
     const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

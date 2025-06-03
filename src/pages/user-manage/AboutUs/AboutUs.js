@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Block,
   BlockHead,
@@ -27,7 +27,6 @@ import {
 } from "../../../components/table/DataTable";
 import Content from "../../../layout/content/Content";
 import Head from "../../../layout/head/Head";
-import { AboutContext } from "./AboutContext";
 import TooltipComponent from "../../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -42,8 +41,7 @@ import {
 } from "../../../api/api";
 
 const AboutUs = () => {
-  const { contextData } = useContext(AboutContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

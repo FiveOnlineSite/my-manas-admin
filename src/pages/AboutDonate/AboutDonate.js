@@ -27,7 +27,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { AboutDonateContext } from "./AboutDonateContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -41,8 +40,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const AboutDonate = () => {
-  const { contextData } = useContext(AboutDonateContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

@@ -30,7 +30,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { InstitutionsAboutContext } from "./InstitutionsAboutContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
 import {
@@ -42,8 +41,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const InstitutionsAbout = () => {
-  const { contextData } = useContext(InstitutionsAboutContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

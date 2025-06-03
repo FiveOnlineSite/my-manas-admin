@@ -28,7 +28,6 @@ import {
 } from "../../components/table/DataTable";
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
-import { TestimonialsContext } from "./TestimonialsContext";
 import TooltipComponent from "../../components/tooltip/Tooltip";
 import { toast } from "react-toastify";
 import {
@@ -40,8 +39,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const Testimonials = () => {
-  const { contextData } = useContext(TestimonialsContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);

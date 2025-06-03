@@ -31,7 +31,6 @@ import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
-import { VidhyaVanamGradeContext } from "./VidhyaVanamGradeContext";
 import { Spinner } from "reactstrap";
 import {
   deleteRequest,
@@ -41,8 +40,7 @@ import {
 } from "../../api/api";
 
 const VidhyaVanamGrade = () => {
-  const { contextData } = useContext(VidhyaVanamGradeContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

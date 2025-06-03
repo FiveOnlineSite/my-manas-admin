@@ -31,16 +31,14 @@ import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
-import { VidhyaVanamAchievementsContext } from "./VidhyaVanamAchievementsContext";
 import { Spinner } from "reactstrap";
 import { deleteRequest, getRequest, postFormData, putRequest } from "../../api/api";
 
 
 const VidhyaVanamAchievements = () => {
-  const { contextData } = useContext(VidhyaVanamAchievementsContext);
     const [submitting, setSubmitting] = useState(false);
   
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
 

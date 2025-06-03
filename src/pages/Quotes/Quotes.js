@@ -28,7 +28,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { QuotesContext } from "./QuotesContext"; // Assume context is created
 import { toast } from "react-toastify";
 import {
   deleteRequest,
@@ -39,8 +38,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const Quotes = () => {
-  const { contextData } = useContext(QuotesContext);
-  const [data, setData] = contextData;
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);

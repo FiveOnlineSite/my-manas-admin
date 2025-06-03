@@ -29,7 +29,6 @@ import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import { useForm } from "react-hook-form";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { OurMissionContext } from "./OurMissionContext";
 import { toast } from "react-toastify";
 import { Spinner } from "reactstrap";
 
@@ -41,8 +40,7 @@ import {
 } from "../../api/api";
 
 const OurMission = () => {
-  const { contextData } = useContext(OurMissionContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);;
   const [modal, setModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 

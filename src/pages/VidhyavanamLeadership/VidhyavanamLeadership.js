@@ -31,14 +31,12 @@ import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
-import { VidhyavanamLeadershipContext } from "./VidhyavanamLeadershipContext";
 import { deleteRequest, getRequest, postFormData, putRequest } from "../../api/api";
 import { Spinner } from "reactstrap";
 
 
 const VidhyavanamLeadership = () => {
-  const { contextData } = useContext(VidhyavanamLeadershipContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
     const [submitting, setSubmitting] = useState(false);
   
   const [modal, setModal] = useState(false);

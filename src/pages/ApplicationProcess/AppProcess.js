@@ -30,7 +30,6 @@ import {
 import Content from "../../layout/content/Content";
 import Head from "../../layout/head/Head";
 import TooltipComponent from "../../components/tooltip/Tooltip";
-import { AppProcessContext } from "./AppProcessContext";
 import { toast } from "react-toastify";
 import {
   deleteRequest,
@@ -41,8 +40,7 @@ import {
 import { Spinner } from "reactstrap";
 
 const AppProcess = () => {
-  const { contextData } = useContext(AppProcessContext);
-  const [data, setData] = contextData;
+  const [data, setData] =  useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [modal, setModal] = useState(false);
