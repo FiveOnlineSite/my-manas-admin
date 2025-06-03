@@ -57,6 +57,14 @@ const User = () => {
             </div>
           </div>
         </div>
+
+         <div className="dropdown-inner">
+          <LinkList>
+            <LinkItem to={`${process.env.PUBLIC_URL}/change-password`} icon="user-alt" onClick={toggle}>
+             change password
+            </LinkItem>
+          </LinkList>
+        </div>
        
         <div className='dropdown-inner'>
           <LinkList>

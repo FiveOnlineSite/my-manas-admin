@@ -198,6 +198,7 @@ import Register from "../pages/auth/Register";
 import Login from "../pages/auth/Login";
 import PrivateRoute from "./PrivateRoute";
 import HomeBanner from "../pages/user-manage/UserListDefault";
+import ChangePassword from "../pages/auth/ChangePassword";
 
 const Router = () => {
   const location = useLocation();
@@ -212,6 +213,7 @@ const Router = () => {
       <Route path='auth-success' element={<Success />}></Route>
       <Route path='auth-reset' element={<ForgotPassword />}></Route>
       <Route path='auth-register' element={<Register />}></Route>
+      <Route path='change-password' element={<ChangePassword />}></Route>
 
       <Route path='login' element={<Login />}></Route>
       <Route element={<PrivateRoute />}>
