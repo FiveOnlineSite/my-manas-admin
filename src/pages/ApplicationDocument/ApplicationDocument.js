@@ -43,6 +43,7 @@ const ApplicationDocument = () => {
   const [data, setData] = useState([]);
   const [modal, setModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [editId, setEditId] = useState(null);
   const [contentErrors, setContentErrors] = useState([]);
@@ -64,8 +65,12 @@ const ApplicationDocument = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/scholarships/application-content");
-    if (res.success) setData(res.data);
+    if (res.success) {
+      setData(res.data);
+    }
+    setLoading(false)
   };
 
   const toggleModal = (item = null) => {
@@ -173,57 +178,62 @@ const ApplicationDocument = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Contents</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'></DataTableRow>
-            </DataTableHead>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Contents</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'></DataTableRow>
+              </DataTableHead>
 
-            {data.map((item) => (
-              <DataTableItem key={item._id}>
-                <DataTableRow>
-                  <span>{item.title}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <ul>
-                    {item.contents.map((c, i) => (
-                      <li key={i} dangerouslySetInnerHTML={{ __html: c }} />
-                    ))}
-                  </ul>
-                </DataTableRow>
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => toggleModal(item)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        id={`edit-${item._id}`}
-                        containerClassName='btn btn-trigger btn-icon'
-                        icon='edit-alt-fill'
-                        text='Edit'
-                      />
-                    </li>
-                    <li onClick={() => onDelete(item._id)}>
-                      <TooltipComponent
-                        tag='a'
-                        id={`delete-${item._id}`}
-                        containerClassName='btn btn-trigger btn-icon'
-                        icon='trash-fill'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
+              {data.map((item) => (
+                <DataTableItem key={item._id}>
+                  <DataTableRow>
+                    <span>{item.title}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <ul>
+                      {item.contents.map((c, i) => (
+                        <li key={i} dangerouslySetInnerHTML={{ __html: c }} />
+                      ))}
+                    </ul>
+                  </DataTableRow>
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li
+                        className='nk-tb-action-hidden'
+                        onClick={() => toggleModal(item)}
+                      >
+                        <TooltipComponent
+                          tag='a'
+                          id={`edit-${item._id}`}
+                          containerClassName='btn btn-trigger btn-icon'
+                          icon='edit-alt-fill'
+                          text='Edit'
+                        />
+                      </li>
+                      <li onClick={() => onDelete(item._id)}>
+                        <TooltipComponent
+                          tag='a'
+                          id={`delete-${item._id}`}
+                          containerClassName='btn btn-trigger btn-icon'
+                          icon='trash-fill'
+                          text='Delete'
+                        />
+                      </li>
+                    </ul>
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal

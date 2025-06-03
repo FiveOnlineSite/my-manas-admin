@@ -43,7 +43,7 @@ const OurMission = () => {
   const [data, setData] =  useState([]);;
   const [modal, setModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
+    const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
     subtitle: "",
@@ -66,10 +66,14 @@ const OurMission = () => {
   }, []);
 
   const fetchData = async () => {
+  setLoading(true); // Show loader
+
     const res = await getRequest("/home/mission");
     if (res.success) {
       setData(res.data);
     }
+       setLoading(false); // Show loader
+
   };
 
   const toggleModal = (item = null) => {
@@ -224,6 +228,10 @@ const OurMission = () => {
         </BlockHead>
 
         <Block>
+           {loading?(
+           <div className="text-center p-5">
+            <Spinner color="primary" size="lg" />
+             </div>):(
           <div className='nk-tb-list is-separate is-medium mb-3'>
             <DataTableHead>
               <DataTableRow>
@@ -293,6 +301,7 @@ const OurMission = () => {
               </DataTableItem>
             ))}
           </div>
+           )}
         </Block>
 
         <Modal

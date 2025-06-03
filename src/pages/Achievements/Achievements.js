@@ -42,6 +42,7 @@ import { Spinner } from "reactstrap";
 const Achievements = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -64,6 +65,7 @@ const Achievements = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/academy/achievements");
     console.log(res.data.data, "resfdfdfdf");
 
@@ -73,6 +75,7 @@ const Achievements = () => {
       toast.error(res.message || "Failed to fetch data");
       setData([]);
     }
+    setLoading(false)
   };
 
   const toggleModal = (editItem = null) => {
@@ -82,11 +85,11 @@ const Achievements = () => {
         title: editItem.title || "",
         items: Array.isArray(editItem.items)
           ? editItem.items.map((item) => ({
-              title: item.title || "",
-              description: item.description || "",
-              image: item.image?.url ? { url: item.image.url } : null,
-              altText: item.image?.altText || "",
-            }))
+            title: item.title || "",
+            description: item.description || "",
+            image: item.image?.url ? { url: item.image.url } : null,
+            altText: item.image?.altText || "",
+          }))
           : [],
       });
     } else {
@@ -218,33 +221,37 @@ const Achievements = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Main Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Item Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Alt Text</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <span>Actions</span>
-              </DataTableRow>
-            </DataTableHead>
-            {console.log(data, "datadddddddddd")}
-            {data &&
-              data?.length > 0 &&
-              data.map((achievement) =>
-                Array.isArray(achievement.items)
-                  ? achievement?.items?.map((item, idx) => (
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Main Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Item Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Alt Text</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <span>Actions</span>
+                </DataTableRow>
+              </DataTableHead>
+              {console.log(data, "datadddddddddd")}
+              {data &&
+                data?.length > 0 &&
+                data.map((achievement) =>
+                  Array.isArray(achievement.items)
+                    ? achievement?.items?.map((item, idx) => (
                       <DataTableItem key={`${achievement._id}-${idx}`}>
                         <DataTableRow>
                           <span>{achievement.title}</span>
@@ -302,9 +309,10 @@ const Achievements = () => {
                         </DataTableRow>
                       </DataTableItem>
                     ))
-                  : []
-              )}
-          </div>
+                    : []
+                )}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -395,8 +403,8 @@ const Achievements = () => {
                                 item.image instanceof File
                                   ? URL.createObjectURL(item.image)
                                   : typeof item.image === "string"
-                                  ? item.image
-                                  : item.image?.url || ""
+                                    ? item.image
+                                    : item.image?.url || ""
                               }
                               alt={item.altText || "Image"}
                               style={{

@@ -40,8 +40,9 @@ import {
 import { Spinner } from "reactstrap";
 
 const OurModel = () => {
-  const [data, setData] =  useState([]);
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [descriptionError, setDescriptionError] = useState("");
@@ -67,12 +68,14 @@ const OurModel = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/institutions/our-model");
     if (res.success) {
       setData(res.data);
     } else {
       toast.error(res.message || "Failed to fetch data");
     }
+    setLoading(false)
   };
 
   const toggleModal = (editItem = null) => {
@@ -241,55 +244,59 @@ const OurModel = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Value Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Value Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Icon</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
-                          tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
-                      </li>
-                    </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Value Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Value Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Icon</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
+                            }}
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
 
-            {data.map((item) =>
-              Array.isArray(item.icons)
-                ? item.icons.map((iconItem, index) => (
+              {data.map((item) =>
+                Array.isArray(item.icons)
+                  ? item.icons.map((iconItem, index) => (
                     <DataTableItem key={`${item._id}-${index}`}>
                       <DataTableRow>
                         <span>{index === 0 ? item.title : ""}</span>
@@ -362,9 +369,10 @@ const OurModel = () => {
                       </DataTableRow>
                     </DataTableItem>
                   ))
-                : null
-            )}
-          </div>
+                  : null
+              )}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -473,8 +481,8 @@ const OurModel = () => {
                               typeof iconItem.icon === "string"
                                 ? iconItem.icon
                                 : iconItem.icon.url
-                                ? iconItem.icon.url
-                                : URL.createObjectURL(iconItem.icon)
+                                  ? iconItem.icon.url
+                                  : URL.createObjectURL(iconItem.icon)
                             }
                             alt='icon preview'
                             width={100}

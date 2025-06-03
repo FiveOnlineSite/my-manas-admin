@@ -36,24 +36,25 @@ import { Spinner } from "reactstrap";
 
 
 const VidhyavanamLeadership = () => {
-  const [data, setData] =  useState([]);
-    const [submitting, setSubmitting] = useState(false);
-  
+  const [data, setData] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
-      members: [
-        {
-          name: "",
-          description: "",
-          image: null,
-          altText: "",
-        },
-      ],
+    members: [
+      {
+        name: "",
+        description: "",
+        image: null,
+        altText: "",
+      },
+    ],
   });
-  
-  
-  
+
+
+
   const {
     register,
     handleSubmit,
@@ -71,140 +72,142 @@ const VidhyavanamLeadership = () => {
     },
   });
 
-    useEffect(() => {
-      fetchData();
-    }, []);
-  
-    const fetchData = async () => {
-      const res = await getRequest("/vidhyavanam/leadership-team");
-      if (res.success) {
-        setData(res.data);
-      } else {
-        toast.error(res.message || "Failed to fetch data");
-      }
-    };
-  
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true)
+    const res = await getRequest("/vidhyavanam/leadership-team");
+    if (res.success) {
+      setData(res.data);
+    } else {
+      toast.error(res.message || "Failed to fetch data");
+    }
+    setLoading(false)
+  };
+
 
   const toggleModal = (editItem = null) => {
-      if (editItem) {
-        setEditId(editItem._id);
-        setFormData(editItem);
+    if (editItem) {
+      setEditId(editItem._id);
+      setFormData(editItem);
+    } else {
+      resetForm();
+      setEditId(null);
+    }
+    setModal(!modal);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      members: [
+        {
+          name: "",
+          description: "",
+          image: null,
+          altText: "",
+        },
+      ],
+    });
+    reset();
+  };
+
+  const addMember = () => {
+    setFormData({
+      ...formData,
+      members: [
+        ...formData.members,
+        { name: "", description: "", image: null, altText: "" },
+      ],
+    });
+  };
+
+  const removeMember = (index) => {
+    const updated = [...formData.members];
+    updated.splice(index, 1);
+    setFormData({ ...formData, members: updated });
+  };
+
+  const handleMemberChange = (index, field, value) => {
+    const updated = [...formData.members];
+    updated[index][field] = value;
+    setFormData({ ...formData, members: updated });
+  };
+
+  const handleImageChange = (e, index) => {
+    const file = e.target.files[0];
+    handleMemberChange(index, "image", file);
+  };
+
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({ ...formData, [name]: value });
+  // };
+
+  const selectorDeleteUser = () => {
+    const updated = data.filter((item) => !item.checked);
+    setData(updated);
+  };
+
+  const onSubmit = async () => {
+    setSubmitting(true);
+
+    const member = formData.members[0];
+
+    const hasErrors =
+      !member.name.trim() ||
+      !member.description.trim() ||
+      !member.altText.trim() ||
+      !member.image;
+
+    if (hasErrors) {
+      // Do not submit if validation fails, just allow inline errors to show
+      return;
+    }
+    const payload = new FormData();
+    payload.append("members", JSON.stringify(formData.members));
+
+    formData.members.forEach((member) => {
+      if (member.image instanceof File) {
+        payload.append("files", member.image);
+      }
+    });
+
+    try {
+      let res;
+      if (editId) {
+        res = await putRequest(`/vidhyavanam/leadership-team/${editId}`, payload);
       } else {
-        resetForm();
-        setEditId(null);
+        res = await postFormData("/vidhyavanam/leadership-team", payload);
       }
-      setModal(!modal);
-    };
-  
-    const resetForm = () => {
-      setFormData({
-        members: [
-          {
-            name: "",
-            description: "",
-            image: null,
-            altText: "",
-          },
-        ],
-      });
-      reset();
-    };
-  
-    const addMember = () => {
-      setFormData({
-        ...formData,
-        members: [
-          ...formData.members,
-          { name: "", description: "", image: null, altText: "" },
-        ],
-      });
-    };
-  
-    const removeMember = (index) => {
-      const updated = [...formData.members];
-      updated.splice(index, 1);
-      setFormData({ ...formData, members: updated });
-    };
-  
-    const handleMemberChange = (index, field, value) => {
-      const updated = [...formData.members];
-      updated[index][field] = value;
-      setFormData({ ...formData, members: updated });
-    };
-  
-    const handleImageChange = (e, index) => {
-      const file = e.target.files[0];
-      handleMemberChange(index, "image", file);
-    };
-  
-    // const handleInputChange = (e) => {
-    //   const { name, value } = e.target;
-    //   setFormData({ ...formData, [name]: value });
-    // };
-  
-    const selectorDeleteUser = () => {
-      const updated = data.filter((item) => !item.checked);
-      setData(updated);
-    };
-  
-    const onSubmit = async () => {
-      setSubmitting(true);
-  
-      const member = formData.members[0];
-  
-      const hasErrors =
-        !member.name.trim() ||
-        !member.description.trim() ||
-        !member.altText.trim() ||
-        !member.image;
-  
-      if (hasErrors) {
-        // Do not submit if validation fails, just allow inline errors to show
-        return;
-      }
-      const payload = new FormData();
-      payload.append("members", JSON.stringify(formData.members));
-  
-      formData.members.forEach((member) => {
-        if (member.image instanceof File) {
-          payload.append("files", member.image);
-        }
-      });
-  
-      try {
-        let res;
-        if (editId) {
-          res = await putRequest(`/vidhyavanam/leadership-team/${editId}`, payload);
-        } else {
-          res = await postFormData("/vidhyavanam/leadership-team", payload);
-        }
-  
-        if (res.success) {
-          toast.success("Leadership team saved!");
-          fetchData();
-          toggleModal();
-          setSubmitting(false);
-  
-        } else {
-          toast.error(res.message || "Failed to save");
-        }
-      } catch (err) {
-        toast.error("An error occurred during submission");
-      } finally {
-        setSubmitting(false);
-      }
-    };
-  
-    const onDeleteClick = async (id) => {
-      const res = await deleteRequest(`/vidhyavanam/leadership-team/${id}`);
+
       if (res.success) {
-        setData(data.filter((item) => item._id !== id));
-        toast.success("Deleted successfully!");
+        toast.success("Leadership team saved!");
+        fetchData();
+        toggleModal();
+        setSubmitting(false);
+
       } else {
-        toast.error(res.message || "Failed to delete");
+        toast.error(res.message || "Failed to save");
       }
-    };
-  
+    } catch (err) {
+      toast.error("An error occurred during submission");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onDeleteClick = async (id) => {
+    const res = await deleteRequest(`/vidhyavanam/leadership-team/${id}`);
+    if (res.success) {
+      setData(data.filter((item) => item._id !== id));
+      toast.success("Deleted successfully!");
+    } else {
+      toast.error(res.message || "Failed to delete");
+    }
+  };
+
 
   return (
     <>
@@ -233,76 +236,81 @@ const VidhyavanamLeadership = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Name</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Alt Text</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end' />
-            </DataTableHead>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Name</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Alt Text</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end' />
+              </DataTableHead>
 
-            {data.length > 0 &&
-              data[0]?.members?.map((member, index) => (
-                <DataTableItem key={index}>
-                  <DataTableRow>
-                    <span>{member.name}</span>
-                  </DataTableRow>
-                  <DataTableRow>
-                    <span
-                      dangerouslySetInnerHTML={{ __html: member.description }}
-                    />
-                  </DataTableRow>
-                  <DataTableRow>
-                    {member.image?.url ? (
-                      <img
-                        src={member.image.url}
-                        alt={member.image.altText}
-                        width={60}
-                        height={40}
+              {data.length > 0 &&
+                data[0]?.members?.map((member, index) => (
+                  <DataTableItem key={index}>
+                    <DataTableRow>
+                      <span>{member.name}</span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span
+                        dangerouslySetInnerHTML={{ __html: member.description }}
                       />
-                    ) : (
-                      "No image"
-                    )}
-                  </DataTableRow>
-                  <DataTableRow>
-                    <span>{member.image?.altText}</span>
-                  </DataTableRow>
-                  <DataTableRow className='nk-tb-col-tools'>
-                    <ul className='nk-tb-actions gx-1'>
-                      <li onClick={() => toggleModal(data[0])}>
-                        <TooltipComponent
-                          tag='a'
-                          id={`edit-${index}`}
-                          containerClassName='btn btn-trigger btn-icon'
-                          icon='edit-alt-fill'
-                          direction='top'
-                          text='Edit'
+                    </DataTableRow>
+                    <DataTableRow>
+                      {member.image?.url ? (
+                        <img
+                          src={member.image.url}
+                          alt={member.image.altText}
+                          width={60}
+                          height={40}
                         />
-                      </li>
-                      <li onClick={() => onDeleteClick(data[0]._id)}>
-                        <TooltipComponent
-                          tag='a'
-                          id={`delete-${index}`}
-                          containerClassName='btn btn-trigger btn-icon'
-                          icon='trash-fill'
-                          direction='top'
-                          text='Delete'
-                        />
-                      </li>
-                    </ul>
-                  </DataTableRow>
-                </DataTableItem>
-              ))}
-          </div>
+                      ) : (
+                        "No image"
+                      )}
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span>{member.image?.altText}</span>
+                    </DataTableRow>
+                    <DataTableRow className='nk-tb-col-tools'>
+                      <ul className='nk-tb-actions gx-1'>
+                        <li onClick={() => toggleModal(data[0])}>
+                          <TooltipComponent
+                            tag='a'
+                            id={`edit-${index}`}
+                            containerClassName='btn btn-trigger btn-icon'
+                            icon='edit-alt-fill'
+                            direction='top'
+                            text='Edit'
+                          />
+                        </li>
+                        <li onClick={() => onDeleteClick(data[0]._id)}>
+                          <TooltipComponent
+                            tag='a'
+                            id={`delete-${index}`}
+                            containerClassName='btn btn-trigger btn-icon'
+                            icon='trash-fill'
+                            direction='top'
+                            text='Delete'
+                          />
+                        </li>
+                      </ul>
+                    </DataTableRow>
+                  </DataTableItem>
+                ))}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -446,7 +454,7 @@ const VidhyavanamLeadership = () => {
 
                 <div>
                   <Button
-                  style={{width:"auto"}}
+                    style={{ width: "auto" }}
                     color='primary'
                     size='sm'
                     type='button'

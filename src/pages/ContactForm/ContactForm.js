@@ -18,6 +18,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  Spinner,
 } from "reactstrap";
 import { useForm } from "react-hook-form";
 import {
@@ -39,6 +40,7 @@ import {
 const ContactForm = () => {
   const [data, setData] = useState([]);
   const [modal, setModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
     subtitle: "",
@@ -65,10 +67,12 @@ const ContactForm = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/mastercontact");
     if (res.success) {
       setData(res.data);
     }
+    setLoading(false)
   };
 
   const toggleModal = (editItem = null) => {
@@ -192,154 +196,159 @@ const ContactForm = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Sr. No.</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Subtitle</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Button Text</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Full Name</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Number</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Email</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Inquiry Type</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Message</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Origin Page</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Sr. No.</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Subtitle</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Button Text</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Full Name</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Number</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Email</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Inquiry Type</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Message</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Origin Page</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
+                            }}
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
+              {data.map((item, index) => (
+                <DataTableItem key={item._id}>
+                  <DataTableRow>
+                    <span>{index + 1}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.subtitle}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.title}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.buttonText}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.fullName}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.number}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.email}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.inquiryType}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.message}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.originPage}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    {item.image?.url ? (
+                      <img
+                        src={
+                          item.image?.url
+                            ? item.image.url
+                            : typeof item.image === "string"
+                              ? item.image
+                              : item.image instanceof File
+                                ? URL.createObjectURL(item.image)
+                                : ""
+                        }
+                        alt='Uploaded'
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span>No Image</span>
+                    )}
+                  </DataTableRow>
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li
+                        className='nk-tb-action-hidden'
+                        onClick={() => toggleModal(item)}
+                      >
+                        <TooltipComponent
                           tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"edit" + item._id}
+                          icon='edit-alt-fill'
+                          direction='top'
+                          text='Edit'
+                        />
+                      </li>
+                      <li onClick={() => onDeleteClick(item._id)}>
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"delete" + item._id}
+                          icon='trash-fill'
+                          direction='top'
+                          text='Delete'
+                        />
                       </li>
                     </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
-            {data.map((item, index) => (
-              <DataTableItem key={item._id}>
-                <DataTableRow>
-                  <span>{index + 1}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.subtitle}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.title}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.buttonText}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.fullName}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.number}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.email}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.inquiryType}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.message}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.originPage}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  {item.image?.url ? (
-                    <img
-                      src={
-                        item.image?.url
-                          ? item.image.url
-                          : typeof item.image === "string"
-                          ? item.image
-                          : item.image instanceof File
-                          ? URL.createObjectURL(item.image)
-                          : ""
-                      }
-                      alt='Uploaded'
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    <span>No Image</span>
-                  )}
-                </DataTableRow>
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => toggleModal(item)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item._id}
-                        icon='edit-alt-fill'
-                        direction='top'
-                        text='Edit'
-                      />
-                    </li>
-                    <li onClick={() => onDeleteClick(item._id)}>
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"delete" + item._id}
-                        icon='trash-fill'
-                        direction='top'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal

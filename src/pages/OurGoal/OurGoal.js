@@ -42,6 +42,7 @@ import { Spinner } from "reactstrap";
 const OurGoal = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -62,12 +63,14 @@ const OurGoal = () => {
   } = useForm();
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/scholarships/our-goal");
     if (res.success) {
       console.log("goal created:", res.data);
 
       setData(res.data);
     }
+    setLoading(false)
   };
 
   useEffect(() => {
@@ -88,7 +91,7 @@ const OurGoal = () => {
         description: editItem.description,
         additionalItems: normalizedItems,
       };
-  
+
 
       setFormData(editData);
       reset(editData);
@@ -106,9 +109,9 @@ const OurGoal = () => {
       additionalItems: [{ title: "", description: "", images: [] }],
     };
     setFormData(empty);
-    reset(empty); 
+    reset(empty);
   };
-  
+
 
   const selectorDeleteUser = () => {
     const updated = data.filter((item) => !item.checked);
@@ -239,67 +242,71 @@ const OurGoal = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Main Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Main Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Additional Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Additional Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Additional Description</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
-                          tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
-                      </li>
-                    </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Main Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Main Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Additional Image</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Additional Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Additional Description</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
+                            }}
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
 
-            {data.map((item) => (
-              <DataTableItem key={item.id}>
-                <DataTableRow>
-                  <span>{item.title}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span
-                    dangerouslySetInnerHTML={{ __html: item.description }}
-                  />
-                </DataTableRow>
-                {item.goals?.map((additional, index) => (
-                  <>
-                    <DataTableRow key={index}>
-                      {additional.images && additional.images.length > 0
-                        ? additional.images.map((img, imgIndex) => (
+              {data.map((item) => (
+                <DataTableItem key={item.id}>
+                  <DataTableRow>
+                    <span>{item.title}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span
+                      dangerouslySetInnerHTML={{ __html: item.description }}
+                    />
+                  </DataTableRow>
+                  {item.goals?.map((additional, index) => (
+                    <>
+                      <DataTableRow key={index}>
+                        {additional.images && additional.images.length > 0
+                          ? additional.images.map((img, imgIndex) => (
                             <img
                               key={imgIndex}
                               src={img.url}
@@ -313,50 +320,51 @@ const OurGoal = () => {
                               }}
                             />
                           ))
-                        : "No image"}
-                    </DataTableRow>
-                    <DataTableRow>
-                      <span>{additional.title}</span>
-                    </DataTableRow>
-                    <DataTableRow>
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: additional.description,
-                        }}
-                      />
-                    </DataTableRow>
-                  </>
-                ))}
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => toggleModal(item)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item.id}
-                        icon='edit-alt-fill'
-                        direction='top'
-                        text='Edit'
-                      />
-                    </li>
-                    <li onClick={() => handleDelete(item._id)}>
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"delete" + item._id}
-                        icon='trash-fill'
-                        direction='top'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
+                          : "No image"}
+                      </DataTableRow>
+                      <DataTableRow>
+                        <span>{additional.title}</span>
+                      </DataTableRow>
+                      <DataTableRow>
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: additional.description,
+                          }}
+                        />
+                      </DataTableRow>
+                    </>
+                  ))}
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li
+                        className='nk-tb-action-hidden'
+                        onClick={() => toggleModal(item)}
+                      >
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"edit" + item.id}
+                          icon='edit-alt-fill'
+                          direction='top'
+                          text='Edit'
+                        />
+                      </li>
+                      <li onClick={() => handleDelete(item._id)}>
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"delete" + item._id}
+                          icon='trash-fill'
+                          direction='top'
+                          text='Delete'
+                        />
+                      </li>
+                    </ul>
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -499,8 +507,8 @@ const OurGoal = () => {
                                     img instanceof File
                                       ? URL.createObjectURL(img)
                                       : typeof img === "string"
-                                      ? img
-                                      : img?.url || ""
+                                        ? img
+                                        : img?.url || ""
                                   }
                                   alt={`Preview ${imgIdx + 1}`}
                                   style={{

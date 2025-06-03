@@ -38,8 +38,9 @@ import {
 } from "../../api/api";
 
 const Facilities = () => {
-  const [data, setData] =  useState([]);
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -65,8 +66,10 @@ const Facilities = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/academy/facilities");
-    if (res.success) setData(res.data);
+    if (res.success) { setData(res.data) };
+    setLoading(false)
   };
 
   const toggleModal = (editItem = null) => {
@@ -199,146 +202,82 @@ const Facilities = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Video</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image Alt Text</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Video Alt Text</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Featured Image</span>{" "}
-                {/* New column for Featured Image */}
-              </DataTableRow>
-              <DataTableRow>
-                <span>Is Featured</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
-                          tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
-                      </li>
-                    </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
-
-            {data.map((item) => (
-              <DataTableItem key={item._id}>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
                 <DataTableRow>
-                  <span>{item.title}</span>
+                  <span>Title</span>
                 </DataTableRow>
-
                 <DataTableRow>
-                  {item.resources?.image ? (
-                    <img
-                      src={
-                        item.image instanceof File
-                          ? URL.createObjectURL(item?.resources?.image)
-                          : typeof item?.resources?.image === "string"
-                          ? item?.resources?.image
-                          : item?.resources?.image?.url || ""
-                      }
-                      alt={
-                        item?.resources?.imageAltText ||
-                        item.image?.altText ||
-                        "Image"
-                      }
-                      width={60}
-                      height={40}
-                      style={{ objectFit: "cover", borderRadius: "4px" }}
-                    />
-                  ) : (
-                    "No image"
-                  )}
+                  <span>Image</span>
                 </DataTableRow>
-
                 <DataTableRow>
-                  <span>
-                    <DataTableRow>
-                      {item?.resources?.video ? (
-                        <video
-                          width={80}
-                          height={50}
-                          style={{ borderRadius: "4px", objectFit: "cover" }}
-                          controls
-                        >
-                          <source
-                            src={
-                              item?.resources?.video instanceof File
-                                ? URL.createObjectURL(item?.resources?.video)
-                                : typeof item?.resources?.video === "string"
-                                ? item?.resources?.video
-                                : item?.resources?.video?.url || ""
-                            }
-                          />
-                          Your browser does not support the video tag.
-                        </video>
-                      ) : (
-                        "No video"
-                      )}
-                    </DataTableRow>
-                  </span>
+                  <span>Video</span>
                 </DataTableRow>
-
                 <DataTableRow>
-                  <span>
-                    {item?.resources?.image?.altText || "No Alt Text"}
-                  </span>
+                  <span>Image Alt Text</span>
                 </DataTableRow>
-
                 <DataTableRow>
-                  <span>
-                    {item?.resources?.video?.altText || "No Alt Text"}
-                  </span>
+                  <span>Video Alt Text</span>
                 </DataTableRow>
-
-                {/* Display featured image */}
                 <DataTableRow>
+                  <span>Featured Image</span>{" "}
+                  {/* New column for Featured Image */}
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Is Featured</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
+                            }}
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
+
+              {data.map((item) => (
+                <DataTableItem key={item._id}>
                   <DataTableRow>
-                    {item.resources?.featuredImage ? (
+                    <span>{item.title}</span>
+                  </DataTableRow>
+
+                  <DataTableRow>
+                    {item.resources?.image ? (
                       <img
                         src={
                           item.image instanceof File
-                            ? URL.createObjectURL(
-                                item?.resources?.featuredImage
-                              )
-                            : typeof item?.resources?.featuredImage === "string"
-                            ? item?.resources?.featuredImage
-                            : item?.resources?.featuredImage?.url || ""
+                            ? URL.createObjectURL(item?.resources?.image)
+                            : typeof item?.resources?.image === "string"
+                              ? item?.resources?.image
+                              : item?.resources?.image?.url || ""
                         }
                         alt={
                           item?.resources?.imageAltText ||
-                          item.featuredImage?.altText ||
+                          item.image?.altText ||
                           "Image"
                         }
                         width={60}
@@ -349,42 +288,111 @@ const Facilities = () => {
                       "No image"
                     )}
                   </DataTableRow>
-                </DataTableRow>
 
-                <DataTableRow>
-                  <span>{item.isFeatured ? "Yes" : "No"}</span>
-                </DataTableRow>
+                  <DataTableRow>
+                    <span>
+                      <DataTableRow>
+                        {item?.resources?.video ? (
+                          <video
+                            width={80}
+                            height={50}
+                            style={{ borderRadius: "4px", objectFit: "cover" }}
+                            controls
+                          >
+                            <source
+                              src={
+                                item?.resources?.video instanceof File
+                                  ? URL.createObjectURL(item?.resources?.video)
+                                  : typeof item?.resources?.video === "string"
+                                    ? item?.resources?.video
+                                    : item?.resources?.video?.url || ""
+                              }
+                            />
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          "No video"
+                        )}
+                      </DataTableRow>
+                    </span>
+                  </DataTableRow>
 
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => toggleModal(item)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item._id}
-                        icon='edit-alt-fill'
-                        direction='top'
-                        text='Edit'
-                      />
-                    </li>
-                    <li onClick={() => onDeleteClick(item._id)}>
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"delete" + item._id}
-                        icon='trash-fill'
-                        direction='top'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
+                  <DataTableRow>
+                    <span>
+                      {item?.resources?.image?.altText || "No Alt Text"}
+                    </span>
+                  </DataTableRow>
+
+                  <DataTableRow>
+                    <span>
+                      {item?.resources?.video?.altText || "No Alt Text"}
+                    </span>
+                  </DataTableRow>
+
+                  {/* Display featured image */}
+                  <DataTableRow>
+                    <DataTableRow>
+                      {item.resources?.featuredImage ? (
+                        <img
+                          src={
+                            item.image instanceof File
+                              ? URL.createObjectURL(
+                                item?.resources?.featuredImage
+                              )
+                              : typeof item?.resources?.featuredImage === "string"
+                                ? item?.resources?.featuredImage
+                                : item?.resources?.featuredImage?.url || ""
+                          }
+                          alt={
+                            item?.resources?.imageAltText ||
+                            item.featuredImage?.altText ||
+                            "Image"
+                          }
+                          width={60}
+                          height={40}
+                          style={{ objectFit: "cover", borderRadius: "4px" }}
+                        />
+                      ) : (
+                        "No image"
+                      )}
+                    </DataTableRow>
+                  </DataTableRow>
+
+                  <DataTableRow>
+                    <span>{item.isFeatured ? "Yes" : "No"}</span>
+                  </DataTableRow>
+
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li
+                        className='nk-tb-action-hidden'
+                        onClick={() => toggleModal(item)}
+                      >
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"edit" + item._id}
+                          icon='edit-alt-fill'
+                          direction='top'
+                          text='Edit'
+                        />
+                      </li>
+                      <li onClick={() => onDeleteClick(item._id)}>
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"delete" + item._id}
+                          icon='trash-fill'
+                          direction='top'
+                          text='Delete'
+                        />
+                      </li>
+                    </ul>
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -453,8 +461,8 @@ const Facilities = () => {
                             formData.image instanceof File
                               ? URL.createObjectURL(formData.image)
                               : typeof formData.image === "string"
-                              ? formData.image
-                              : formData.image?.url || ""
+                                ? formData.image
+                                : formData.image?.url || ""
                           }
                           alt='Preview'
                           style={{
@@ -575,8 +583,8 @@ const Facilities = () => {
                               formData.video instanceof File
                                 ? URL.createObjectURL(formData.video)
                                 : typeof formData.video === "string"
-                                ? formData.video
-                                : formData.video?.url || ""
+                                  ? formData.video
+                                  : formData.video?.url || ""
                             }
                           />
                           Your browser does not support the video tag.
@@ -680,8 +688,8 @@ const Facilities = () => {
                             formData.featuredImage instanceof File
                               ? URL.createObjectURL(formData.featuredImage)
                               : typeof formData.featuredImage === "string"
-                              ? formData.featuredImage
-                              : formData.featuredImage?.url || ""
+                                ? formData.featuredImage
+                                : formData.featuredImage?.url || ""
                           }
                           alt='Featured Preview'
                           style={{

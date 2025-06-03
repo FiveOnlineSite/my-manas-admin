@@ -42,6 +42,7 @@ import { Spinner } from "reactstrap";
 const LeadershipTeam = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -62,12 +63,14 @@ const LeadershipTeam = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true)
     const res = await getRequest("/academy/leadership-team");
     if (res.success) {
       setData(res.data);
     } else {
       toast.error(res.message || "Failed to fetch data");
     }
+    setLoading(false)
   };
 
   const toggleModal = (editItem = null) => {
@@ -215,76 +218,81 @@ const LeadershipTeam = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Name</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Alt Text</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end' />
-            </DataTableHead>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Name</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Alt Text</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end' />
+              </DataTableHead>
 
-            {data.length > 0 &&
-              data[0]?.members?.map((member, index) => (
-                <DataTableItem key={index}>
-                  <DataTableRow>
-                    <span>{member.name}</span>
-                  </DataTableRow>
-                  <DataTableRow>
-                    <span
-                      dangerouslySetInnerHTML={{ __html: member.description }}
-                    />
-                  </DataTableRow>
-                  <DataTableRow>
-                    {member.image?.url ? (
-                      <img
-                        src={member.image.url}
-                        alt={member.image.altText}
-                        width={60}
-                        height={40}
+              {data.length > 0 &&
+                data[0]?.members?.map((member, index) => (
+                  <DataTableItem key={index}>
+                    <DataTableRow>
+                      <span>{member.name}</span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span
+                        dangerouslySetInnerHTML={{ __html: member.description }}
                       />
-                    ) : (
-                      "No image"
-                    )}
-                  </DataTableRow>
-                  <DataTableRow>
-                    <span>{member.image?.altText}</span>
-                  </DataTableRow>
-                  <DataTableRow className='nk-tb-col-tools'>
-                    <ul className='nk-tb-actions gx-1'>
-                      <li onClick={() => toggleModal(data[0])}>
-                        <TooltipComponent
-                          tag='a'
-                          id={`edit-${index}`}
-                          containerClassName='btn btn-trigger btn-icon'
-                          icon='edit-alt-fill'
-                          direction='top'
-                          text='Edit'
+                    </DataTableRow>
+                    <DataTableRow>
+                      {member.image?.url ? (
+                        <img
+                          src={member.image.url}
+                          alt={member.image.altText}
+                          width={60}
+                          height={40}
                         />
-                      </li>
-                      <li onClick={() => onDeleteClick(data[0]._id)}>
-                        <TooltipComponent
-                          tag='a'
-                          id={`delete-${index}`}
-                          containerClassName='btn btn-trigger btn-icon'
-                          icon='trash-fill'
-                          direction='top'
-                          text='Delete'
-                        />
-                      </li>
-                    </ul>
-                  </DataTableRow>
-                </DataTableItem>
-              ))}
-          </div>
+                      ) : (
+                        "No image"
+                      )}
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span>{member.image?.altText}</span>
+                    </DataTableRow>
+                    <DataTableRow className='nk-tb-col-tools'>
+                      <ul className='nk-tb-actions gx-1'>
+                        <li onClick={() => toggleModal(data[0])}>
+                          <TooltipComponent
+                            tag='a'
+                            id={`edit-${index}`}
+                            containerClassName='btn btn-trigger btn-icon'
+                            icon='edit-alt-fill'
+                            direction='top'
+                            text='Edit'
+                          />
+                        </li>
+                        <li onClick={() => onDeleteClick(data[0]._id)}>
+                          <TooltipComponent
+                            tag='a'
+                            id={`delete-${index}`}
+                            containerClassName='btn btn-trigger btn-icon'
+                            icon='trash-fill'
+                            direction='top'
+                            text='Delete'
+                          />
+                        </li>
+                      </ul>
+                    </DataTableRow>
+                  </DataTableItem>
+                ))}
+            </div>
+          )}
         </Block>
 
         <Modal

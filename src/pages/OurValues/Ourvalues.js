@@ -40,12 +40,14 @@ import { toast } from "react-toastify";
 import { Spinner } from "reactstrap";
 
 const OurValues = () => {
-  const [data, setData] =  useState([]);
+  const [data, setData] = useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [iconErrors, setIconErrors] = useState([]);
   const [valuesErrors, setValuesErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
 
   const [formData, setFormData] = useState({
     title: "",
@@ -68,10 +70,14 @@ const OurValues = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true); // Show loader
+
     const res = await getRequest("/about/our-values");
     if (res.success) {
       setData(res.data);
     }
+    setLoading(false); // Show loader
+
   };
 
   const toggleModal = (item = null) => {
@@ -84,10 +90,10 @@ const OurValues = () => {
         description: item.description || "",
         values: item.values?.length
           ? item.values.map((v) => ({
-              title: v.title,
-              description: v.description,
-              valueIcon: v.icon?.url || null,
-            }))
+            title: v.title,
+            description: v.description,
+            valueIcon: v.icon?.url || null,
+          }))
           : [{ title: "", description: "", valueIcon: null }],
       });
       setEditId(item._id);
@@ -266,127 +272,132 @@ const OurValues = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Value Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Value Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Value Icon</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
-                          tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
-                      </li>
-                    </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
-
-            {data.map((item) => (
-              <>
-                {item.values.map((value, index) => (
-                  <DataTableItem key={`${item.id}-${index}`}>
-                    {index === 0 && (
-                      <>
-                        <DataTableRow rowSpan={item.values.length}>
-                          <span>{item.title}</span>
-                        </DataTableRow>
-                        <DataTableRow rowSpan={item.values.length}>
-                          <span
-                            dangerouslySetInnerHTML={{
-                              __html: item.description,
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Value Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Value Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Value Icon</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
                             }}
-                          ></span>
-                        </DataTableRow>
-                      </>
-                    )}
-                    <DataTableRow>
-                      <span>{value?.title}</span>
-                    </DataTableRow>
-                    <DataTableRow>
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: value?.description,
-                        }}
-                      ></span>
-                    </DataTableRow>
-                    <DataTableRow>
-                      {value?.icon?.url ? (
-                        <img
-                          src={value.icon.url}
-                          alt='icon'
-                          width={30}
-                          height={30}
-                          style={{ marginLeft: "10px" }}
-                        />
-                      ) : (
-                        "No Icon"
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
+
+              {data.map((item) => (
+                <>
+                  {item.values.map((value, index) => (
+                    <DataTableItem key={`${item.id}-${index}`}>
+                      {index === 0 && (
+                        <>
+                          <DataTableRow rowSpan={item.values.length}>
+                            <span>{item.title}</span>
+                          </DataTableRow>
+                          <DataTableRow rowSpan={item.values.length}>
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: item.description,
+                              }}
+                            ></span>
+                          </DataTableRow>
+                        </>
                       )}
-                    </DataTableRow>
-                    {index === 0 && (
-                      <DataTableRow
-                        rowSpan={item.values.length}
-                        className='nk-tb-col-tools'
-                      >
-                        <ul className='nk-tb-actions gx-1'>
-                          <li onClick={() => toggleModal(item)}>
-                            <TooltipComponent
-                              tag='a'
-                              containerClassName='btn btn-trigger btn-icon'
-                              id={"edit" + item._id}
-                              icon='edit-alt-fill'
-                              direction='top'
-                              text='Edit'
-                            />
-                          </li>
-                          <li onClick={() => onDeleteClick(item._id)}>
-                            <TooltipComponent
-                              tag='a'
-                              containerClassName='btn btn-trigger btn-icon'
-                              id={"delete" + item._id}
-                              icon='trash-fill'
-                              direction='top'
-                              text='Delete'
-                            />
-                          </li>
-                        </ul>
+                      <DataTableRow>
+                        <span>{value?.title}</span>
                       </DataTableRow>
-                    )}
-                  </DataTableItem>
-                ))}
-              </>
-            ))}
-          </div>
+                      <DataTableRow>
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: value?.description,
+                          }}
+                        ></span>
+                      </DataTableRow>
+                      <DataTableRow>
+                        {value?.icon?.url ? (
+                          <img
+                            src={value.icon.url}
+                            alt='icon'
+                            width={30}
+                            height={30}
+                            style={{ marginLeft: "10px" }}
+                          />
+                        ) : (
+                          "No Icon"
+                        )}
+                      </DataTableRow>
+                      {index === 0 && (
+                        <DataTableRow
+                          rowSpan={item.values.length}
+                          className='nk-tb-col-tools'
+                        >
+                          <ul className='nk-tb-actions gx-1'>
+                            <li onClick={() => toggleModal(item)}>
+                              <TooltipComponent
+                                tag='a'
+                                containerClassName='btn btn-trigger btn-icon'
+                                id={"edit" + item._id}
+                                icon='edit-alt-fill'
+                                direction='top'
+                                text='Edit'
+                              />
+                            </li>
+                            <li onClick={() => onDeleteClick(item._id)}>
+                              <TooltipComponent
+                                tag='a'
+                                containerClassName='btn btn-trigger btn-icon'
+                                id={"delete" + item._id}
+                                icon='trash-fill'
+                                direction='top'
+                                text='Delete'
+                              />
+                            </li>
+                          </ul>
+                        </DataTableRow>
+                      )}
+                    </DataTableItem>
+                  ))}
+                </>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -461,7 +472,7 @@ const OurValues = () => {
                       <label className='form-label'>Value Description</label>
                       <Controller
                         defaultValue={value.description || ""}
-                        name={`values[${index}].description`} 
+                        name={`values[${index}].description`}
                         control={control}
                         rules={{ required: "Value Description is required" }}
                         render={({ field }) => (
@@ -496,7 +507,7 @@ const OurValues = () => {
                             required: () =>
                               typeof formData.values[index].valueIcon ===
                                 "string" ||
-                              formData.values[index].valueIcon instanceof File
+                                formData.values[index].valueIcon instanceof File
                                 ? true
                                 : "Icon is required",
                             size: (file) =>
@@ -527,8 +538,8 @@ const OurValues = () => {
                             value.valueIcon instanceof File
                               ? URL.createObjectURL(value.valueIcon)
                               : typeof value.valueIcon === "string"
-                              ? value.valueIcon
-                              : ""
+                                ? value.valueIcon
+                                : ""
                           }
                           alt='icon preview'
                           width={100}

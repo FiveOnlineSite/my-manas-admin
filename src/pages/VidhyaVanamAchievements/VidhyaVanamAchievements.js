@@ -36,9 +36,10 @@ import { deleteRequest, getRequest, postFormData, putRequest } from "../../api/a
 
 
 const VidhyaVanamAchievements = () => {
-    const [submitting, setSubmitting] = useState(false);
-  
-  const [data, setData] =  useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [data, setData] = useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -52,141 +53,143 @@ const VidhyaVanamAchievements = () => {
   } = useForm();
 
   const [formData, setFormData] = useState({
+    title: "",
+    items: [{ title: "", description: "", image: null, altText: "" }],
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true)
+    const res = await getRequest("/vidhyavanam/achievements");
+    console.log(res.data.data, "resfdfdfdf");
+
+    if (res.success) {
+      //  If it's an array, use as is; if it's an object, wrap in array
+      // const result = Array.isArray(res.data) ? res.data : [res.data];
+      setData(res?.data?.data);
+    } else {
+      toast.error(res.message || "Failed to fetch data");
+      setData([]);
+    }
+    setLoading(false)
+  };
+
+  const toggleModal = (editItem = null) => {
+    if (editItem) {
+      setEditId(editItem._id);
+      setFormData({
+        title: editItem.title || "",
+        items: Array.isArray(editItem.items)
+          ? editItem.items.map((item) => ({
+            title: item.title || "",
+            description: item.description || "",
+            image: item.image?.url || "",
+            altText: item.image?.altText || "",
+          }))
+          : [],
+      });
+    } else {
+      resetForm();
+    }
+    setModal(!modal);
+  };
+
+  const resetForm = () => {
+    setFormData({
       title: "",
       items: [{ title: "", description: "", image: null, altText: "" }],
     });
-  
-    useEffect(() => {
+    setEditId(null);
+    reset();
+  };
+
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...formData.items];
+    updatedItems[index][field] = value;
+    setFormData({ ...formData, items: updatedItems });
+  };
+
+  const handleImageChange = (e, index) => {
+    const file = e.target.files[0];
+    // if (file && file.size > 512000)
+    // {
+    //   toast.error("Image must be less than 500KB");
+    //   return;
+    // }
+    handleItemChange(index, "image", file);
+  };
+
+  const addItem = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setFormData({
+      ...formData,
+      items: [
+        ...formData.items,
+        { title: "", description: "", image: null, altText: "" },
+      ],
+    });
+  };
+
+  const removeItem = (index) => {
+    const updatedItems = formData.items.filter((_, i) => i !== index);
+    setFormData({ ...formData, items: updatedItems });
+  };
+
+  const onSubmit = async () => {
+    setSubmitting(true);
+
+    const payload = new FormData();
+    payload.append("title", formData.title);
+
+    const itemsData = formData.items.map(
+      ({ title, description, image, altText }) => ({
+        title,
+        description,
+        image: { altText },
+      })
+    );
+    console.log(formData, itemsData, "itemsDataaaaaaa");
+
+    payload.append("items", JSON.stringify(itemsData));
+    formData.items.forEach((item) => {
+      if (item.image instanceof File) {
+        console.log(item.image, "feeeeeeeee");
+
+        payload.append("images", item.image);
+      }
+    });
+
+    let res;
+    if (editId) {
+      res = await putRequest(`/vidhyavanam/achievements/${editId}`, payload);
+    } else {
+      res = await postFormData("/vidhyavanam/achievements", payload);
+    }
+
+    if (res.success) {
       fetchData();
-    }, []);
-  
-    const fetchData = async () => {
-      const res = await getRequest("/vidhyavanam/achievements");
-      console.log(res.data.data, "resfdfdfdf");
-  
-      if (res.success) {
-        //  If it's an array, use as is; if it's an object, wrap in array
-        // const result = Array.isArray(res.data) ? res.data : [res.data];
-        setData(res?.data?.data);
-      } else {
-        toast.error(res.message || "Failed to fetch data");
-        setData([]);
-      }
-    };
-  
-    const toggleModal = (editItem = null) => {
-      if (editItem) {
-        setEditId(editItem._id);
-        setFormData({
-          title: editItem.title || "",
-          items: Array.isArray(editItem.items)
-            ? editItem.items.map((item) => ({
-                title: item.title || "",
-                description: item.description || "",
-                image: item.image?.url || "",
-                altText: item.image?.altText || "",
-              }))
-            : [],
-        });
-      } else {
-        resetForm();
-      }
-      setModal(!modal);
-    };
-  
-    const resetForm = () => {
-      setFormData({
-        title: "",
-        items: [{ title: "", description: "", image: null, altText: "" }],
-      });
-      setEditId(null);
-      reset();
-    };
-  
-    const handleItemChange = (index, field, value) => {
-      const updatedItems = [...formData.items];
-      updatedItems[index][field] = value;
-      setFormData({ ...formData, items: updatedItems });
-    };
-  
-    const handleImageChange = (e, index) => {
-      const file = e.target.files[0];
-      // if (file && file.size > 512000)
-      // {
-      //   toast.error("Image must be less than 500KB");
-      //   return;
-      // }
-      handleItemChange(index, "image", file);
-    };
-  
-    const addItem = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      setFormData({
-        ...formData,
-        items: [
-          ...formData.items,
-          { title: "", description: "", image: null, altText: "" },
-        ],
-      });
-    };
-  
-    const removeItem = (index) => {
-      const updatedItems = formData.items.filter((_, i) => i !== index);
-      setFormData({ ...formData, items: updatedItems });
-    };
-  
-    const onSubmit = async () => {
-      setSubmitting(true);
-  
-      const payload = new FormData();
-      payload.append("title", formData.title);
-  
-      const itemsData = formData.items.map(
-        ({ title, description, image, altText }) => ({
-          title,
-          description,
-          image: { altText },
-        })
-      );
-      console.log(formData, itemsData, "itemsDataaaaaaa");
-  
-      payload.append("items", JSON.stringify(itemsData));
-      formData.items.forEach((item) => {
-        if (item.image instanceof File) {
-          console.log(item.image, "feeeeeeeee");
-  
-          payload.append("images", item.image);
-        }
-      });
-  
-      let res;
-      if (editId) {
-        res = await putRequest(`/vidhyavanam/achievements/${editId}`, payload);
-      } else {
-        res = await postFormData("/vidhyavanam/achievements", payload);
-      }
-  
-      if (res.success) {
-        fetchData();
-        toast.success(editId ? "Updated successfully!" : "Created successfully!");
-        toggleModal();
-        setSubmitting(false);
-      } else {
-        toast.error(res.message || "Submission failed.");
-      }
-    };
-  
-    const onDeleteClick = async (id) => {
-      const res = await deleteRequest(`/vidhyavanam/achievements/${id}`);
-      if (res.success) {
-        fetchData();
-        toast.success("Deleted successfully!");
-      } else {
-        toast.error(res.message || "Delete failed.");
-      }
-    };
-  
+      toast.success(editId ? "Updated successfully!" : "Created successfully!");
+      toggleModal();
+      setSubmitting(false);
+    } else {
+      toast.error(res.message || "Submission failed.");
+    }
+  };
+
+  const onDeleteClick = async (id) => {
+    const res = await deleteRequest(`/vidhyavanam/achievements/${id}`);
+    if (res.success) {
+      fetchData();
+      toast.success("Deleted successfully!");
+    } else {
+      toast.error(res.message || "Delete failed.");
+    }
+  };
+
   return (
     <>
       <Head title='Achievements Content' />
@@ -214,33 +217,37 @@ const VidhyaVanamAchievements = () => {
         </BlockHead>
 
         <Block>
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Main Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Item Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Alt Text</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <span>Actions</span>
-              </DataTableRow>
-            </DataTableHead>
-            {console.log(data, "datadddddddddd")}
-            {data &&
-              data?.length > 0 &&
-              data.map((achievement) =>
-                Array.isArray(achievement.items)
-                  ? achievement?.items?.map((item, idx) => (
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Main Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Item Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Alt Text</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <span>Actions</span>
+                </DataTableRow>
+              </DataTableHead>
+              {console.log(data, "datadddddddddd")}
+              {data &&
+                data?.length > 0 &&
+                data.map((achievement) =>
+                  Array.isArray(achievement.items)
+                    ? achievement?.items?.map((item, idx) => (
                       <DataTableItem key={`${achievement._id}-${idx}`}>
                         <DataTableRow>
                           <span>{achievement.title}</span>
@@ -298,9 +305,10 @@ const VidhyaVanamAchievements = () => {
                         </DataTableRow>
                       </DataTableItem>
                     ))
-                  : []
-              )}
-          </div>
+                    : []
+                )}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -389,7 +397,7 @@ const VidhyaVanamAchievements = () => {
 
                 <div>
                   <Button
-                  style={{width:"auto"}}
+                    style={{ width: "auto" }}
                     color='primary'
                     size='sm'
                     onClick={(e) => {

@@ -4,6 +4,7 @@ import {
   DropdownToggle,
   UncontrolledDropdown,
   DropdownItem,
+  Spinner,
 } from "reactstrap";
 import EditModal from "./EditModal";
 import AddModal from "./AddModal";
@@ -39,6 +40,7 @@ import { set } from "react-hook-form";
 const HomeBanner = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+const [loading, setLoading] = useState(true);
 
   const [sm, updateSm] = useState(false);
   const [modal, setModal] = useState({ edit: false, add: false });
@@ -61,6 +63,8 @@ const HomeBanner = () => {
   const [editFormData, setEditFormData] = useState({ ...defaultFormData });
 
   const fetchBannerData = async () => {
+          setLoading(true); // Show loader
+
     try {
       const result = await getRequest("/home/banner");
       // console.log(result, "resultfgrgfg");
@@ -69,6 +73,8 @@ const HomeBanner = () => {
     } catch (error) {
       // console.error("Failed to fetch banners:", error);
     }
+          setLoading(false); // Show loader
+
   };
 
   useEffect(() => {
@@ -239,6 +245,12 @@ const HomeBanner = () => {
         </BlockHead>
 
         <Block>
+          {loading?(
+             <div className="text-center p-5">
+      <Spinner color="primary" size="lg" />
+    </div>):(
+      
+  
           <div className='nk-tb-list is-separate is-medium mb-3'>
             <DataTableHead>
               <DataTableRow>
@@ -373,6 +385,7 @@ const HomeBanner = () => {
               </DataTableItem>
             ))}
           </div>
+            )}
 
           <PreviewAltCard>
             {data.length > 0 ? (

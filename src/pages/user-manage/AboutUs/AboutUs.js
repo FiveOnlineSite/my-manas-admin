@@ -43,7 +43,7 @@ import {
 const AboutUs = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [imageError, setImageError] = useState("");
@@ -127,6 +127,8 @@ const AboutUs = () => {
   };
 
   const fetchData = async () => {
+   setLoading(true); // Show loader
+
     const res = await getRequest("/home/aboutus"); // your API route
     if (res.success) {
       console.log("aboutus created:", res.data);
@@ -134,6 +136,8 @@ const AboutUs = () => {
       setData(res.data);
     } else {
     }
+ setLoading(false); // Show loader
+
   };
 
   useEffect(() => {
@@ -229,6 +233,10 @@ const AboutUs = () => {
         </BlockHead>
 
         <Block>
+          {loading?(
+            <div className="text-center p-5">
+             <Spinner color="primary" size="lg" />
+              </div>):(
           <div className='nk-tb-list is-separate is-medium mb-3'>
             <DataTableHead>
               <DataTableRow>
@@ -346,6 +354,7 @@ const AboutUs = () => {
               </DataTableItem>
             ))}
           </div>
+           )}
         </Block>
 
         <Modal
