@@ -123,7 +123,7 @@ const ContactForm = () => {
           toast.error("Update failed.");
         }
       } else {
-        res = await postFormData("mastercontact", formPayload);
+        res = await postFormData("/mastercontact", formPayload);
         if (res.success) {
           setData([res.data, ...data]);
           toast.success("Created successfully!");
