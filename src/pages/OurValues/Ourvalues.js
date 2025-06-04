@@ -322,80 +322,72 @@ const OurValues = () => {
                 </DataTableRow>
               </DataTableHead>
 
-              {data.map((item) => (
-                <>
-                  {item.values.map((value, index) => (
-                    <DataTableItem key={`${item.id}-${index}`}>
-                      {index === 0 && (
-                        <>
-                          <DataTableRow rowSpan={item.values.length}>
-                            <span>{item.title}</span>
-                          </DataTableRow>
-                          <DataTableRow rowSpan={item.values.length}>
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: item.description,
-                              }}
-                            ></span>
-                          </DataTableRow>
-                        </>
-                      )}
-                      <DataTableRow>
-                        <span>{value?.title}</span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: value?.description,
-                          }}
-                        ></span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        {value?.icon?.url ? (
-                          <img
-                            src={value.icon.url}
-                            alt='icon'
-                            width={30}
-                            height={30}
-                            style={{ marginLeft: "10px" }}
-                          />
-                        ) : (
-                          "No Icon"
-                        )}
-                      </DataTableRow>
-                      {index === 0 && (
-                        <DataTableRow
-                          rowSpan={item.values.length}
-                          className='nk-tb-col-tools'
-                        >
-                          <ul className='nk-tb-actions gx-1'>
-                            <li onClick={() => toggleModal(item)}>
-                              <TooltipComponent
-                                tag='a'
-                                containerClassName='btn btn-trigger btn-icon'
-                                id={"edit" + item._id}
-                                icon='edit-alt-fill'
-                                direction='top'
-                                text='Edit'
-                              />
-                            </li>
-                            <li onClick={() => onDeleteClick(item._id)}>
-                              <TooltipComponent
-                                tag='a'
-                                containerClassName='btn btn-trigger btn-icon'
-                                id={"delete" + item._id}
-                                icon='trash-fill'
-                                direction='top'
-                                text='Delete'
-                              />
-                            </li>
-                          </ul>
-                        </DataTableRow>
-                      )}
-                    </DataTableItem>
-                  ))}
-                </>
-              ))}
+              {data.map((item) =>
+  item.values.map((value, index) => (
+    <DataTableItem key={`${item._id}-${index}`}>
+      <DataTableRow>
+        <span>{index === 0 ? item.title : ""}</span>
+      </DataTableRow>
+      <DataTableRow>
+        <span>
+          {index === 0 && (
+            <div
+              dangerouslySetInnerHTML={{ __html: item.description }}
+            />
+          )}
+        </span>
+      </DataTableRow>
+      <DataTableRow>
+        <span>{value?.title}</span>
+      </DataTableRow>
+      <DataTableRow>
+        <div
+          dangerouslySetInnerHTML={{ __html: value?.description }}
+        />
+      </DataTableRow>
+      <DataTableRow>
+        {value?.icon?.url ? (
+          <img
+            src={value.icon.url}
+            alt='icon'
+            width={30}
+            height={30}
+            style={{ marginLeft: "10px" }}
+          />
+        ) : (
+          "No Icon"
+        )}
+      </DataTableRow>
+      <DataTableRow className='nk-tb-col-tools'>
+        {index === 0 ? (
+          <ul className='nk-tb-actions gx-1'>
+            <li onClick={() => toggleModal(item)}>
+              <TooltipComponent
+                tag='a'
+                containerClassName='btn btn-trigger btn-icon'
+                id={"edit" + item._id}
+                icon='edit-alt-fill'
+                direction='top'
+                text='Edit'
+              />
+            </li>
+            <li onClick={() => onDeleteClick(item._id)}>
+              <TooltipComponent
+                tag='a'
+                containerClassName='btn btn-trigger btn-icon'
+                id={"delete" + item._id}
+                icon='trash-fill'
+                direction='top'
+                text='Delete'
+              />
+            </li>
+          </ul>
+        ) : null}
+      </DataTableRow>
+    </DataTableItem>
+  ))
+)}
+
             </div>
           )}
         </Block>

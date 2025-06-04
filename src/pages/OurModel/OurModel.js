@@ -308,7 +308,7 @@ const OurModel = () => {
                               dangerouslySetInnerHTML={{
                                 __html: item.description,
                               }}
-                              style={{ maxHeight: "80px", overflow: "auto" }}
+                              // style={{ maxHeight: "80px", overflow: "auto" }}
                             />
                           ) : null}
                         </span>
@@ -323,7 +323,7 @@ const OurModel = () => {
                             dangerouslySetInnerHTML={{
                               __html: iconItem.description,
                             }}
-                            style={{ maxHeight: "80px", overflow: "auto" }}
+                            // style={{ maxHeight: "80px", overflow: "auto" }}
                           />
                         </span>
                       </DataTableRow>

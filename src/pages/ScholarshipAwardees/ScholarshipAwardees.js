@@ -297,75 +297,68 @@ const ScholarshipAwardees = () => {
                 </DataTableRow>
               </DataTableHead>
 
-              {data.map((item) => (
-                <>
-                  {item.awardees.map((awardee, index) => (
-                    <DataTableItem key={`${item._id}-${index}`}>
-                      {index === 0 && (
-                        <DataTableRow rowSpan={item.awardees.length}>
-                          <span>{item.title}</span>
-                        </DataTableRow>
-                      )}
-                      <DataTableRow>
-                        <span>{awardee.name}</span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        <div
-                          dangerouslySetInnerHTML={{ __html: awardee.review }}
-                          style={{ maxHeight: "100px", overflow: "auto" }}
-                        />
-                      </DataTableRow>
+              {data.map((item) =>
+  item.awardees.map((awardee, index) => (
+    <DataTableItem key={`${item._id}-${index}`}>
+      <DataTableRow>
+        <span>{index === 0 ? item.title : ""}</span>
+      </DataTableRow>
+      <DataTableRow>
+        <span>{awardee.name}</span>
+      </DataTableRow>
+      <DataTableRow>
+        <div dangerouslySetInnerHTML={{ __html: awardee.review }} />
+      </DataTableRow>
+      <DataTableRow>
+        <span>{awardee.year}</span>
+      </DataTableRow>
+      <DataTableRow>
+        <span>{awardee.institute}</span>
+      </DataTableRow>
+      <DataTableRow>
+        {awardee.image?.url ? (
+          <img
+            src={awardee.image?.url}
+            alt='awardee'
+            width={50}
+            height={50}
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          "No image"
+        )}
+      </DataTableRow>
+      <DataTableRow className='nk-tb-col-tools'>
+        <ul className='nk-tb-actions gx-1'>
+          <li
+            className='nk-tb-action-hidden'
+            onClick={() => toggleModal(item)}
+          >
+            <TooltipComponent
+              tag='a'
+              containerClassName='btn btn-trigger btn-icon'
+              id={"edit" + item._id}
+              icon='edit-alt-fill'
+              direction='top'
+              text='Edit'
+            />
+          </li>
+          <li onClick={() => onDeleteClick(item._id)}>
+            <TooltipComponent
+              tag='a'
+              containerClassName='btn btn-trigger btn-icon'
+              id={"delete" + item._id}
+              icon='trash-fill'
+              direction='top'
+              text='Delete'
+            />
+          </li>
+        </ul>
+      </DataTableRow>
+    </DataTableItem>
+  ))
+)}
 
-                      <DataTableRow>
-                        <span>{awardee.year}</span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        <span>{awardee.institute}</span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        {awardee.image?.url ? (
-                          <img
-                            src={awardee.image?.url}
-                            alt='awardee'
-                            width={50}
-                            height={50}
-                            style={{ objectFit: "cover" }}
-                          />
-                        ) : (
-                          "No image"
-                        )}
-                      </DataTableRow>
-                      <DataTableRow className='nk-tb-col-tools'>
-                        <ul className='nk-tb-actions gx-1'>
-                          <li
-                            className='nk-tb-action-hidden'
-                            onClick={() => toggleModal(item)}
-                          >
-                            <TooltipComponent
-                              tag='a'
-                              containerClassName='btn btn-trigger btn-icon'
-                              id={"edit" + item._id}
-                              icon='edit-alt-fill'
-                              direction='top'
-                              text='Edit'
-                            />
-                          </li>
-                          <li onClick={() => onDeleteClick(item._id)}>
-                            <TooltipComponent
-                              tag='a'
-                              containerClassName='btn btn-trigger btn-icon'
-                              id={"delete" + item._id}
-                              icon='trash-fill'
-                              direction='top'
-                              text='Delete'
-                            />
-                          </li>
-                        </ul>
-                      </DataTableRow>
-                    </DataTableItem>
-                  ))}
-                </>
-              ))}
             </div>
           )}
         </Block>
