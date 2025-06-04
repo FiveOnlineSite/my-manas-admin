@@ -90,15 +90,16 @@ const AcademyHistory = () => {
     setModal(!modal);
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      logo: null,
-      altText: "",
-      description: "",
-    });
-    reset();
+   const resetForm = () => {
+  const emptyData = {
+    title: "",
+    logo: null,
+    altText: "",
+    description: "",
   };
+  setFormData(emptyData);
+  reset(emptyData);
+};
 
   const selectorDeleteUser = () => {
     const updated = data.filter((item) => !item.checked);
