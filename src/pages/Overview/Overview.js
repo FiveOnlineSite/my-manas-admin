@@ -120,7 +120,7 @@ const Overview = () => {
       setEditId(null);
       resetForm();
     }
-    setModal(true);
+    setModal(!modal); 
   };
 
   const resetForm = () => {
