@@ -40,11 +40,13 @@ import {
 } from "../../api/api";
 
 const OurMission = () => {
-  const [data, setData] =  useState([]);;
+  const [data, setData] = useState([]);;
   const [modal, setModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const [formData, setFormData] = useState({
     subtitle: "",
     title: "",
@@ -66,13 +68,13 @@ const OurMission = () => {
   }, []);
 
   const fetchData = async () => {
-  setLoading(true); // Show loader
+    setLoading(true); // Show loader
 
     const res = await getRequest("/home/mission");
     if (res.success) {
       setData(res.data);
     }
-       setLoading(false); // Show loader
+    setLoading(false); // Show loader
 
   };
 
@@ -196,6 +198,11 @@ const OurMission = () => {
     }
   };
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/home/mission/${id}`);
     if (res.success) {
@@ -219,89 +226,92 @@ const OurMission = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button color='primary' onClick={() => toggleModal()}>
+              {/* <Button color='primary' onClick={() => toggleModal()}>
                 <Icon name='plus' />
                 <span>Add Mission</span>
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
 
         <Block>
-           {loading?(
-           <div className="text-center p-5">
-            <Spinner color="primary" size="lg" />
-             </div>):(
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Subtitle</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Accordions</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end' />
-            </DataTableHead>
-            {data.map((item) => (
-              <DataTableItem key={item._id}>
-                <DataTableRow>{item.subtitle}</DataTableRow>
-                <DataTableRow>{item.title}</DataTableRow>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
                 <DataTableRow>
-                  {item?.image?.url ? (
-                    <img
-                      src={item.image.url}
-                      alt='preview'
-                      width={60}
-                      height={40}
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    "No image"
-                  )}
+                  <span>Subtitle</span>
                 </DataTableRow>
                 <DataTableRow>
-                  <ul>
-                    {item.accordions.map((acc, i) => (
-                      <li key={i}>
-                        <strong>{acc.title}</strong>: {acc.description}
+                  <span>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Accordions</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end' />
+              </DataTableHead>
+              {data.map((item) => (
+                <DataTableItem key={item._id}>
+                  <DataTableRow>{item.subtitle}</DataTableRow>
+                  <DataTableRow>{item.title}</DataTableRow>
+                  <DataTableRow>
+                    {item?.image?.url ? (
+                      <img
+                        src={item.image.url}
+                        alt='preview'
+                        width={60}
+                        height={40}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      "No image"
+                    )}
+                  </DataTableRow>
+                  <DataTableRow>
+                    <ul  style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+                      {item.accordions.map((acc, i) => (
+                        <li key={i}>
+                          <strong>{acc.title}</strong>: {acc.description}
+                        </li>
+                      ))}
+                    </ul>
+                  </DataTableRow>
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li className='nk-tb-action-hidden' onClick={() => toggleModal(item)}>
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"edit" + item._id}
+                          icon='edit-alt-fill'
+                          direction='top'
+                          text='Edit'
+                        />
                       </li>
-                    ))}
-                  </ul>
-                </DataTableRow>
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li onClick={() => toggleModal(item)}>
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item._id}
-                        icon='edit-alt-fill'
-                        direction='top'
-                        text='Edit'
-                      />
-                    </li>
-                    <li onClick={() => onDeleteClick(item._id)}>
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"delete" + item._id}
-                        icon='trash-fill'
-                        direction='top'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
-           )}
+                      <li
+
+                        onClick={() => confirmDelete(item._id)}
+                      >
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"delete" + item._id}
+                          icon='trash-fill'
+                          direction='top'
+                          text='Delete'
+                        />
+                      </li>
+                    </ul>
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -438,9 +448,8 @@ const OurMission = () => {
                       <Row className='gy-2'>
                         <Col md='6'>
                           <input
-                            className={`form-control ${
-                              accordionErrors[index]?.title ? "is-invalid" : ""
-                            }`}
+                            className={`form-control ${accordionErrors[index]?.title ? "is-invalid" : ""
+                              }`}
                             placeholder='Accordion Title'
                             value={acc.title}
                             onChange={(e) =>
@@ -457,11 +466,10 @@ const OurMission = () => {
                         </Col>
                         <Col md='6'>
                           <input
-                            className={`form-control ${
-                              accordionErrors[index]?.description
+                            className={`form-control ${accordionErrors[index]?.description
                                 ? "is-invalid"
                                 : ""
-                            }`}
+                              }`}
                             placeholder='Accordion Description'
                             value={acc.description}
                             onChange={(e) =>
@@ -481,7 +489,7 @@ const OurMission = () => {
                       </Row>
                     </div>
                   ))}
-                  <Button size='sm' onClick={addAccordion}>
+                  <Button size='sm' type="button" onClick={addAccordion}>
                     <Icon name='plus' /> Add More
                   </Button>
                 </Col>
@@ -513,6 +521,43 @@ const OurMission = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/home/mission/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

@@ -37,12 +37,14 @@ import {
   putRequest,
 } from "../../api/api";
 import { Spinner } from "reactstrap";
+import ReactQuill from "react-quill";
 
 const Testimonials = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-
+const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null); 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -50,6 +52,7 @@ const Testimonials = () => {
     designation: "",
     location: "",
     image: null, // to store the image file
+    description: "", 
   });
 
   const {
@@ -77,7 +80,14 @@ const Testimonials = () => {
   const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
-      setFormData(editItem);
+      // setFormData(editItem);
+      setFormData({
+      name: editItem.name || "",
+      designation: editItem.designation || "",
+      location: editItem.location || "",
+      image: editItem.image || null,
+      altText: editItem.image?.altText || "", 
+    });
     } else {
       resetForm();
       setEditId(null);
@@ -117,6 +127,8 @@ const Testimonials = () => {
     formPayload.append("designation", formData.designation);
     formPayload.append("location", formData.location);
     formPayload.append("altText", formData.altText);
+    formPayload.append("description", formData.description);
+
 
     if (formData.image instanceof File) {
       formPayload.append("image", formData.image);
@@ -146,6 +158,12 @@ const Testimonials = () => {
       toast.error("Something went wrong.");
     }
   };
+
+   const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
 
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/testimonials/${id}`);
@@ -207,6 +225,10 @@ const Testimonials = () => {
                 <DataTableRow>
                   <span>Image</span>
                 </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                
                 <DataTableRow className='nk-tb-col-tools text-end'>
                   <UncontrolledDropdown>
                     <DropdownToggle
@@ -258,6 +280,10 @@ const Testimonials = () => {
                       "No image"
                     )}
                   </DataTableRow>
+                  <DataTableRow>
+  <div dangerouslySetInnerHTML={{ __html: item.description }} />
+</DataTableRow>
+
                   <DataTableRow className='nk-tb-col-tools'>
                     <ul className='nk-tb-actions gx-1'>
                       <li
@@ -273,7 +299,7 @@ const Testimonials = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => onDeleteClick(item._id)}>
+                      <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -438,6 +464,15 @@ const Testimonials = () => {
                   )}
                 </Col>
 
+                 <Col md='12'>
+  <label className='form-label'>Description</label>
+  <ReactQuill
+    value={formData.description}
+    onChange={(value) => setFormData({ ...formData, description: value })}
+    theme='snow'
+  />
+</Col>
+
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
@@ -465,7 +500,46 @@ const Testimonials = () => {
                     </li>
                   </ul>
                 </Col>
+               
+
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/testimonials/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchTestimonials();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

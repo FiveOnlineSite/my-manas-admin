@@ -45,6 +45,8 @@ const Overview = () => {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description1: "",
@@ -245,6 +247,11 @@ const Overview = () => {
     }
   };
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/about/overview/${id}`);
     if (res.success) {
@@ -270,13 +277,13 @@ const Overview = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -381,7 +388,7 @@ const Overview = () => {
                   </DataTableRow>
                   <DataTableRow className='nk-tb-col-tools'>
                     <ul className='nk-tb-actions gx-1'>
-                      <li onClick={() => toggleModal(item)}>
+                      <li  className='nk-tb-action-hidden' onClick={() => toggleModal(item)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -391,7 +398,7 @@ const Overview = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => onDeleteClick(item._id)}>
+                      <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -661,6 +668,44 @@ const Overview = () => {
             </div>
           </ModalBody>
         </Modal>
+        <Modal
+                  isOpen={confirmModal}
+                  toggle={() => setConfirmModal(false)}
+                  className='modal-dialog-centered'
+                  size='sm'
+                >
+                  <ModalBody className='text-center'>
+                    <h5 className='mt-3'>Confirm Deletion</h5>
+                    <p>Are you sure you want to delete this item?</p>
+                    <div className='d-flex justify-content-center gap-2 mt-4'>
+                      <Button
+                        color='danger'
+                        className='p-3'
+                        onClick={async () => {
+                          const res = await deleteRequest(`/about/overview/${deleteId}`);
+                          if (res.success) {
+                            toast.success("Deleted successfully");
+                                fetchData();
+
+                          } else {
+                            toast.error("Delete failed");
+                          }
+                          setConfirmModal(false);
+                          setDeleteId(null);
+                        }}
+                      >
+                        OK
+                      </Button>
+                      <Button
+                        color='light'
+                        className='p-3'
+                        onClick={() => setConfirmModal(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </ModalBody>
+                </Modal>
       </Content>
     </>
   );

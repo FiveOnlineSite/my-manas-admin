@@ -47,7 +47,8 @@ const AboutUs = () => {
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [imageError, setImageError] = useState("");
-
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const [formData, setFormData] = useState({
     subtitle: "",
     title: "",
@@ -127,7 +128,7 @@ const AboutUs = () => {
   };
 
   const fetchData = async () => {
-   setLoading(true); // Show loader
+    setLoading(true); // Show loader
 
     const res = await getRequest("/home/aboutus"); // your API route
     if (res.success) {
@@ -136,7 +137,7 @@ const AboutUs = () => {
       setData(res.data);
     } else {
     }
- setLoading(false); // Show loader
+    setLoading(false); // Show loader
 
   };
 
@@ -190,6 +191,11 @@ const AboutUs = () => {
     }
   };
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     if (!id) return;
 
@@ -221,140 +227,139 @@ const AboutUs = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
 
         <Block>
-          {loading?(
+          {loading ? (
             <div className="text-center p-5">
-             <Spinner color="primary" size="lg" />
-              </div>):(
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span>Subtitle</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Button Text</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Button Link</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span>Image</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Subtitle</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Button Text</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Button Link</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Image</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
+                            }}
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
+
+              {data.map((item) => (
+                <DataTableItem key={item._id}>
+                  <DataTableRow>
+                    <span>{item.subtitle}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.title}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <div
+                      style={{ maxWidth: 250 }}
+                      dangerouslySetInnerHTML={{ __html: item.description }}
+                    />
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.buttonText}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <a href={item.buttonLink} target='_blank' rel='noreferrer'>
+                      {item.buttonLink}
+                    </a>
+                  </DataTableRow>
+                  <DataTableRow>
+                    {item?.image?.url ? (
+                      <img
+                        src={item?.image?.url}
+                        alt={item?.image?.url}
+                        width={60}
+                        height={40}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      "No image"
+                    )}
+                  </DataTableRow>
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li
+                        className='nk-tb-action-hidden'
+                        onClick={() => onEditClick(item)}
+                      >
+                        <TooltipComponent
                           tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"edit" + item._id}
+                          icon='edit-alt-fill'
+                          direction='top'
+                          text='Edit'
+                        />
+                      </li>
+                      <li
+                        onClick={() => confirmDelete(item._id)}
+                      >
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon '
+                          id={"delete" + item._id}
+                          icon='trash-fill'
+                          direction='top'
+                          text='Delete'
+                        />
                       </li>
                     </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
-
-            {data.map((item) => (
-              <DataTableItem key={item._id}>
-                <DataTableRow>
-                  <span>{item.subtitle}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.title}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <div
-                    style={{ maxWidth: 250 }}
-                    dangerouslySetInnerHTML={{ __html: item.description }}
-                  />
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.buttonText}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <a href={item.buttonLink} target='_blank' rel='noreferrer'>
-                    {item.buttonLink}
-                  </a>
-                </DataTableRow>
-                <DataTableRow>
-                  {item?.image?.url ? (
-                    <img
-                      src={item?.image?.url}
-                      alt={item?.image?.url}
-                      width={60}
-                      height={40}
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    "No image"
-                  )}
-                </DataTableRow>
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => onEditClick(item)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item._id}
-                        icon='edit-alt-fill'
-                        direction='top'
-                        text='Edit'
-                      />
-                    </li>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => onDeleteClick(item._id)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon '
-                        id={"delete" + item._id}
-                        icon='trash-fill'
-                        direction='top'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
-           )}
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
         </Block>
 
         <Modal
@@ -471,8 +476,8 @@ const AboutUs = () => {
                           typeof formData.image === "string"
                             ? formData.image
                             : formData.image instanceof File
-                            ? URL.createObjectURL(formData.image)
-                            : formData.image?.url
+                              ? URL.createObjectURL(formData.image)
+                              : formData.image?.url
                         }
                         alt='Preview'
                         width={100}
@@ -542,6 +547,44 @@ const AboutUs = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/home/aboutus/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                       fetchData();
+
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

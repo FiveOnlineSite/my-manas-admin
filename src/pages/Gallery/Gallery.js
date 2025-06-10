@@ -39,15 +39,19 @@ import {
 } from "../../api/api";
 
 const Gallery = () => {
-  const [data, setData] =  useState([]);
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [fileError, setFileError] = useState(""); // To store file validation error
   const [formData, setFormData] = useState({
     file: null,
+    file2: null,
     altText: "",
   });
 
@@ -65,6 +69,7 @@ const [loading, setLoading] = useState(true);
       setFormData(editItem);
       setFormData({
         file: editItem.url,
+        file2: editItem.url2 || null,
         altText: editItem.altText,
       });
     } else {
@@ -105,6 +110,19 @@ const [loading, setLoading] = useState(true);
     setFileError(""); // Reset file error
     setFormData({ ...formData, file });
   };
+  const handleFileChange2 = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("video")) {
+      setFileError("Second file must be a video.");
+      return;
+    }
+
+    setFileError("");
+    setFormData({ ...formData, file2: file });
+  };
+
 
   const selectorDeleteUser = () => {
     const updated = data.filter((item) => !item.checked);
@@ -117,7 +135,7 @@ const [loading, setLoading] = useState(true);
   };
 
   const fetchGallery = async () => {
-      setLoading(true); // Show loader
+    setLoading(true); // Show loader
 
     const res = await getRequest("/home/gallery");
     if (res.success) {
@@ -127,7 +145,7 @@ const [loading, setLoading] = useState(true);
     } else {
       console.error("Failed to fetch gallery:", res.message);
     }
-      setLoading(false); // Hide loader
+    setLoading(false); // Hide loader
 
   };
 
@@ -151,6 +169,10 @@ const [loading, setLoading] = useState(true);
     // Only append the file if it's a new upload (a File object)
     if (formData.file instanceof File) {
       formPayload.append("file", formData.file);
+    }
+
+    if (formData.file2 instanceof File) {
+      formPayload.append("file2", formData.file2);
     }
 
     try {
@@ -182,6 +204,8 @@ const [loading, setLoading] = useState(true);
     if (res.success) {
       toast.success("Deleted successfully");
       fetchGallery();
+
+
     } else {
       toast.error("Delete failed");
     }
@@ -211,73 +235,91 @@ const [loading, setLoading] = useState(true);
         </BlockHead>
 
         <Block>
-  {loading ? (
-    <div className="text-center p-5">
-      <Spinner color="primary" size="lg" />
-    </div>
-  ) : (
-    <div className='nk-tb-list is-separate is-medium mb-3'>
-      <DataTableHead>
-        <DataTableRow>
-          <span>Preview</span>
-        </DataTableRow>
-        <DataTableRow>
-          <span>Alt Text</span>
-        </DataTableRow>
-        <DataTableRow className='nk-tb-col-tools text-end'>
-          {/* Actions dropdown */}
-        </DataTableRow>
-      </DataTableHead>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>
+          ) : (
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span>Preview</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Alt Text</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>Secondary Video</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  {/* Actions dropdown */}
+                </DataTableRow>
+              </DataTableHead>
 
-      {data.map((item) => (
-        <DataTableItem key={item._id}>
-          <DataTableRow>
-            {item.url ? (
-              item.url.match(/\.(mp4|webm)$/i) ? (
-                <video src={item.url} width='100' height='60' controls />
-              ) : (
-                <img
-                  src={item.url}
-                  alt={item.altText}
-                  width='100'
-                  height='60'
-                  style={{ objectFit: "cover" }}
-                />
-              )
-            ) : (
-              <span>No media</span>
-            )}
-          </DataTableRow>
-          <DataTableRow>
-            <span>{item.altText}</span>
-          </DataTableRow>
-          <DataTableRow className='nk-tb-col-tools'>
-            <ul className='nk-tb-actions gx-1'>
-              <li onClick={() => toggleModal(item)}>
-                <TooltipComponent
-                  tag='a'
-                  containerClassName='btn btn-trigger btn-icon'
-                   id={`edit-${item._id}`} 
-                  icon='edit-alt-fill'
-                  text='Edit'
-                />
-              </li>
-              <li onClick={() => onDeleteClick(item._id)}>
-                <TooltipComponent
-                  tag='a'
-                  containerClassName='btn btn-trigger btn-icon'
-                  id={`delete-${item._id}`} 
-                  icon='trash-fill'
-                  text='Delete'
-                />
-              </li>
-            </ul>
-          </DataTableRow>
-        </DataTableItem>
-      ))}
-    </div>
-  )}
-</Block>
+              {data.map((item) => (
+                <DataTableItem key={item._id}>
+                  <DataTableRow>
+                    {item.url ? (
+                      item.url.match(/\.(mp4|webm)$/i) ? (
+                        <video src={item.url} width='100' height='60' controls />
+                      ) : (
+                        <img
+                          src={item.url}
+                          alt={item.altText}
+                          width='100'
+                          height='60'
+                          style={{ objectFit: "cover" }}
+                        />
+                      )
+                    ) : (
+                      <span>No media</span>
+                    )}
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.altText}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    {item.url2 ? (
+                      item.url2.match(/\.(mp4|webm)$/i) ? (
+                        <video src={item.url2} width='100' height='60' controls />
+                      ) : (
+                        <span>Invalid file</span>
+                      )
+                    ) : (
+                      <span>None</span>
+                    )}
+                  </DataTableRow>
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li onClick={() => toggleModal(item)}>
+                        <TooltipComponent
+                        
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={`edit-${item._id}`}
+                          icon='edit-alt-fill'
+                          text='Edit'
+                        />
+                      </li>
+                      <li onClick={() => {
+                        setDeleteId(item._id);
+                        setConfirmModal(true);
+                      }}>
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={`delete-${item._id}`}
+                          icon='trash-fill'
+                          text='Delete'
+                        />
+                      </li>
+                    </ul>
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
+        </Block>
 
 
         <Modal
@@ -421,6 +463,49 @@ const [loading, setLoading] = useState(true);
                     <span className='invalid'>{errors.altText.message}</span>
                   )}
                 </Col>
+                <Col md='12' style={{ display: "flex", flexDirection: "column" }}>
+                  <label className='form-label'>Optional Video Upload</label>
+                  {!formData.file2 ? (
+                    <input
+                      className='form-control'
+                      type='file'
+                      accept='video/*'
+                      onChange={handleFileChange2}
+                    />
+                  ) : (
+                    <div style={{ display: "inline-flex", alignItems: "flex-start", gap: "12px", marginTop: "8px" }}>
+                      <div style={{ position: "relative", display: "inline-block" }}>
+                        {formData.file2 instanceof File ? (
+                          <video src={URL.createObjectURL(formData.file2)} width='150' controls />
+                        ) : (
+                          <video src={formData.file2.url || formData.file2} width='150' controls />
+                        )}
+                        <Button
+                          size='sm'
+                          color='danger'
+                          className='btn-icon'
+                          style={{
+                            position: "absolute",
+                            top: "-8px",
+                            right: "-8px",
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                            zIndex: 10,
+                            height: "20px",
+                            width: "20px",
+                          }}
+                          onClick={() => setFormData({ ...formData, file2: null })}
+                        >
+                          <Icon name='cross' />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </Col>
+
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>
                     <li>
@@ -452,6 +537,41 @@ const [loading, setLoading] = useState(true);
             </div>
           </ModalBody>
         </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            {/* <Icon name='alert-circle' className='text-danger' style={{ fontSize: "30px" }} /> */}
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this  item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className="p-3"
+                onClick={async () => {
+                  const res = await deleteRequest(`/home/gallery/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchGallery();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button color='light' className="p-3" onClick={() => setConfirmModal(false)}>
+                Cancel
+              </Button>
+            </div>
+          </ModalBody>
+        </Modal>
+
       </Content>
     </>
   );

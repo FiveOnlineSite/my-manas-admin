@@ -37,7 +37,7 @@ const Sidebar = ({ fixed, className, ...props }) => {
           <div className="nk-sidebar-brand">
             <Logo />
           </div>
-          <div className="nk-menu-trigger me-n2">
+          {/* <div className="nk-menu-trigger me-n2">
             <Toggle className="nk-nav-toggle nk-quick-nav-icon d-xl-none me-n2" icon="arrow-left" click={themeUpdate.sidebarVisibility} />
             <Toggle
               className={`nk-nav-compact nk-quick-nav-icon d-none d-xl-inline-flex ${
@@ -46,7 +46,7 @@ const Sidebar = ({ fixed, className, ...props }) => {
               click={themeUpdate.sidebarCompact}
               icon="menu"
             />
-          </div>
+          </div> */}
         </div>
         <div className="nk-sidebar-content" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           <SimpleBar className="nk-sidebar-menu">

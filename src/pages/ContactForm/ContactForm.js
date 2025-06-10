@@ -52,7 +52,6 @@ const ContactForm = () => {
     inquiryType: "",
     message: "",
     originPage: "",
-    image: null,
   });
 
   const {
@@ -97,7 +96,7 @@ const ContactForm = () => {
       inquiryType: "",
       message: "",
       originPage: "",
-      image: null,
+      // image: null,
     });
     reset();
   };
@@ -153,16 +152,16 @@ const ContactForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, image: file });
-    }
-  };
+  // const handleImageUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setFormData({ ...formData, image: file });
+  //   }
+  // };
 
-  const handleImageRemove = () => {
-    setFormData({ ...formData, image: null });
-  };
+  // const handleImageRemove = () => {
+  //   setFormData({ ...formData, image: null });
+  // };
 
   const selectorDeleteUser = () => {
     const updated = data.filter((item) => !item.checked);
@@ -232,10 +231,10 @@ const ContactForm = () => {
                 <DataTableRow>
                   <span>Origin Page</span>
                 </DataTableRow>
-                <DataTableRow>
+                {/* <DataTableRow>
                   <span>Image</span>
-                </DataTableRow>
-                <DataTableRow className='nk-tb-col-tools text-end'>
+                </DataTableRow> */}
+                {/* <DataTableRow className='nk-tb-col-tools text-end'>
                   <UncontrolledDropdown>
                     <DropdownToggle
                       color='tranparent'
@@ -261,7 +260,7 @@ const ContactForm = () => {
                       </ul>
                     </DropdownMenu>
                   </UncontrolledDropdown>
-                </DataTableRow>
+                </DataTableRow> */}
               </DataTableHead>
               {data.map((item, index) => (
                 <DataTableItem key={item._id}>
@@ -295,7 +294,7 @@ const ContactForm = () => {
                   <DataTableRow>
                     <span>{item.originPage}</span>
                   </DataTableRow>
-                  <DataTableRow>
+                  {/* <DataTableRow>
                     {item.image?.url ? (
                       <img
                         src={
@@ -317,8 +316,8 @@ const ContactForm = () => {
                     ) : (
                       <span>No Image</span>
                     )}
-                  </DataTableRow>
-                  <DataTableRow className='nk-tb-col-tools'>
+                  </DataTableRow> */}
+                  {/* <DataTableRow className='nk-tb-col-tools'>
                     <ul className='nk-tb-actions gx-1'>
                       <li
                         className='nk-tb-action-hidden'
@@ -344,7 +343,7 @@ const ContactForm = () => {
                         />
                       </li>
                     </ul>
-                  </DataTableRow>
+                  </DataTableRow> */}
                 </DataTableItem>
               ))}
             </div>
@@ -515,7 +514,7 @@ const ContactForm = () => {
                     </span>
                   )}
                 </Col>
-                <Col md='12'>
+                {/* <Col md='12'>
                   <label className='form-label'>
                     Image Upload (optional, max 500KB)
                   </label>
@@ -583,7 +582,7 @@ const ContactForm = () => {
                       </Button>
                     </div>
                   )}
-                </Col>
+                </Col> */}
 
                 <Col md='6'>
                   <label className='form-label'>Message</label>

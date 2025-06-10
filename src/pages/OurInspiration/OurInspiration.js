@@ -46,6 +46,8 @@ const OurInspirations = () => {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
   const [formData, setFormData] = useState({
     subtitle: "",
     title: "",
@@ -176,6 +178,11 @@ const OurInspirations = () => {
     }
   };
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/about/our-inspiration/${id}`);
     if (res.success) {
@@ -201,13 +208,13 @@ const OurInspirations = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -302,7 +309,7 @@ const OurInspirations = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => onDeleteClick(item._id)}>
+                      <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -392,12 +399,20 @@ const OurInspirations = () => {
                     name='image'
                     control={control}
                     rules={{
-                      required: "Image is required",
-                      validate: (file) =>
-                        file && file.size > 512000
-                          ? "Image size must be under 500KB"
-                          : true,
+                      validate: (file) => {
+                        const isNewUpload = file instanceof File;
+                        const hasOldImage = formData.image && !(formData.image instanceof File);
+
+                        if (!file && !hasOldImage) {
+                          return "Image is required";
+                        }
+                        if (isNewUpload && file.size > 512000) {
+                          return "Image size must be under 500KB";
+                        }
+                        return true;
+                      },
                     }}
+
                     render={({ field: { onChange } }) => (
                       <>
                         <input
@@ -503,6 +518,44 @@ const OurInspirations = () => {
             </div>
           </ModalBody>
         </Modal>
+        <Modal
+                  isOpen={confirmModal}
+                  toggle={() => setConfirmModal(false)}
+                  className='modal-dialog-centered'
+                  size='sm'
+                >
+                  <ModalBody className='text-center'>
+                    <h5 className='mt-3'>Confirm Deletion</h5>
+                    <p>Are you sure you want to delete this item?</p>
+                    <div className='d-flex justify-content-center gap-2 mt-4'>
+                      <Button
+                        color='danger'
+                        className='p-3'
+                        onClick={async () => {
+                          const res = await deleteRequest(`/about/our-inspiration/${deleteId}`);
+                          if (res.success) {
+                            toast.success("Deleted successfully");
+                                fetchData();
+
+                          } else {
+                            toast.error("Delete failed");
+                          }
+                          setConfirmModal(false);
+                          setDeleteId(null);
+                        }}
+                      >
+                        OK
+                      </Button>
+                      <Button
+                        color='light'
+                        className='p-3'
+                        onClick={() => setConfirmModal(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </ModalBody>
+                </Modal>
       </Content>
     </>
   );

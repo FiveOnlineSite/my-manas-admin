@@ -37,7 +37,8 @@ const OurInstitutions = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-
+const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null); 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -70,8 +71,13 @@ const OurInstitutions = () => {
 
   const toggleModal = (editItem = null) => {
     if (editItem) {
-      setEditId(editItem.id);
-      setFormData(editItem);
+      setEditId(editItem._id);
+      // setFormData(editItem);
+      setFormData({
+      title: editItem.title || "",
+      image: editItem.image || null,
+      altText: editItem.image?.altText || "", // FIXED: extract from nested image object
+    });
     } else {
       resetForm();
       setEditId(null);
@@ -165,6 +171,11 @@ const OurInstitutions = () => {
     }
   };
 
+   const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/institutions/our-institutions/${id}`);
     if (res.success) {
@@ -192,13 +203,13 @@ const OurInstitutions = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -249,7 +260,7 @@ const OurInstitutions = () => {
               </DataTableHead>
 
               {data.map((item) => (
-                <DataTableItem key={item.id}>
+                <DataTableItem key={item._id}>
                   <DataTableRow>
                     <span>{item.title}</span>
                   </DataTableRow>
@@ -288,13 +299,13 @@ const OurInstitutions = () => {
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
-                          id={"edit" + item.id}
+                          id={"edit" + item._id}
                           icon='edit-alt-fill'
                           direction='top'
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => onDeleteClick(item._id)}>
+                      <li onClick={() => confirmDelete (item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -455,6 +466,44 @@ const OurInstitutions = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/institutions/our-institutions/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

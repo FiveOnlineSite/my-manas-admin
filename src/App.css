@@ -20,3 +20,20 @@
   justify-content: center;
   align-items: center;
 }
+
+/* @media (min-width:1440px) {
+  
+.nk-sidebar{
+ 
+    overflow: hidden !important;
+    transform: translateX(0) !important;
+    width: 290px !important;
+
+}
+  
+} */
+ .force-bullets ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+}

@@ -38,12 +38,14 @@ import {
   putRequest,
 } from "../../api/api";
 import { Spinner } from "reactstrap";
+import { toast } from "react-toastify";
 
 const OurGoal = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -83,7 +85,10 @@ const OurGoal = () => {
       const normalizedItems = editItem.goals.map((goal) => ({
         title: goal.title,
         description: goal.description,
-        images: goal.images || [], // Ensure array exists
+        images: goal.images?.map((img) => ({
+          url: img.url || "",
+          altText: img.altText || "",
+        })) || [],
       }));
 
       const editData = {
@@ -164,19 +169,37 @@ const OurGoal = () => {
     payload.append("title", formData.title);
     payload.append("description", formData.description);
 
-    const goalsToSend = formData.additionalItems.map((item, index) => {
-      if (item.images?.length) {
-        item.images.forEach((file) => {
-          payload.append("goalImages", file); // Multiple files for all goals
-        });
-      }
+    let imageFileIndex = 0;
+
+    const goalsToSend = formData.additionalItems.map((item) => {
+      const images = item.images.map((img) => {
+        if (img instanceof File) {
+          payload.append("goalImages", img);
+          return {
+            isNew: true,
+            altText: "", // you can add altText from a field if needed
+            url: "",     // will be replaced on backend
+          };
+        } else {
+          return {
+            isNew: false,
+            altText: img.altText || "",
+            url: img.url || "",
+          };
+        }
+      });
+
       return {
         title: item.title,
         description: item.description,
+        images: images,
       };
     });
 
     payload.append("goals", JSON.stringify(goalsToSend));
+
+
+    // payload.append("goals", JSON.stringify(goalsToSend));
 
     if (formData.image instanceof File) {
       payload.append("image", formData.image);
@@ -185,6 +208,8 @@ const OurGoal = () => {
     let response;
     if (editId !== null) {
       response = await putRequest(`/scholarships/our-goal/${editId}`, payload);
+      toast.success("Content updated successfully!");
+
     } else {
       response = await postFormData("/scholarships/our-goal", payload);
     }
@@ -207,11 +232,17 @@ const OurGoal = () => {
     });
   }, [register, formData.additionalItems]);
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const handleDelete = async (id) => {
     const res = await deleteRequest(`/scholarships/our-goal/${id}`);
     if (res.success) {
       const updated = data.filter((item) => item._id !== id);
       setData(updated);
+
     }
   };
 
@@ -230,13 +261,13 @@ const OurGoal = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -293,80 +324,80 @@ const OurGoal = () => {
               </DataTableHead>
 
               {data.map((item) =>
-  item.goals?.map((goal, index) => (
-    <DataTableItem key={`${item._id}-${index}`}>
-      <DataTableRow>
-        <span>{index === 0 ? item.title : ""}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <span>
-          {index === 0 && (
-            <div
-              dangerouslySetInnerHTML={{ __html: item.description }}
-            />
-          )}
-        </span>
-      </DataTableRow>
-      <DataTableRow>
-        {goal.images && goal.images.length > 0 ? (
-          goal.images.map((img, imgIdx) => (
-            <img
-              key={imgIdx}
-              src={img.url}
-              alt={img.altText || `Image ${imgIdx + 1}`}
-              width={60}
-              height={40}
-              style={{
-                objectFit: "cover",
-                marginRight: "5px",
-                borderRadius: "4px",
-              }}
-            />
-          ))
-        ) : (
-          "No image"
-        )}
-      </DataTableRow>
-      <DataTableRow>
-        <span>{goal.title}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <div
-          dangerouslySetInnerHTML={{ __html: goal.description }}
-        />
-      </DataTableRow>
-      <DataTableRow className='nk-tb-col-tools'>
-        {index === 0 && (
-          <ul className='nk-tb-actions gx-1'>
-            <li
-              className='nk-tb-action-hidden'
-              onClick={() => toggleModal(item)}
-            >
-              <TooltipComponent
-                tag='a'
-                containerClassName='btn btn-trigger btn-icon'
-                id={"edit" + item._id}
-                icon='edit-alt-fill'
-                direction='top'
-                text='Edit'
-              />
-            </li>
-            <li onClick={() => handleDelete(item._id)}>
-              <TooltipComponent
-                tag='a'
-                containerClassName='btn btn-trigger btn-icon'
-                id={"delete" + item._id}
-                icon='trash-fill'
-                direction='top'
-                text='Delete'
-              />
-            </li>
-          </ul>
-        )}
-      </DataTableRow>
-    </DataTableItem>
-  ))
-)}
+                item.goals?.map((goal, index) => (
+                  <DataTableItem key={`${item._id}-${index}`}>
+                    <DataTableRow>
+                      <span>{index === 0 ? item.title : ""}</span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span>
+                        {index === 0 && (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: item.description }}
+                          />
+                        )}
+                      </span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      {goal.images && goal.images.length > 0 ? (
+                        goal.images.map((img, imgIdx) => (
+                          <img
+                            key={imgIdx}
+                            src={img.url}
+                            alt={img.altText || `Image ${imgIdx + 1}`}
+                            width={60}
+                            height={40}
+                            style={{
+                              objectFit: "cover",
+                              marginRight: "5px",
+                              borderRadius: "4px",
+                            }}
+                          />
+                        ))
+                      ) : (
+                        "No image"
+                      )}
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span>{goal.title}</span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: goal.description }}
+                      />
+                    </DataTableRow>
+                    <DataTableRow className='nk-tb-col-tools'>
+                      {index === 0 && (
+                        <ul className='nk-tb-actions gx-1'>
+                          <li
+                            className='nk-tb-action-hidden'
+                            onClick={() => toggleModal(item)}
+                          >
+                            <TooltipComponent
+                              tag='a'
+                              containerClassName='btn btn-trigger btn-icon'
+                              id={"edit" + item._id}
+                              icon='edit-alt-fill'
+                              direction='top'
+                              text='Edit'
+                            />
+                          </li>
+                          <li onClick={() => confirmDelete(item._id)}>
+                            <TooltipComponent
+                              tag='a'
+                              containerClassName='btn btn-trigger btn-icon'
+                              id={"delete" + item._id}
+                              icon='trash-fill'
+                              direction='top'
+                              text='Delete'
+                            />
+                          </li>
+                        </ul>
+                      )}
+                    </DataTableRow>
+                  </DataTableItem>
+                ))
+              )}
 
             </div>
           )}
@@ -609,6 +640,43 @@ const OurGoal = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/scholarships/our-goal/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

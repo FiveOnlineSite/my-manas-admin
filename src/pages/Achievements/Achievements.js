@@ -43,7 +43,8 @@ const Achievements = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-
+const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null); 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const {
@@ -154,6 +155,7 @@ const Achievements = () => {
           altText,
           url: image instanceof File ? null : image?.url || image,
         },
+         hasNewImage: image instanceof File,
       })
     );
     console.log(formData, itemsData, "itemsDataaaaaaa");
@@ -183,6 +185,12 @@ const Achievements = () => {
       toast.error(res.message || "Submission failed.");
     }
   };
+
+   const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
 
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/academy/achievements/${id}`);
@@ -295,7 +303,7 @@ const Achievements = () => {
                                 text='Edit'
                               />
                             </li>
-                            <li onClick={() => onDeleteClick(achievement._id)}>
+                            <li onClick={() => confirmDelete(achievement._id)}>
                               <TooltipComponent
                                 tag='a'
                                 containerClassName='btn btn-trigger btn-icon'
@@ -507,6 +515,43 @@ const Achievements = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/academy/achievements/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

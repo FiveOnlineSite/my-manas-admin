@@ -47,7 +47,8 @@ const OurValues = () => {
   const [valuesErrors, setValuesErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -158,21 +159,22 @@ const OurValues = () => {
   };
 
   const validateValues = () => {
-    const errs = formData.values.map((item) => ({
-      title: !item.title,
-      description: !item.description,
-      valueIcon: !item.valueIcon,
-    }));
-    console.log(errs, "iuhih");
+    const errs = formData.values.map((item) => {
+      const hasAnyField = item.title || item.description || item.valueIcon;
+      return {
+        title: hasAnyField && !item.title,
+        description: hasAnyField && !item.description,
+        valueIcon: hasAnyField && !item.valueIcon,
+      };
+    });
+
     setValuesErrors(errs);
 
-    // Also validate iconErrors have no strings (errors)
     const hasIconError = iconErrors.some((e) => e);
-    return (
-      errs.every((e) => !e.title && !e.description && !e.valueIcon) &&
-      !hasIconError
-    );
+
+    return errs.every((e) => !e.title && !e.description && !e.valueIcon) && !hasIconError;
   };
+
 
   const removeValue = (index) => {
     const updatedValues = formData.values.filter((_, i) => i !== index);
@@ -188,15 +190,13 @@ const OurValues = () => {
     const formPayload = new FormData();
     formPayload.append("title", formData.title);
     formPayload.append("description", formData.description);
-    formPayload.append(
-      "values",
-      JSON.stringify(
-        formData.values.map(({ title, description }) => ({
-          title,
-          description,
-        }))
-      )
-    );
+    formPayload.append("values", JSON.stringify(
+      formData.values.map(({ title, description, valueIcon }) => ({
+        title,
+        description,
+        valueIcon: typeof valueIcon === "string" ? valueIcon : null,
+      }))
+    ));
 
     // Append icons separately (key: valueIcons)
     formData.values.forEach((v, i) => {
@@ -235,6 +235,11 @@ const OurValues = () => {
     }
   };
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/about/our-values/${id}`);
     if (res.success) {
@@ -260,13 +265,13 @@ const OurValues = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -323,70 +328,70 @@ const OurValues = () => {
               </DataTableHead>
 
               {data.map((item) =>
-  item.values.map((value, index) => (
-    <DataTableItem key={`${item._id}-${index}`}>
-      <DataTableRow>
-        <span>{index === 0 ? item.title : ""}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <span>
-          {index === 0 && (
-            <div
-              dangerouslySetInnerHTML={{ __html: item.description }}
-            />
-          )}
-        </span>
-      </DataTableRow>
-      <DataTableRow>
-        <span>{value?.title}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <div
-          dangerouslySetInnerHTML={{ __html: value?.description }}
-        />
-      </DataTableRow>
-      <DataTableRow>
-        {value?.icon?.url ? (
-          <img
-            src={value.icon.url}
-            alt='icon'
-            width={30}
-            height={30}
-            style={{ marginLeft: "10px" }}
-          />
-        ) : (
-          "No Icon"
-        )}
-      </DataTableRow>
-      <DataTableRow className='nk-tb-col-tools'>
-        {index === 0 ? (
-          <ul className='nk-tb-actions gx-1'>
-            <li onClick={() => toggleModal(item)}>
-              <TooltipComponent
-                tag='a'
-                containerClassName='btn btn-trigger btn-icon'
-                id={"edit" + item._id}
-                icon='edit-alt-fill'
-                direction='top'
-                text='Edit'
-              />
-            </li>
-            <li onClick={() => onDeleteClick(item._id)}>
-              <TooltipComponent
-                tag='a'
-                containerClassName='btn btn-trigger btn-icon'
-                id={"delete" + item._id}
-                icon='trash-fill'
-                direction='top'
-                text='Delete'
-              />
-            </li>
-          </ul>
-        ) : null}
-      </DataTableRow>
-    </DataTableItem>
-  ))
-)}
+                item.values.map((value, index) => (
+                  <DataTableItem key={`${item._id}-${index}`}>
+                    <DataTableRow>
+                      <span>{index === 0 ? item.title : ""}</span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span>
+                        {index === 0 && (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: item.description }}
+                          />
+                        )}
+                      </span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <span>{value?.title}</span>
+                    </DataTableRow>
+                    <DataTableRow>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: value?.description }}
+                      />
+                    </DataTableRow>
+                    <DataTableRow>
+                      {value?.icon?.url ? (
+                        <img
+                          src={value.icon.url}
+                          alt='icon'
+                          width={30}
+                          height={30}
+                          style={{ marginLeft: "10px" }}
+                        />
+                      ) : (
+                        "No Icon"
+                      )}
+                    </DataTableRow>
+                    <DataTableRow className='nk-tb-col-tools'>
+                      {index === 0 ? (
+                        <ul className='nk-tb-actions gx-1'>
+                          <li className='nk-tb-action-hidden' onClick={() => toggleModal(item)}>
+                            <TooltipComponent
+                              tag='a'
+                              containerClassName='btn btn-trigger btn-icon'
+                              id={"edit" + item._id}
+                              icon='edit-alt-fill'
+                              direction='top'
+                              text='Edit'
+                            />
+                          </li>
+                          <li onClick={() => confirmDelete(item._id)}>
+                            <TooltipComponent
+                              tag='a'
+                              containerClassName='btn btn-trigger btn-icon'
+                              id={"delete" + item._id}
+                              icon='trash-fill'
+                              direction='top'
+                              text='Delete'
+                            />
+                          </li>
+                        </ul>
+                      ) : null}
+                    </DataTableRow>
+                  </DataTableItem>
+                ))
+              )}
 
             </div>
           )}
@@ -568,6 +573,18 @@ const OurValues = () => {
                         </Button>
                       </div>
                     )}
+                    {formData.values.length > 1 && (
+                      <div className=" mt-2">
+                        <Button
+                          size="sm"
+                          color="danger"
+                          onClick={() => removeValue(index)}
+                        >
+                          {/* <Icon name="trash" className="me-1" /> */}
+                          Remove
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div>
@@ -606,6 +623,43 @@ const OurValues = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/about/our-values/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                   fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

@@ -39,7 +39,8 @@ const VidhyavanamLeadership = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-
+const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null); 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
@@ -91,7 +92,15 @@ const VidhyavanamLeadership = () => {
   const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
-      setFormData(editItem);
+      // setFormData(editItem);
+         const mappedMembers = editItem.members.map((m) => ({
+      name: m.name || "",
+      description: m.description || "",
+      image: m.image || null,
+      altText: m.image?.altText || "", 
+    }));
+
+    setFormData({ members: mappedMembers });
     } else {
       resetForm();
       setEditId(null);
@@ -166,7 +175,12 @@ const VidhyavanamLeadership = () => {
       return;
     }
     const payload = new FormData();
-    payload.append("members", JSON.stringify(formData.members));
+const membersWithFlag = formData.members.map((member) => ({
+  ...member,
+  hasNewImage: member.image instanceof File,
+}));
+
+payload.append("members", JSON.stringify(membersWithFlag));
 
     formData.members.forEach((member) => {
       if (member.image instanceof File) {
@@ -196,6 +210,11 @@ const VidhyavanamLeadership = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
   };
 
   const onDeleteClick = async (id) => {
@@ -295,7 +314,7 @@ const VidhyavanamLeadership = () => {
                             text='Edit'
                           />
                         </li>
-                        <li onClick={() => onDeleteClick(data[0]._id)}>
+                        <li onClick={() => confirmDelete(data[0]._id)}>
                           <TooltipComponent
                             tag='a'
                             id={`delete-${index}`}
@@ -483,6 +502,43 @@ const VidhyavanamLeadership = () => {
                   </Button>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/vidhyavanam/leadership-team/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

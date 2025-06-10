@@ -43,6 +43,8 @@ const ScholarshipAwardees = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -207,6 +209,11 @@ const ScholarshipAwardees = () => {
     }
   };
 
+    const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/scholarships/scholarship-awardees/${id}`);
     if (res.success) {
@@ -232,13 +239,13 @@ const ScholarshipAwardees = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -343,7 +350,7 @@ const ScholarshipAwardees = () => {
               text='Edit'
             />
           </li>
-          <li onClick={() => onDeleteClick(item._id)}>
+          <li onClick={() => confirmDelete(item._id)}>
             <TooltipComponent
               tag='a'
               containerClassName='btn btn-trigger btn-icon'
@@ -542,6 +549,7 @@ const ScholarshipAwardees = () => {
                 <div>
                   <Button
                     color='primary'
+                    type="button"
                     size='sm'
                     style={{ width: "auto" }}
                     onClick={addAwardee}
@@ -581,6 +589,43 @@ const ScholarshipAwardees = () => {
             </div>
           </ModalBody>
         </Modal>
+        <Modal
+                  isOpen={confirmModal}
+                  toggle={() => setConfirmModal(false)}
+                  className='modal-dialog-centered'
+                  size='sm'
+                >
+                  <ModalBody className='text-center'>
+                    <h5 className='mt-3'>Confirm Deletion</h5>
+                    <p>Are you sure you want to delete this item?</p>
+                    <div className='d-flex justify-content-center gap-2 mt-4'>
+                      <Button
+                        color='danger'
+                        className='p-3'
+                        onClick={async () => {
+                          const res = await deleteRequest(`/scholarships/scholarship-awardees/${deleteId}`);
+                          if (res.success) {
+                            toast.success("Deleted successfully");
+                            fetchData();
+                          } else {
+                            toast.error("Delete failed");
+                          }
+                          setConfirmModal(false);
+                          setDeleteId(null);
+                        }}
+                      >
+                        OK
+                      </Button>
+                      <Button
+                        color='light'
+                        className='p-3'
+                        onClick={() => setConfirmModal(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </ModalBody>
+                </Modal>
       </Content>
     </>
   );

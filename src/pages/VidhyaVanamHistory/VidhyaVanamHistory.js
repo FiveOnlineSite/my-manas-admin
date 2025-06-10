@@ -45,6 +45,9 @@ const VidhyaVanamHistory = () => {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null); 
+
   const [formData, setFormData] = useState({
     title: "",
     logo: null,
@@ -76,10 +79,17 @@ const VidhyaVanamHistory = () => {
   const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
-      setFormData(editItem);
+      // setFormData(editItem);
+       setFormData({
+      title: editItem.title || "",
+      logo: editItem.logo || null,
+      altText: editItem.logo?.altText || "", // FIX: correctly extract nested altText
+      description: editItem.description || "",
+          });
+
       reset({
         title: editItem.title || "",
-        altText: editItem.altText || "",
+        altText: editItem.logo?.altText || "", 
         description: editItem.description || "",
         logo: editItem.logo || null,
       });
@@ -158,6 +168,11 @@ const VidhyaVanamHistory = () => {
     } catch (err) {
       toast.error("Submission failed.");
     }
+  };
+
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
   };
 
   const onDeleteClick = async (id) => {
@@ -289,7 +304,7 @@ const VidhyaVanamHistory = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => onDeleteClick(item._id)}>
+                      <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -503,6 +518,43 @@ const VidhyaVanamHistory = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`vidhyavanam/history/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchHistory();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>

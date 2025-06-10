@@ -5,6 +5,8 @@ import {
   UncontrolledDropdown,
   DropdownItem,
   Spinner,
+  Modal,
+  ModalBody,
 } from "reactstrap";
 import EditModal from "./EditModal";
 import AddModal from "./AddModal";
@@ -40,7 +42,9 @@ import { set } from "react-hook-form";
 const HomeBanner = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   const [sm, updateSm] = useState(false);
   const [modal, setModal] = useState({ edit: false, add: false });
@@ -63,7 +67,7 @@ const [loading, setLoading] = useState(true);
   const [editFormData, setEditFormData] = useState({ ...defaultFormData });
 
   const fetchBannerData = async () => {
-          setLoading(true); // Show loader
+    setLoading(true); // Show loader
 
     try {
       const result = await getRequest("/home/banner");
@@ -73,7 +77,7 @@ const [loading, setLoading] = useState(true);
     } catch (error) {
       // console.error("Failed to fetch banners:", error);
     }
-          setLoading(false); // Show loader
+    setLoading(false); // Show loader
 
   };
 
@@ -175,6 +179,11 @@ const [loading, setLoading] = useState(true);
     setSubmitting(false);
   };
 
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
+  };
+  
   const onDeleteClick = async (id) => {
     if (!id) return;
 
@@ -216,9 +225,8 @@ const [loading, setLoading] = useState(true);
             <BlockHeadContent>
               <div className='toggle-wrap nk-block-tools-toggle'>
                 <Button
-                  className={`btn-icon btn-trigger toggle-expand me-n1 ${
-                    sm ? "active" : ""
-                  }`}
+                  className={`btn-icon btn-trigger toggle-expand me-n1 ${sm ? "active" : ""
+                    }`}
                   onClick={() => updateSm(!sm)}
                 >
                   <Icon name='menu-alt-r' />
@@ -229,13 +237,13 @@ const [loading, setLoading] = useState(true);
                 >
                   <ul className='nk-block-tools g-3'>
                     <li className='nk-block-tools-opt'>
-                      <Button
+                      {/* <Button
                         color='primary'
                         className='btn-icon'
                         onClick={() => setModal({ add: true })}
                       >
                         <Icon name='plus' />
-                      </Button>
+                      </Button> */}
                     </li>
                   </ul>
                 </div>
@@ -245,147 +253,147 @@ const [loading, setLoading] = useState(true);
         </BlockHead>
 
         <Block>
-          {loading?(
-             <div className="text-center p-5">
-      <Spinner color="primary" size="lg" />
-    </div>):(
-      
-  
-          <div className='nk-tb-list is-separate is-medium mb-3'>
-            <DataTableHead>
-              <DataTableRow>
-                <span className='sub-text'>Title</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span className='sub-text'>Description</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span className='sub-text'>Button Text</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span className='sub-text'>Button Link</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span className='sub-text'>Desktop Images</span>
-              </DataTableRow>
-              <DataTableRow>
-                <span className='sub-text'>Mobile Images</span>
-              </DataTableRow>
-              <DataTableRow className='nk-tb-col-tools text-end'>
-                <UncontrolledDropdown>
-                  <DropdownToggle
-                    color='tranparent'
-                    className='dropdown-toggle btn btn-icon btn-trigger me-n1'
-                  >
-                    <Icon name='more-h' />
-                  </DropdownToggle>
-                  <DropdownMenu end>
-                    <ul className='link-list-opt no-bdr'>
-                      <li>
-                        <DropdownItem
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner color="primary" size="lg" />
+            </div>) : (
+
+
+            <div className='nk-tb-list is-separate is-medium mb-3'>
+              <DataTableHead>
+                <DataTableRow>
+                  <span className='sub-text'>Title</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span className='sub-text'>Description</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span className='sub-text'>Button Text</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span className='sub-text'>Button Link</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span className='sub-text'>Desktop Images</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span className='sub-text'>Mobile Images</span>
+                </DataTableRow>
+                <DataTableRow className='nk-tb-col-tools text-end'>
+                  <UncontrolledDropdown>
+                    <DropdownToggle
+                      color='tranparent'
+                      className='dropdown-toggle btn btn-icon btn-trigger me-n1'
+                    >
+                      <Icon name='more-h' />
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <ul className='link-list-opt no-bdr'>
+                        <li>
+                          <DropdownItem
+                            tag='a'
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectorDeleteUser();
+                            }}
+                          >
+                            <Icon name='na' />
+                            <span>Remove Selected</span>
+                          </DropdownItem>
+                        </li>
+                      </ul>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </DataTableRow>
+              </DataTableHead>
+
+              {currentItems.map((item) => (
+                <DataTableItem key={item.id}>
+                  <DataTableRow>
+                    <span className='tb-lead'>{item.title}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                  </DataTableRow>
+                  <DataTableRow>
+                    <span>{item.buttonText}</span>
+                  </DataTableRow>
+                  <DataTableRow>
+                    <a
+                      href={item.buttonLink}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      {item.buttonLink}
+                    </a>
+                  </DataTableRow>
+                  <DataTableRow>
+                    {item?.images?.desktop?.url ? (
+                      <img
+                        src={item?.images?.desktop?.url}
+                        alt={item?.images?.desktop?.url || "No Alt Text"}
+                        width={60}
+                        height={40}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <span>No image</span>
+                    )}
+                    {!item?.images?.desktop?.altText && (
+                      <span className='text-danger'>Missing Alt</span>
+                    )}
+                  </DataTableRow>
+                  <DataTableRow>
+                    {item?.images?.mobile?.url ? (
+                      <img
+                        src={item?.images?.mobile?.url}
+                        alt={item.mobileAlt || "No Alt Text"}
+                        width={60}
+                        height={40}
+                        style={{ objectFit: "cover" }}
+                      />
+                    ) : (
+                      <span>No image</span>
+                    )}
+                    {!item?.images?.mobile?.altText && (
+                      <span className='text-danger'>Missing Alt</span>
+                    )}
+                  </DataTableRow>
+                  <DataTableRow className='nk-tb-col-tools'>
+                    <ul className='nk-tb-actions gx-1'>
+                      <li
+                        className='nk-tb-action-hidden'
+                        onClick={() => onEditClick(item)}
+                      >
+                        <TooltipComponent
                           tag='a'
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            selectorDeleteUser();
-                          }}
-                        >
-                          <Icon name='na' />
-                          <span>Remove Selected</span>
-                        </DropdownItem>
+                          containerClassName='btn btn-trigger btn-icon'
+                          id={"edit" + item.id}
+                          icon='edit-alt-fill'
+                          direction='top'
+                          text='Edit'
+                        />
+                      </li>
+                      <li
+                      
+                        onClick={() => confirmDelete(item._id)}
+                      >
+                        <TooltipComponent
+                          tag='a'
+                          containerClassName='btn btn-trigger btn-icon '
+                          id={"delete" + item.id}
+                          icon='trash-fill'
+                          direction='top'
+                          text='Delete'
+                        />
                       </li>
                     </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </DataTableRow>
-            </DataTableHead>
-
-            {currentItems.map((item) => (
-              <DataTableItem key={item.id}>
-                <DataTableRow>
-                  <span className='tb-lead'>{item.title}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <div dangerouslySetInnerHTML={{ __html: item.description }} />
-                </DataTableRow>
-                <DataTableRow>
-                  <span>{item.buttonText}</span>
-                </DataTableRow>
-                <DataTableRow>
-                  <a
-                    href={item.buttonLink}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    {item.buttonLink}
-                  </a>
-                </DataTableRow>
-                <DataTableRow>
-                  {item?.images?.desktop?.url ? (
-                    <img
-                      src={item?.images?.desktop?.url}
-                      alt={item?.images?.desktop?.url || "No Alt Text"}
-                      width={60}
-                      height={40}
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    <span>No image</span>
-                  )}
-                  {!item?.images?.desktop?.altText && (
-                    <span className='text-danger'>Missing Alt</span>
-                  )}
-                </DataTableRow>
-                <DataTableRow>
-                  {item?.images?.mobile?.url ? (
-                    <img
-                      src={item?.images?.mobile?.url}
-                      alt={item.mobileAlt || "No Alt Text"}
-                      width={60}
-                      height={40}
-                      style={{ objectFit: "cover" }}
-                    />
-                  ) : (
-                    <span>No image</span>
-                  )}
-                  {!item?.images?.mobile?.altText && (
-                    <span className='text-danger'>Missing Alt</span>
-                  )}
-                </DataTableRow>
-                <DataTableRow className='nk-tb-col-tools'>
-                  <ul className='nk-tb-actions gx-1'>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => onEditClick(item)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon'
-                        id={"edit" + item.id}
-                        icon='edit-alt-fill'
-                        direction='top'
-                        text='Edit'
-                      />
-                    </li>
-                    <li
-                      className='nk-tb-action-hidden'
-                      onClick={() => onDeleteClick(item._id)}
-                    >
-                      <TooltipComponent
-                        tag='a'
-                        containerClassName='btn btn-trigger btn-icon '
-                        id={"delete" + item.id}
-                        icon='trash-fill'
-                        direction='top'
-                        text='Delete'
-                      />
-                    </li>
-                  </ul>
-                </DataTableRow>
-              </DataTableItem>
-            ))}
-          </div>
-            )}
+                  </DataTableRow>
+                </DataTableItem>
+              ))}
+            </div>
+          )}
 
           <PreviewAltCard>
             {data.length > 0 ? (
@@ -419,7 +427,46 @@ const [loading, setLoading] = useState(true);
           closeModal={closeEditModal}
           onSubmit={onEditSubmit}
         />
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this banner item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/home/banner/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchBannerData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </ModalBody>
+        </Modal>
+
       </Content>
+
     </React.Fragment>
   );
 };

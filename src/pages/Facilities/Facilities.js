@@ -43,6 +43,9 @@ const Facilities = () => {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null); 
+
   const [formData, setFormData] = useState({
     title: "",
     image: null,
@@ -80,8 +83,8 @@ const Facilities = () => {
         title: editItem.title || "",
         image: resources.image || null,
         video: resources.video || null,
-        imageAltText: resources.imageAltText || "",
-        videoAltText: resources.videoAltText || "",
+        imageAltText: resources.image?.altText || "",
+        videoAltText: resources.video?.altText || "",
         featuredImage: resources.featuredImage || null,
         isFeatured: editItem.isFeatured || false,
       };
@@ -163,6 +166,11 @@ const Facilities = () => {
     }
 
     setSubmitting(false);
+  };
+
+   const confirmDelete = (id) => {
+    setDeleteId(id);
+    setConfirmModal(true);
   };
 
   const onDeleteClick = async (id) => {
@@ -377,7 +385,7 @@ const Facilities = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => onDeleteClick(item._id)}>
+                      <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -506,13 +514,12 @@ const Facilities = () => {
                   <input
                     type='hidden'
                     {...register("image", {
-                      required: "Image is required",
-                      // validate: (file) =>
-                      //   file instanceof File
-                      //     ? file.size <= 512000 ||
-                      //       "Image must be less than 500KB"
-                      //     : true,
+                      validate: () =>
+                        formData.image !== null && formData.image !== undefined
+                          ? true
+                          : "Image is required",
                     })}
+
                   />
                   {errors.image && (
                     <span className='invalid'>{errors.image.message}</span>
@@ -620,12 +627,10 @@ const Facilities = () => {
                   <input
                     type='hidden'
                     {...register("video", {
-                      required: "Video is required",
-                      // validate: (file) =>
-                      //   file instanceof File
-                      //     ? file.size <= 10 * 1024 * 1024 ||
-                      //       "Video must be less than 10MB"
-                      //     : true,
+                      validate: () =>
+                        formData.video !== null && formData.video !== undefined
+                          ? true
+                          : "Video is required",
                     })}
                   />
                   {errors.video && (
@@ -735,12 +740,10 @@ const Facilities = () => {
                   <input
                     type='hidden'
                     {...register("featuredImage", {
-                      required: "Featured image is required",
-                      // validate: (file) =>
-                      //   file instanceof File
-                      //     ? file.size <= 512000 ||
-                      //       "Featured image must be less than 500KB"
-                      //     : true,
+                      validate: () =>
+                        formData.featuredImage !== null && formData.featuredImage !== undefined
+                          ? true
+                          : "Featured image is required",
                     })}
                   />
                   {errors.featuredImage && (
@@ -799,6 +802,43 @@ const Facilities = () => {
                   </ul>
                 </Col>
               </Form>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/academy/facilities/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </ModalBody>
         </Modal>
