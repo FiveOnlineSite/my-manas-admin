@@ -86,7 +86,8 @@ const [confirmModal, setConfirmModal] = useState(false);
       designation: editItem.designation || "",
       location: editItem.location || "",
       image: editItem.image || null,
-      altText: editItem.image?.altText || "", 
+      altText: editItem.image?.altText || "",
+       description: editItem.description || "", 
     });
     } else {
       resetForm();
@@ -101,6 +102,8 @@ const [confirmModal, setConfirmModal] = useState(false);
       designation: "",
       location: "",
       image: null, // reset image to null
+      altText: "",
+    description: "",
     });
     reset();
   };
