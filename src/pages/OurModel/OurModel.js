@@ -46,7 +46,7 @@ const OurModel = () => {
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [confirmModal, setConfirmModal] = useState(false);
-  const [deleteId, setDeleteId] = useState(null); 
+  const [deleteId, setDeleteId] = useState(null);
   const [descriptionError, setDescriptionError] = useState("");
   const [valueDescriptionErrors, setValueDescriptionErrors] = useState([]);
   const [valueTitleErrors, setValueTitleErrors] = useState([]);
@@ -174,7 +174,14 @@ const OurModel = () => {
     const payload = new FormData();
     payload.append("title", formData.title);
     payload.append("description", formData.description);
-    payload.append("icons", JSON.stringify(formData.icons));
+    const preparedIcons = formData.icons.map((icon) => ({
+      title: icon.title,
+      description: icon.description,
+      hasNewIcon: icon.icon instanceof File,
+    }));
+
+    payload.append("icons", JSON.stringify(preparedIcons));
+
 
     formData.icons.forEach((val) => {
       if (val.icon instanceof File) {
@@ -209,7 +216,7 @@ const OurModel = () => {
     }
   };
 
-   const confirmDelete = (id) => {
+  const confirmDelete = (id) => {
     setDeleteId(id);
     setConfirmModal(true);
   };
@@ -301,83 +308,80 @@ const OurModel = () => {
                 </DataTableRow>
               </DataTableHead>
 
-              {data.map((item) =>
-                Array.isArray(item.icons)
-                  ? item.icons.map((iconItem, index) => (
-                    <DataTableItem key={`${item._id}-${index}`}>
-                      <DataTableRow>
-                        <span>{index === 0 ? item.title : ""}</span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        <span>
-                          {index === 0 ? (
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: item.description,
-                              }}
-                              // style={{ maxHeight: "80px", overflow: "auto" }}
-                            />
-                          ) : null}
-                        </span>
-                      </DataTableRow>
+              {data.map((item) => (
+  <DataTableItem key={item._id}>
+    <DataTableRow>
+      <span>{item.title}</span>
+    </DataTableRow>
+    <DataTableRow>
+      <div dangerouslySetInnerHTML={{ __html: item.description }} />
+    </DataTableRow>
 
-                      <DataTableRow>
-                        <span>{iconItem.title}</span>
-                      </DataTableRow>
-                      <DataTableRow>
-                        <span>
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: iconItem.description,
-                            }}
-                            // style={{ maxHeight: "80px", overflow: "auto" }}
-                          />
-                        </span>
-                      </DataTableRow>
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.icons.map((icon, i) => (
+          <li key={i}>{icon.title}</li>
+        ))}
+      </ul>
+    </DataTableRow>
 
-                      <DataTableRow>
-                        {iconItem.icon?.url ? (
-                          <img
-                            src={iconItem.icon.url}
-                            alt={iconItem.icon.altText || "icon"}
-                            width={30}
-                            height={30}
-                          />
-                        ) : (
-                          "No Icon"
-                        )}
-                      </DataTableRow>
-                      <DataTableRow className='nk-tb-col-tools'>
-                        <ul className='nk-tb-actions gx-1'>
-                          <li
-                            className='nk-tb-action-hidden'
-                            onClick={() => toggleModal(item)}
-                          >
-                            <TooltipComponent
-                              tag='a'
-                              containerClassName='btn btn-trigger btn-icon'
-                              id={"edit" + item._id}
-                              icon='edit-alt-fill'
-                              direction='top'
-                              text='Edit'
-                            />
-                          </li>
-                          <li onClick={() => confirmDelete(item._id)}>
-                            <TooltipComponent
-                              tag='a'
-                              containerClassName='btn btn-trigger btn-icon'
-                              id={"delete" + item._id}
-                              icon='trash-fill'
-                              direction='top'
-                              text='Delete'
-                            />
-                          </li>
-                        </ul>
-                      </DataTableRow>
-                    </DataTableItem>
-                  ))
-                  : null
-              )}
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.icons.map((icon, i) => (
+          <li key={i}>
+            <div
+              dangerouslySetInnerHTML={{ __html: icon.description }}
+            />
+          </li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <div style={{ display: "flex", gap: "10px", flexDirection:"column" }}>
+        {item.icons.map((icon, i) =>
+          icon.icon?.url ? (
+            <img
+              key={i}
+              src={icon.icon.url}
+              alt={icon.icon.altText || "icon"}
+              width={30}
+              height={30}
+            />
+          ) : (
+            <span key={i}>No Icon</span>
+          )
+        )}
+      </div>
+    </DataTableRow>
+
+    <DataTableRow className='nk-tb-col-tools'>
+      <ul className='nk-tb-actions gx-1'>
+        <li className='nk-tb-action-hidden' onClick={() => toggleModal(item)}>
+          <TooltipComponent
+            tag='a'
+            containerClassName='btn btn-trigger btn-icon'
+            id={"edit" + item._id}
+            icon='edit-alt-fill'
+            direction='top'
+            text='Edit'
+          />
+        </li>
+        <li onClick={() => confirmDelete(item._id)}>
+          <TooltipComponent
+            tag='a'
+            containerClassName='btn btn-trigger btn-icon'
+            id={"delete" + item._id}
+            icon='trash-fill'
+            direction='top'
+            text='Delete'
+          />
+        </li>
+      </ul>
+    </DataTableRow>
+  </DataTableItem>
+))}
+
             </div>
           )}
         </Block>
@@ -485,11 +489,13 @@ const OurModel = () => {
                         >
                           <img
                             src={
-                              typeof iconItem.icon === "string"
-                                ? iconItem.icon
-                                : iconItem.icon.url
-                                  ? iconItem.icon.url
-                                  : URL.createObjectURL(iconItem.icon)
+                              iconItem.icon
+                                ? typeof iconItem.icon === "string"
+                                  ? iconItem.icon
+                                  : iconItem.icon instanceof File
+                                    ? URL.createObjectURL(iconItem.icon)
+                                    : iconItem.icon.url || ""
+                                : ""
                             }
                             alt='icon preview'
                             width={100}

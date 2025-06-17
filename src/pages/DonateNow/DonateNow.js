@@ -48,6 +48,7 @@ const DonateNow = () => {
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
+      page: "",
     title: "",
     buttonText: "",
     buttonLink: "",
@@ -86,6 +87,7 @@ const DonateNow = () => {
 
   const resetForm = () => {
     setFormData({
+            page: "",
       title: "",
       buttonText: "",
       buttonLink: "",
@@ -160,13 +162,13 @@ const DonateNow = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -178,6 +180,9 @@ const DonateNow = () => {
             </div>) : (
             <div className='nk-tb-list is-separate is-medium mb-3'>
               <DataTableHead>
+                <DataTableRow>
+                                  <span>Page</span>
+                                </DataTableRow>
                 <DataTableRow>
                   <span>Title</span>
                 </DataTableRow>
@@ -218,6 +223,9 @@ const DonateNow = () => {
 
               {data.map((item) => (
                 <DataTableItem key={item._id}>
+                   <DataTableRow>
+                                      <span>{item.page}</span>
+                                    </DataTableRow>
                   <DataTableRow>
                     <span>{item.title}</span>
                   </DataTableRow>
@@ -248,7 +256,7 @@ const DonateNow = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => confirmDelete(item._id)}>
+                      {/* <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -257,7 +265,7 @@ const DonateNow = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>
@@ -288,6 +296,27 @@ const DonateNow = () => {
                 {editId ? "Edit Donate Now" : "Add Donate Now"}
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
+                <Col md='12'>
+                                  <label className='form-label'>Page</label>
+                                  <select
+                                    className='form-control'
+                                    {...register("page", { required: "Required" })}
+                                    name='page'
+                                    value={formData.page}
+                                    onChange={(e) =>
+    setFormData({ ...formData, page: e.target.value })
+  }
+                                  >
+                                    <option value=''>Select Page</option>
+                                    
+                                    <option value='about'>about</option>
+                                    <option value='donate'>donate</option>
+                                    
+                                  </select>
+                                  {errors.page && (
+                                    <span className='invalid'>{errors.page.message}</span>
+                                  )}
+                                </Col>
                 <Col md='12'>
                   <label className='form-label'>Title</label>
                   <input

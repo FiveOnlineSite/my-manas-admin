@@ -189,13 +189,13 @@ const Contribution = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -274,7 +274,7 @@ const Contribution = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => confirmDelete(item._id)}>
+                      {/* <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -283,7 +283,7 @@ const Contribution = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>
@@ -366,6 +366,17 @@ const Contribution = () => {
                           )}
                         </Col>
                       </Row>
+                       {formData.items.length > 1 && (
+      <div className='d-flex justify-content-end mt-2'>
+        <Button
+          color='danger'
+          size='sm'
+          onClick={() => removeItem(index)}
+        >
+           Remove
+        </Button>
+      </div>
+    )}
                     </div>
                   ))}
                   <div className='mt-2'>

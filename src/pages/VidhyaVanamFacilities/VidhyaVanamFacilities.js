@@ -42,17 +42,26 @@ const VidhyaVanamFacilities = () => {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
-  const [confirmModal, setConfirmModal] = useState(false);
-  const [deleteId, setDeleteId] = useState(null); 
   const [editId, setEditId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({
+    image: "",
+    video: "",
+  });
+
   const [formData, setFormData] = useState({
-    title: "",
+    // title: "",
     image: null,
     video: null,
     imageAltText: "",
     videoAltText: "",
     featuredImage: null,
     isFeatured: false,
+    moreFeaturedImages: [], // new array for additional
+    moreFeaturedVideos: [], // new array for additional
+      removedImages: [],            
+  removedVideos: [],   
   });
 
   const {
@@ -61,6 +70,7 @@ const VidhyaVanamFacilities = () => {
     formState: { errors },
     reset,
     setValue,
+    trigger,
   } = useForm();
 
   useEffect(() => {
@@ -70,25 +80,29 @@ const VidhyaVanamFacilities = () => {
   const fetchData = async () => {
     setLoading(true)
     const res = await getRequest("/vidhyavanam/facilities");
-    if (res.success) { setData(res.data) }
-    setLoading(false);
+    if (res.success) { setData(res.data) };
+    setLoading(false)
   };
 
- const toggleModal = (editItem = null) => {
+  const toggleModal = (editItem = null) => {
     if (editItem) {
       setEditId(editItem._id);
       const resources = editItem.resources || {};
       const initialData = {
-        title: editItem.title || "",
+        // title: editItem.title || "",
         image: resources.image || null,
         video: resources.video || null,
         imageAltText: resources.image?.altText || "",
         videoAltText: resources.video?.altText || "",
         featuredImage: resources.featuredImage || null,
         isFeatured: editItem.isFeatured || false,
+        moreFeaturedImages: resources.moreFeaturedImages || [], // 🔁 fix here
+        moreFeaturedVideos: resources.moreFeaturedVideos || [], // 🔁 fix here
+        removedImages: [], // ✅ init empty
+  removedVideos: [],
       };
       setFormData(initialData);
-      setValue("title", initialData.title);
+      // setValue("title", initialData.title);
       setValue("image", initialData.image);
       setValue("video", initialData.video);
       setValue("imageAltText", initialData.imageAltText);
@@ -104,13 +118,17 @@ const VidhyaVanamFacilities = () => {
 
   const resetForm = () => {
     setFormData({
-      title: "",
+      // title: "",
       image: null,
       video: null,
       imageAltText: "",
       videoAltText: "",
       featuredImage: null,
       isFeatured: false,
+      moreFeaturedImages: [], // ✅ add this
+      moreFeaturedVideos: [],
+      removedImages: [], // ✅
+    removedVideos: [], 
     });
     reset();
   };
@@ -119,17 +137,68 @@ const VidhyaVanamFacilities = () => {
     const updated = data.filter((item) => !item.checked);
     setData(updated);
   };
+
+  const addMoreField = (type) => {
+    setFormData((prev) => ({
+      ...prev,
+      [type]: [...prev[type], null],
+    }));
+  };
+
+ const removeMoreField = (type, index) => {
+  setFormData((prev) => {
+    const removedItem = prev[type][index];
+
+    const isExistingFile = !(removedItem instanceof File);
+    const removalKey = type === "moreFeaturedImages" ? "removedImages" : "removedVideos";
+
+    return {
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index),
+      [removalKey]: isExistingFile
+        ? [...prev[removalKey], removedItem]
+        : prev[removalKey],
+    };
+  });
+};
+
+  const updateMoreFile = (e, type, index) => {
+    const file = e.target.files[0];
+    setFormData((prev) => {
+      const updated = [...prev[type]];
+      updated[index] = file;
+      return { ...prev, [type]: updated };
+    });
+  };
+
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
-    setFormData({ ...formData, [type]: file });
+    setFormData((prev) => ({ ...prev, [type]: file }));
     setValue(type, file, { shouldValidate: true });
+
+    // Trigger validation manually
+    trigger(type);
   };
 
   const onSubmit = async () => {
     setSubmitting(true);
 
+    const errors = {};
+
+    // Manual file validations
+    if (!formData.image) {
+      toast.error("Image is required");
+      setSubmitting(false);
+      return;
+    }
+    // if (!formData.video) {
+    //   toast.error("Video is required");
+    //   setSubmitting(false);
+    //   return;
+    // }
+
     const formPayload = new FormData();
-    formPayload.append("title", formData.title);
+    // formPayload.append("title", formData.title);
     formPayload.append("imageAltText", formData.imageAltText);
     formPayload.append("videoAltText", formData.videoAltText);
     formPayload.append("isFeatured", formData.isFeatured);
@@ -141,26 +210,43 @@ const VidhyaVanamFacilities = () => {
     if (formData.featuredImage instanceof File)
       formPayload.append("featuredImage", formData.featuredImage);
 
+    formData.moreFeaturedImages.forEach((file, i) => {
+      if (file instanceof File) {
+        formPayload.append(`moreFeaturedImages[${i}]`, file);
+      }
+    });
+
+    formData.moreFeaturedVideos.forEach((file, i) => {
+      if (file instanceof File) {
+        formPayload.append(`moreFeaturedVideos[${i}]`, file);
+      }
+    });
+
+  formData.removedImages.forEach((file, i) => {
+  const url = typeof file === "string" ? file : file?.url;
+  if (url) formPayload.append(`removedImages[${i}]`, url);
+});
+
+formData.removedVideos.forEach((file, i) => {
+  if (file?.url) formPayload.append(`removedVideos[${i}]`, file.url);
+});
+
+
+
     try {
       let res;
       if (editId) {
-        res = await putRequest(
-          `/vidhyavanam/facilities/${editId}`,
-          formPayload
-        );
+        res = await putRequest(`/vidhyavanam/facilities/${editId}`, formPayload);
       } else {
         res = await postFormData("/vidhyavanam/facilities", formPayload);
       }
 
       if (res.success) {
-        const updatedData = editId
-          ? data.map((item) => (item._id === editId ? res.data : item))
-          : [res.data, ...data];
-
-        setData(updatedData);
-        toast.success(`${editId ? "Updated" : "Created"} successfully!`);
-        toggleModal();
-      } else {
+  toast.success(`${editId ? "Updated" : "Created"} successfully!`);
+  toggleModal();
+  fetchData(); // ✅ This will re-fetch the updated backend data
+}
+else {
         toast.error("Submission failed.");
       }
     } catch {
@@ -218,9 +304,9 @@ const VidhyaVanamFacilities = () => {
             </div>) : (
             <div className='nk-tb-list is-separate is-medium mb-3'>
               <DataTableHead>
-                <DataTableRow>
+                {/* <DataTableRow>
                   <span>Title</span>
-                </DataTableRow>
+                </DataTableRow> */}
                 <DataTableRow>
                   <span>Image</span>
                 </DataTableRow>
@@ -240,6 +326,13 @@ const VidhyaVanamFacilities = () => {
                 <DataTableRow>
                   <span>Is Featured</span>
                 </DataTableRow>
+                <DataTableRow>
+                  <span>More Images</span>
+                </DataTableRow>
+                <DataTableRow>
+                  <span>More Videos</span>
+                </DataTableRow>
+
                 <DataTableRow className='nk-tb-col-tools text-end'>
                   <UncontrolledDropdown>
                     <DropdownToggle
@@ -271,9 +364,9 @@ const VidhyaVanamFacilities = () => {
 
               {data.map((item) => (
                 <DataTableItem key={item._id}>
-                  <DataTableRow>
+                  {/* <DataTableRow>
                     <span>{item.title}</span>
-                  </DataTableRow>
+                  </DataTableRow> */}
 
                   <DataTableRow>
                     {item.resources?.image ? (
@@ -372,6 +465,49 @@ const VidhyaVanamFacilities = () => {
                     <span>{item.isFeatured ? "Yes" : "No"}</span>
                   </DataTableRow>
 
+                  {/* More Featured Images */}
+                  <DataTableRow>
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      {item.resources?.moreFeaturedImages?.length > 0 ? (
+                        item.resources.moreFeaturedImages.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img.url}
+                            alt={img.altText || `MoreImage-${idx}`}
+                            width={50}
+                            height={35}
+                            style={{ objectFit: "cover", borderRadius: "4px", border: "1px solid #ccc" }}
+                          />
+                        ))
+                      ) : (
+                        <span>No additional images</span>
+                      )}
+                    </div>
+                  </DataTableRow>
+
+                  {/* More Featured Videos */}
+                  <DataTableRow>
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                      {item.resources?.moreFeaturedVideos?.length > 0 ? (
+                        item.resources.moreFeaturedVideos.map((vid, idx) => (
+                          <video
+                            key={idx}
+                            width={60}
+                            height={40}
+                            controls
+                            style={{ borderRadius: "4px", objectFit: "cover", border: "1px solid #ccc" }}
+                          >
+                            <source src={vid.url} />
+                            Your browser does not support video playback.
+                          </video>
+                        ))
+                      ) : (
+                        <span>No additional videos</span>
+                      )}
+                    </div>
+                  </DataTableRow>
+
+
                   <DataTableRow className='nk-tb-col-tools'>
                     <ul className='nk-tb-actions gx-1'>
                       <li
@@ -425,7 +561,7 @@ const VidhyaVanamFacilities = () => {
             <div className='p-2'>
               <h5 className='title'>{editId ? "Edit" : "Add"} Upload Item</h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
-                <Col md='12'>
+                {/* <Col md='12'>
                   <label className='form-label'>Title</label>
                   <input
                     className='form-control'
@@ -438,7 +574,7 @@ const VidhyaVanamFacilities = () => {
                   {errors.title && (
                     <span className='invalid'>{errors.title.message}</span>
                   )}
-                </Col>
+                </Col> */}
 
                 {/* Image Upload */}
                 <Col md='6'>
@@ -467,7 +603,13 @@ const VidhyaVanamFacilities = () => {
                         }}
                       >
                         <img
-                          src={URL.createObjectURL(formData.image)}
+                          src={
+                            formData.image instanceof File
+                              ? URL.createObjectURL(formData.image)
+                              : typeof formData.image === "string"
+                                ? formData.image
+                                : formData.image?.url || ""
+                          }
                           alt='Preview'
                           style={{
                             width: "150px",
@@ -507,7 +649,7 @@ const VidhyaVanamFacilities = () => {
                       </div>
                     </div>
                   )}
-                  <input
+                  {/* <input
                     type='hidden'
                     {...register("image", {
                       validate: () =>
@@ -516,7 +658,7 @@ const VidhyaVanamFacilities = () => {
                           : "Image is required",
                     })}
 
-                  />
+                  /> */}
                   {errors.image && (
                     <span className='invalid'>{errors.image.message}</span>
                   )}
@@ -581,7 +723,15 @@ const VidhyaVanamFacilities = () => {
                             backgroundColor: "#fff",
                           }}
                         >
-                          <source src={URL.createObjectURL(formData.video)} />
+                          <source
+                            src={
+                              formData.video instanceof File
+                                ? URL.createObjectURL(formData.video)
+                                : typeof formData.video === "string"
+                                  ? formData.video
+                                  : formData.video?.url || ""
+                            }
+                          />
                           Your browser does not support the video tag.
                         </video>
                         <Button
@@ -612,7 +762,7 @@ const VidhyaVanamFacilities = () => {
                       </div>
                     </div>
                   )}
-                  <input
+                  {/* <input
                     type='hidden'
                     {...register("video", {
                       validate: () =>
@@ -620,7 +770,7 @@ const VidhyaVanamFacilities = () => {
                           ? true
                           : "Video is required",
                     })}
-                  />
+                  /> */}
                   {errors.video && (
                     <span className='invalid'>{errors.video.message}</span>
                   )}
@@ -677,7 +827,13 @@ const VidhyaVanamFacilities = () => {
                         }}
                       >
                         <img
-                          src={URL.createObjectURL(formData.featuredImage)}
+                          src={
+                            formData.featuredImage instanceof File
+                              ? URL.createObjectURL(formData.featuredImage)
+                              : typeof formData.featuredImage === "string"
+                                ? formData.featuredImage
+                                : formData.featuredImage?.url || ""
+                          }
                           alt='Featured Preview'
                           style={{
                             width: "150px",
@@ -719,7 +875,7 @@ const VidhyaVanamFacilities = () => {
                       </div>
                     </div>
                   )}
-                   <input
+                  <input
                     type='hidden'
                     {...register("featuredImage", {
                       validate: () =>
@@ -755,6 +911,134 @@ const VidhyaVanamFacilities = () => {
                     </label>
                   </div>
                 </Col>
+
+                {/* Additional Featured Images */}
+                <Col md="12">
+                  <label className="form-label mt-2">More Featured Images</label>
+                  {formData.moreFeaturedImages.map((file, index) => (
+  <div key={index} className="d-flex align-items-center mb-2">
+    <div style={{ position: "relative", marginRight: "8px" }}>
+      <img
+        src={
+          file instanceof File
+            ? URL.createObjectURL(file)
+            : typeof file === "string"
+              ? file
+              : file?.url || ""
+        }
+        alt={`preview-${index}`}
+        style={{
+          width: 80,
+          height: 50,
+          objectFit: "cover",
+          borderRadius: 4,
+          border: "1px solid #ccc",
+        }}
+      />
+    </div>
+    <input
+      type="file"
+      accept="image/*"
+      className="form-control me-2"
+      onChange={(e) => updateMoreFile(e, "moreFeaturedImages", index)}
+    />
+    <Button
+    type="button"
+      size="sm"
+      color="danger"
+      onClick={() => removeMoreField("moreFeaturedImages", index)}
+    >
+      Remove
+    </Button>
+  </div>
+))}
+
+                  {/* <Button
+                    color="secondary"
+                    size="sm"
+                    onClick={() => addMoreField("moreFeaturedImages")}
+                  >
+                    + Add More Featured Image
+                  </Button> */}
+                  <div>
+                    <Button
+                      type="button"
+                      color='primary'
+                      size='sm'
+                      style={{ width: "auto" }}
+                      onClick={() => addMoreField("moreFeaturedImages")}
+                    >
+                      Add More Item
+                    </Button>
+                  </div>
+                </Col>
+
+                {/* Additional Featured Videos */}
+                <Col md="12">
+                  <label className="form-label mt-2">More Featured Videos</label>
+                  {formData.moreFeaturedVideos.map((file, index) => (
+  <div key={index} className="d-flex align-items-center mb-2">
+    <div style={{ position: "relative", marginRight: "8px" }}>
+      <video
+        width={100}
+        height={60}
+        controls
+        style={{
+          borderRadius: 4,
+          border: "1px solid #ccc",
+          objectFit: "cover",
+        }}
+      >
+        <source
+          src={
+            file instanceof File
+              ? URL.createObjectURL(file)
+              : typeof file === "string"
+                ? file
+                : file?.url || ""
+          }
+        />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <input
+      type="file"
+      accept="video/*"
+      className="form-control me-2"
+      onChange={(e) => updateMoreFile(e, "moreFeaturedVideos", index)}
+    />
+    <Button
+    type="button"
+      size="sm"
+      color="danger"
+      onClick={() => removeMoreField("moreFeaturedVideos", index)}
+    >
+     Remove
+    </Button>
+  </div>
+))}
+
+
+                  <div>
+                    <Button
+                      type="button"
+                      color='primary'
+                      size='sm'
+                      style={{ width: "auto" }}
+                      onClick={() => addMoreField("moreFeaturedVideos")}
+                    >
+                      Add More Item
+                    </Button>
+                  </div>
+                  {/* <Button
+                    color="secondary"
+                    size="sm"
+                    onClick={() => addMoreField("moreFeaturedVideos")}
+                  >
+                    + Add More Featured Video
+                  </Button> */}
+                </Col>
+
 
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>

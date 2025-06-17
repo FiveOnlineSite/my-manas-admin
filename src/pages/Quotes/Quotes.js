@@ -54,16 +54,17 @@ const Quotes = () => {
     setValue,
   } = useForm();
 
-  useEffect(() => {
-    fetchQuotes();
-  }, []);
-
+ 
   const fetchQuotes = async () => {
     setLoading(true)
     const res = await getRequest("/masterquote");
     if (res.success) { setData(res.data) }
     setLoading(false);
   };
+   useEffect(() => {
+    fetchQuotes();
+  }, []);
+
 
   const [formData, setFormData] = useState({
     page: "",
@@ -107,21 +108,23 @@ const Quotes = () => {
       if (editId !== null) {
         res = await putRequest(`/masterquote/${editId}`, formData);
         if (res.success) {
-          const updated = data.map((d) => (d._id === editId ? res.data : d));
-          setData(updated);
+         
           toast.success("Quote updated successfully!");
         }
       } else {
         res = await postRequest("/masterquote", formData);
         if (res.success) {
-          setData([res.data, ...data]);
           toast.success("Quote added successfully!");
         }
       }
-      toggleModal();
-      setSubmitting(false);
+      
     } catch {
       toast.error("Something went wrong.");
+    }
+    finally {
+       fetchQuotes();
+       toggleModal();
+      setSubmitting(false);
     }
   };
 
@@ -161,13 +164,13 @@ const Quotes = () => {
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -249,7 +252,7 @@ const Quotes = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => confirmDelete(item._id)}>
+                      {/* <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -258,7 +261,7 @@ const Quotes = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>
@@ -299,12 +302,12 @@ const Quotes = () => {
                     <option value=''>Select Page</option>
                     <option value='home'>home</option>
                     <option value='about'>about</option>
-                    <option value='donate'>donate</option>
-                    <option value='scholarship'>scholarship</option>
+                    {/* <option value='donate'>donate</option> */}
+                    {/* <option value='scholarship'>scholarship</option> */}
                     <option value='academy'>academy</option>
-                    <option value='contact'>contact</option>
+                    {/* <option value='contact'>contact</option> */}
                     <option value='vidhyavanam'>vidhyavanam</option>
-                    <option value='news'>news</option>
+                    {/* <option value='news'>news</option> */}
                   </select>
                   {errors.page && (
                     <span className='invalid'>{errors.page.message}</span>

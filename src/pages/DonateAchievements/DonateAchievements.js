@@ -217,13 +217,13 @@ const [confirmModal, setConfirmModal] = useState(false);
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -256,69 +256,91 @@ const [confirmModal, setConfirmModal] = useState(false);
               </DataTableHead>
               {console.log(data, "datadddddddddd")}
               {data &&
-                data?.length > 0 &&
-                data.map((achievement) =>
-                  Array.isArray(achievement.items)
-                    ? achievement?.items?.map((item, idx) => (
-                      <DataTableItem key={`${achievement._id}-${idx}`}>
-                        <DataTableRow>
-                          <span>{achievement.title}</span>
-                        </DataTableRow>
-                        <DataTableRow>
-                          <span>{item.title}</span>
-                        </DataTableRow>
-                        <DataTableRow>
-                          <span
-                            dangerouslySetInnerHTML={{
-                              __html: item.description,
-                            }}
-                          />
-                        </DataTableRow>
-                        <DataTableRow>
-                          {item.image?.url && (
-                            <img
-                              src={item.image.url}
-                              alt={item.image.altText || "item image"}
-                              width={60}
-                              height={40}
-                              style={{ objectFit: "cover" }}
-                            />
-                          )}
-                        </DataTableRow>
-                        <DataTableRow>
-                          <span>{item.image?.altText}</span>
-                        </DataTableRow>
-                        <DataTableRow className='nk-tb-col-tools'>
-                          <ul className='nk-tb-actions gx-1'>
-                            <li
-                              className='nk-tb-action-hidden'
-                              onClick={() => toggleModal(achievement)}
-                            >
-                              <TooltipComponent
-                                tag='a'
-                                id={`delete-${idx}`}
-                                containerClassName='btn btn-trigger btn-icon'
-                                icon='edit-alt-fill'
-                                direction='top'
-                                text='Edit'
-                              />
-                            </li>
-                            <li onClick={() => confirmDelete(achievement._id)}>
-                              <TooltipComponent
-                                tag='a'
-                                containerClassName='btn btn-trigger btn-icon'
-                                icon='trash-fill'
-                                id={`delete-${idx}`}
-                                direction='top'
-                                text='Delete'
-                              />
-                            </li>
-                          </ul>
-                        </DataTableRow>
-                      </DataTableItem>
-                    ))
-                    : []
-                )}
+  data.length > 0 &&
+  data.map((achievement) => (
+    <DataTableItem key={achievement._id}>
+      {/* Main Title */}
+      <DataTableRow>
+        <span>{achievement.title}</span>
+      </DataTableRow>
+
+      {/* Item Titles */}
+      <DataTableRow>
+        <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
+          {achievement.items.map((item, idx) => (
+            <li key={idx}>{item.title}</li>
+          ))}
+        </ul>
+      </DataTableRow>
+
+      {/* Descriptions */}
+      <DataTableRow>
+        <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
+          {achievement.items.map((item, idx) => (
+            <li key={idx}>
+              <div dangerouslySetInnerHTML={{ __html: item.description }} />
+            </li>
+          ))}
+        </ul>
+      </DataTableRow>
+
+      {/* Images */}
+      <DataTableRow>
+        <div style={{ display: "flex", gap: "10px", flexDirection:"column" }}>
+          {achievement.items.map((item, idx) =>
+            item.image?.url || typeof item.image === "string" ? (
+              <img
+                key={idx}
+                src={typeof item.image === "string" ? item.image : item.image?.url}
+                alt={item.altText || "achievement"}
+                width={30}
+                height={30}
+                style={{ objectFit: "cover", borderRadius: "4px" }}
+              />
+            ) : (
+              <span key={idx}>No image</span>
+            )
+          )}
+        </div>
+      </DataTableRow>
+
+      {/* Alt Texts */}
+      <DataTableRow>
+        <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
+          {achievement.items.map((item, idx) => (
+            <li key={idx}>{item.image?.altText}</li>
+          ))}
+        </ul>
+      </DataTableRow>
+
+      {/* Actions */}
+      <DataTableRow className='nk-tb-col-tools'>
+        <ul className='nk-tb-actions gx-1'>
+          <li onClick={() => toggleModal(achievement)}>
+            <TooltipComponent
+              tag='a'
+              id={`edit-${achievement._id}`}
+              containerClassName='btn btn-trigger btn-icon'
+              icon='edit-alt-fill'
+              direction='top'
+              text='Edit'
+            />
+          </li>
+          <li onClick={() => confirmDelete(achievement._id)}>
+            <TooltipComponent
+              tag='a'
+              id={`delete-${achievement._id}`}
+              containerClassName='btn btn-trigger btn-icon'
+              icon='trash-fill'
+              direction='top'
+              text='Delete'
+            />
+          </li>
+        </ul>
+      </DataTableRow>
+    </DataTableItem>
+  ))}
+
             </div>
           )}
         </Block>

@@ -97,6 +97,12 @@ const OurValues = () => {
           }))
           : [{ title: "", description: "", valueIcon: null }],
       });
+      item.values?.forEach((v, index) => {
+  setValue(`values[${index}].title`, v.title);
+  setValue(`values[${index}].description`, v.description);
+  setValue(`values[${index}].valueIcon`, v.icon?.url || null);
+});
+
       setEditId(item._id);
 
       setValue("description", item.description || "");
@@ -148,15 +154,18 @@ const OurValues = () => {
     setValue(`values[${index}].valueIcon`, null, { shouldValidate: true });
   };
 
-  const addValue = () => {
-    setFormData({
-      ...formData,
-      values: [
-        ...formData.values,
-        { title: "", description: "", valueIcon: null },
-      ],
-    });
-  };
+const addValue = () => {
+  const newValues = [
+    ...formData.values,
+    { title: "", description: "", valueIcon: null },
+  ];
+  setFormData({ ...formData, values: newValues });
+
+  const newIndex = newValues.length - 1;
+  setValue(`values[${newIndex}].title`, "");
+  setValue(`values[${newIndex}].description`, "");
+  setValue(`values[${newIndex}].valueIcon`, null);
+};
 
   const validateValues = () => {
     const errs = formData.values.map((item) => {
@@ -476,10 +485,12 @@ const OurValues = () => {
                           <ReactQuill
                             theme='snow'
                             value={field.value || ""}
-                            onChange={(val) => {
-                              field.onChange(val);
-                              handleValueChange(index, "description", val);
-                            }}
+                           onChange={(val) => {
+  field.onChange(val);
+  handleValueChange(index, "description", val);
+  trigger(`values[${index}].description`);
+}}
+
                           />
                         )}
                       />

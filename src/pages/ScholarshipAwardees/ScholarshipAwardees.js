@@ -43,7 +43,7 @@ const ScholarshipAwardees = () => {
   const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
-const [confirmModal, setConfirmModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
   const [modal, setModal] = useState(false);
@@ -117,7 +117,7 @@ const [confirmModal, setConfirmModal] = useState(false);
   };
 
   const handleAwardeeChange = (index, field, value) => {
-    const updatedAwardees = [...formData.awardees];
+    const updatedAwardees = JSON.parse(JSON.stringify(formData.awardees));
     updatedAwardees[index][field] = value;
     setFormData({ ...formData, awardees: updatedAwardees });
   };
@@ -166,7 +166,16 @@ const [confirmModal, setConfirmModal] = useState(false);
 
     const payload = new FormData();
     payload.append("title", formData.title);
-    payload.append("awardees", JSON.stringify(formData.awardees));
+    const preparedAwardees = formData.awardees.map((a) => ({
+      name: a.name,
+      review: a.review,
+      year: a.year,
+      institute: a.institute,
+      hasNewImage: a.image instanceof File,
+    }));
+
+    payload.append("awardees", JSON.stringify(preparedAwardees));
+
 
     formData.awardees.forEach((awardee) => {
       if (awardee.image instanceof File) {
@@ -209,7 +218,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     }
   };
 
-    const confirmDelete = (id) => {
+  const confirmDelete = (id) => {
     setDeleteId(id);
     setConfirmModal(true);
   };
@@ -304,67 +313,96 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </DataTableRow>
               </DataTableHead>
 
-              {data.map((item) =>
-  item.awardees.map((awardee, index) => (
-    <DataTableItem key={`${item._id}-${index}`}>
-      <DataTableRow>
-        <span>{index === 0 ? item.title : ""}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <span>{awardee.name}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <div dangerouslySetInnerHTML={{ __html: awardee.review }} />
-      </DataTableRow>
-      <DataTableRow>
-        <span>{awardee.year}</span>
-      </DataTableRow>
-      <DataTableRow>
-        <span>{awardee.institute}</span>
-      </DataTableRow>
-      <DataTableRow>
-        {awardee.image?.url ? (
-          <img
-            src={awardee.image?.url}
-            alt='awardee'
-            width={50}
-            height={50}
-            style={{ objectFit: "cover" }}
-          />
-        ) : (
-          "No image"
+              {data.map((item) => (
+  <DataTableItem key={item._id}>
+    <DataTableRow>
+      <span>{item.title}</span>
+    </DataTableRow>
+
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.awardees.map((awardee, i) => (
+          <li key={i}>{awardee.name}</li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.awardees.map((awardee, i) => (
+          <li key={i}>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: awardee.review,
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.awardees.map((awardee, i) => (
+          <li key={i}>{awardee.year}</li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.awardees.map((awardee, i) => (
+          <li key={i}>{awardee.institute}</li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <div style={{ display: "flex", flexDirection:"column", gap: "10px" }}>
+        {item.awardees.map((awardee, i) =>
+          awardee.image?.url ? (
+            <img
+              key={i}
+              src={awardee.image.url}
+              alt={`Awardee ${i}`}
+              width={30}
+              height={30}
+              style={{ objectFit: "cover", borderRadius: "4px" }}
+            />
+          ) : (
+            <span key={i}>No image</span>
+          )
         )}
-      </DataTableRow>
-      <DataTableRow className='nk-tb-col-tools'>
-        <ul className='nk-tb-actions gx-1'>
-          <li
-            className='nk-tb-action-hidden'
-            onClick={() => toggleModal(item)}
-          >
-            <TooltipComponent
-              tag='a'
-              containerClassName='btn btn-trigger btn-icon'
-              id={"edit" + item._id}
-              icon='edit-alt-fill'
-              direction='top'
-              text='Edit'
-            />
-          </li>
-          <li onClick={() => confirmDelete(item._id)}>
-            <TooltipComponent
-              tag='a'
-              containerClassName='btn btn-trigger btn-icon'
-              id={"delete" + item._id}
-              icon='trash-fill'
-              direction='top'
-              text='Delete'
-            />
-          </li>
-        </ul>
-      </DataTableRow>
-    </DataTableItem>
-  ))
-)}
+      </div>
+    </DataTableRow>
+
+    <DataTableRow className='nk-tb-col-tools'>
+      <ul className='nk-tb-actions gx-1'>
+        <li className='nk-tb-action-hidden' onClick={() => toggleModal(item)}>
+          <TooltipComponent
+            tag='a'
+            containerClassName='btn btn-trigger btn-icon'
+            id={"edit" + item._id}
+            icon='edit-alt-fill'
+            direction='top'
+            text='Edit'
+          />
+        </li>
+        <li onClick={() => confirmDelete(item._id)}>
+          <TooltipComponent
+            tag='a'
+            containerClassName='btn btn-trigger btn-icon'
+            id={"delete" + item._id}
+            icon='trash-fill'
+            direction='top'
+            text='Delete'
+          />
+        </li>
+      </ul>
+    </DataTableRow>
+  </DataTableItem>
+))}
+
 
             </div>
           )}
@@ -491,11 +529,14 @@ const [confirmModal, setConfirmModal] = useState(false);
                           >
                             <img
                               src={
-                                typeof awardee.image === "string"
-                                  ? awardee.image
-                                  : awardee.image.url
-                                    ? awardee.image.url
-                                    : URL.createObjectURL(awardee.image)
+                                awardee.image
+                                  ? typeof awardee.image === "string"
+                                    ? awardee.image
+                                    : awardee.image instanceof File
+                                      ? URL.createObjectURL(awardee.image)
+                                      : awardee.image.url || ""
+                                  : ""
+
                               }
                               alt={awardee.name}
                               style={{
@@ -590,42 +631,42 @@ const [confirmModal, setConfirmModal] = useState(false);
           </ModalBody>
         </Modal>
         <Modal
-                  isOpen={confirmModal}
-                  toggle={() => setConfirmModal(false)}
-                  className='modal-dialog-centered'
-                  size='sm'
-                >
-                  <ModalBody className='text-center'>
-                    <h5 className='mt-3'>Confirm Deletion</h5>
-                    <p>Are you sure you want to delete this item?</p>
-                    <div className='d-flex justify-content-center gap-2 mt-4'>
-                      <Button
-                        color='danger'
-                        className='p-3'
-                        onClick={async () => {
-                          const res = await deleteRequest(`/scholarships/scholarship-awardees/${deleteId}`);
-                          if (res.success) {
-                            toast.success("Deleted successfully");
-                            fetchData();
-                          } else {
-                            toast.error("Delete failed");
-                          }
-                          setConfirmModal(false);
-                          setDeleteId(null);
-                        }}
-                      >
-                        OK
-                      </Button>
-                      <Button
-                        color='light'
-                        className='p-3'
-                        onClick={() => setConfirmModal(false)}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </ModalBody>
-                </Modal>
+          isOpen={confirmModal}
+          toggle={() => setConfirmModal(false)}
+          className='modal-dialog-centered'
+          size='sm'
+        >
+          <ModalBody className='text-center'>
+            <h5 className='mt-3'>Confirm Deletion</h5>
+            <p>Are you sure you want to delete this item?</p>
+            <div className='d-flex justify-content-center gap-2 mt-4'>
+              <Button
+                color='danger'
+                className='p-3'
+                onClick={async () => {
+                  const res = await deleteRequest(`/scholarships/scholarship-awardees/${deleteId}`);
+                  if (res.success) {
+                    toast.success("Deleted successfully");
+                    fetchData();
+                  } else {
+                    toast.error("Delete failed");
+                  }
+                  setConfirmModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                OK
+              </Button>
+              <Button
+                color='light'
+                className='p-3'
+                onClick={() => setConfirmModal(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </ModalBody>
+        </Modal>
       </Content>
     </>
   );

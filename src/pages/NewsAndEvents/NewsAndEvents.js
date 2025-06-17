@@ -52,7 +52,6 @@ const [confirmModal, setConfirmModal] = useState(false);
     uploadDate: "",
     type: "news",
     image: null,
-    excerpt: "",
     content: "",
     metaTitle: "",
     metaDescription: "",
@@ -82,25 +81,36 @@ const [confirmModal, setConfirmModal] = useState(false);
   };
 
   const toggleModal = (editItem = null) => {
-    if (editItem) {
-      setEditId(editItem._id);
-      setFormData(editItem);
+  if (editItem) {
+    setEditId(editItem._id);
 
-      // Set form values for react-hook-form
-      setValue("title", editItem.title);
-      setValue("uploadDate", editItem.uploadDate);
-      setValue("type", editItem.type);
-      setValue("excerpt", editItem.excerpt);
-      setValue("content", editItem.content);
-      setValue("metaTitle", editItem.metaTitle);
-      setValue("metaDescription", editItem.metaDescription);
-      setValue("image", editItem.image);
-    } else {
-      resetForm();
-      setEditId(null);
-    }
-    setModal(!modal);
-  };
+    const formattedDate = editItem.uploadDate
+      ? new Date(editItem.uploadDate).toISOString().split("T")[0]
+      : "";
+
+    const updatedData = {
+      ...editItem,
+      uploadDate: formattedDate, // Format the date
+    };
+
+    setFormData(updatedData);
+
+    // Set values for react-hook-form
+    setValue("title", updatedData.title);
+    setValue("uploadDate", updatedData.uploadDate);
+    setValue("type", editItem.type.charAt(0).toUpperCase() + editItem.type.slice(1));
+    setValue("content", updatedData.content);
+    setValue("metaTitle", updatedData.metaTitle);
+    setValue("metaDescription", updatedData.metaDescription);
+    setValue("image", updatedData.image);
+  } else {
+    resetForm();
+    setEditId(null);
+  }
+
+  setModal(!modal);
+};
+
 
   const resetForm = () => {
     setFormData({
@@ -108,7 +118,6 @@ const [confirmModal, setConfirmModal] = useState(false);
       uploadDate: "",
       type: "News",
       image: null,
-      excerpt: "",
       content: "",
       metaTitle: "",
       metaDescription: "",
@@ -142,7 +151,6 @@ const [confirmModal, setConfirmModal] = useState(false);
     formPayload.append("title", values.title);
     formPayload.append("uploadDate", values.uploadDate);
     formPayload.append("type", values.type.toLowerCase());
-    formPayload.append("excerpt", values.excerpt);
     formPayload.append("content", values.content);
     formPayload.append("metaTitle", values.metaTitle);
     formPayload.append("metaDescription", values.metaDescription);
@@ -240,9 +248,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   <span>Image</span>
                 </DataTableRow>
 
-                <DataTableRow>
-                  <span>Excerpt</span>
-                </DataTableRow>
+                
                 <DataTableRow>
                   <span>Content</span>
                 </DataTableRow>
@@ -316,9 +322,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                     )}
                   </DataTableRow>
 
-                  <DataTableRow>
-                    <span>{item.excerpt}</span>
-                  </DataTableRow>
+                 
                   <DataTableRow>
                     <span>{item.content}</span>
                   </DataTableRow>
@@ -542,22 +546,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   )}
                 </Col>
 
-                <Col md='12'>
-                  <label className='form-label'>Excerpt</label>
-                  <textarea
-                    className='form-control'
-                    {...register("excerpt", {
-                      required: "Excerpt is required",
-                    })}
-                    value={formData.excerpt}
-                    onChange={(e) =>
-                      setFormData({ ...formData, excerpt: e.target.value })
-                    }
-                  />
-                  {errors.excerpt && (
-                    <span className='invalid'>{errors.excerpt.message}</span>
-                  )}
-                </Col>
+                
 
                 <Col md='12'>
                   <label className='form-label'>Content</label>

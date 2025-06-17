@@ -228,13 +228,13 @@ payload.append("members", JSON.stringify(membersWithFlag));
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -261,58 +261,84 @@ payload.append("members", JSON.stringify(membersWithFlag));
                 <DataTableRow className='nk-tb-col-tools text-end' />
               </DataTableHead>
 
-              {data.length > 0 &&
-                data[0]?.members?.map((member, index) => (
-                  <DataTableItem key={index}>
-                    <DataTableRow>
-                      <span>{member.name}</span>
-                    </DataTableRow>
-                    <DataTableRow>
-                      <span
-                        dangerouslySetInnerHTML={{ __html: member.description }}
-                      />
-                    </DataTableRow>
-                    <DataTableRow>
-                      {member.image?.url ? (
-                        <img
-                          src={member.image.url}
-                          alt={member.image.altText}
-                          width={60}
-                          height={40}
-                        />
-                      ) : (
-                        "No image"
-                      )}
-                    </DataTableRow>
-                    <DataTableRow>
-                      <span>{member.image?.altText}</span>
-                    </DataTableRow>
-                    <DataTableRow className='nk-tb-col-tools'>
-                      <ul className='nk-tb-actions gx-1'>
-                        <li onClick={() => toggleModal(data[0])}>
-                          <TooltipComponent
-                            tag='a'
-                            id={`edit-${index}`}
-                            containerClassName='btn btn-trigger btn-icon'
-                            icon='edit-alt-fill'
-                            direction='top'
-                            text='Edit'
-                          />
-                        </li>
-                        <li onClick={() => confirmDelete(data[0]._id)}>
-                          <TooltipComponent
-                            tag='a'
-                            id={`delete-${index}`}
-                            containerClassName='btn btn-trigger btn-icon'
-                            icon='trash-fill'
-                            direction='top'
-                            text='Delete'
-                          />
-                        </li>
-                      </ul>
-                    </DataTableRow>
-                  </DataTableItem>
-                ))}
+              {data.map((item) => (
+  <DataTableItem key={item._id}>
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.members.map((m, i) => (
+          <li key={i}>{m.name}</li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.members.map((m, i) => (
+          <li key={i}>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: m.description,
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow>
+      <div style={{ display: "flex", flexDirection:"column", gap: "10px" }}>
+        {item.members.map((m, i) =>
+          m.image?.url ? (
+            <img
+              key={i}
+              src={m.image.url}
+              alt={m.altText}
+              width={30}
+              height={30}
+              
+            />
+          ) : (
+            <span key={i}>No image</span>
+          )
+        )}
+      </div>
+    </DataTableRow>
+
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.members.map((m, i) => (
+          <li key={i}>{m.image?.altText}</li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    <DataTableRow className='nk-tb-col-tools'>
+      <ul className='nk-tb-actions gx-1'>
+        <li onClick={() => toggleModal(item)}>
+          <TooltipComponent
+            tag='a'
+            id={`edit-${item._id}`}
+            containerClassName='btn btn-trigger btn-icon'
+            icon='edit-alt-fill'
+            direction='top'
+            text='Edit'
+          />
+        </li>
+        <li onClick={() => confirmDelete(item._id)}>
+          <TooltipComponent
+            tag='a'
+            id={`delete-${item._id}`}
+            containerClassName='btn btn-trigger btn-icon'
+            icon='trash-fill'
+            direction='top'
+            text='Delete'
+          />
+        </li>
+      </ul>
+    </DataTableRow>
+  </DataTableItem>
+))}
+
             </div>
           )}
         </Block>

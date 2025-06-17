@@ -155,13 +155,13 @@ const [confirmModal, setConfirmModal] = useState(false);
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button
+              {/* <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -240,7 +240,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => confirmDelete(item._id)}>
+                      {/* <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -249,7 +249,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>
