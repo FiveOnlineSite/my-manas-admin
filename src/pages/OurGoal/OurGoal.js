@@ -323,7 +323,7 @@ const OurGoal = () => {
                 </DataTableRow>
               </DataTableHead>
 
-              {data.map((item) =>
+              {/* {data.map((item) =>
                 item.goals?.map((goal, index) => (
                   <DataTableItem key={`${item._id}-${index}`}>
                     <DataTableRow>
@@ -397,7 +397,79 @@ const OurGoal = () => {
                     </DataTableRow>
                   </DataTableItem>
                 ))
-              )}
+              )} */}
+
+              {data.map((item) => (
+  <DataTableItem key={item._id}>
+    <DataTableRow>
+      <span>{item.title}</span>
+    </DataTableRow>
+    <DataTableRow>
+      <div dangerouslySetInnerHTML={{ __html: item.description }} />
+    </DataTableRow>
+    <DataTableRow>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+        {item.goals?.map((goal, i) =>
+          goal.images?.map((img, j) => (
+            <img
+              key={`${i}-${j}`}
+              src={img.url}
+              alt={img.altText || `Goal ${i + 1} Image`}
+              width={60}
+              height={40}
+              style={{
+                objectFit: "cover",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+            />
+          ))
+        )}
+      </div>
+    </DataTableRow>
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.goals?.map((goal, i) => (
+          <li key={i}>{goal.title}</li>
+        ))}
+      </ul>
+    </DataTableRow>
+    <DataTableRow>
+      <ul style={{ listStyleType: "disc", paddingLeft: "20px" }}>
+        {item.goals?.map((goal, i) => (
+          <li key={i}>
+            <div dangerouslySetInnerHTML={{ __html: goal.description }} />
+          </li>
+        ))}
+      </ul>
+    </DataTableRow>
+    <DataTableRow className='nk-tb-col-tools'>
+      <ul className='nk-tb-actions gx-1'>
+        <li className='nk-tb-action-hidden' onClick={() => toggleModal(item)}>
+          <TooltipComponent
+            tag='a'
+            containerClassName='btn btn-trigger btn-icon'
+            id={"edit" + item._id}
+            icon='edit-alt-fill'
+            direction='top'
+            text='Edit'
+          />
+        </li>
+        <li onClick={() => confirmDelete(item._id)}>
+          <TooltipComponent
+            tag='a'
+            containerClassName='btn btn-trigger btn-icon'
+            id={"delete" + item._id}
+            icon='trash-fill'
+            direction='top'
+            text='Delete'
+          />
+        </li>
+      </ul>
+    </DataTableRow>
+  </DataTableItem>
+))}
+
 
             </div>
           )}
