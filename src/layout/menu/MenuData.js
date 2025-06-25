@@ -251,6 +251,10 @@ const menu = [
         text: "Social media links",
         link: "/socialMedia-links",
       },
+      {
+        text: "Meta Data",
+        link: "/meta-data",
+      },
     ],
   },
   {

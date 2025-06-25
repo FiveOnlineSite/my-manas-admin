@@ -178,6 +178,7 @@ const OurModel = () => {
       title: icon.title,
       description: icon.description,
       hasNewIcon: icon.icon instanceof File,
+       icon: !(icon.icon instanceof File) ? icon.icon : null, 
     }));
 
     payload.append("icons", JSON.stringify(preparedIcons));
@@ -367,7 +368,7 @@ const OurModel = () => {
             text='Edit'
           />
         </li>
-        <li onClick={() => confirmDelete(item._id)}>
+        {/* <li onClick={() => confirmDelete(item._id)}>
           <TooltipComponent
             tag='a'
             containerClassName='btn btn-trigger btn-icon'
@@ -376,7 +377,7 @@ const OurModel = () => {
             direction='top'
             text='Delete'
           />
-        </li>
+        </li> */}
       </ul>
     </DataTableRow>
   </DataTableItem>
@@ -541,6 +542,7 @@ const OurModel = () => {
                     </Col>
 
                     <Button
+                    type="button"
                       color='danger'
                       size='sm'
                       onClick={() => removeIcon(index)}

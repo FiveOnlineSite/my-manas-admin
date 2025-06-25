@@ -172,7 +172,7 @@ const ScholarshipAwardees = () => {
       year: a.year,
       institute: a.institute,
       hasNewImage: a.image instanceof File,
-    }));
+image: !(a.image instanceof File) ? a.image : null,    }));
 
     payload.append("awardees", JSON.stringify(preparedAwardees));
 
@@ -388,7 +388,7 @@ const ScholarshipAwardees = () => {
             text='Edit'
           />
         </li>
-        <li onClick={() => confirmDelete(item._id)}>
+        {/* <li onClick={() => confirmDelete(item._id)}>
           <TooltipComponent
             tag='a'
             containerClassName='btn btn-trigger btn-icon'
@@ -397,7 +397,7 @@ const ScholarshipAwardees = () => {
             direction='top'
             text='Delete'
           />
-        </li>
+        </li> */}
       </ul>
     </DataTableRow>
   </DataTableItem>
@@ -579,6 +579,7 @@ const ScholarshipAwardees = () => {
                     </Col>
 
                     <Button
+                    type="button"
                       color='danger'
                       size='sm'
                       onClick={() => removeAwardee(index)}

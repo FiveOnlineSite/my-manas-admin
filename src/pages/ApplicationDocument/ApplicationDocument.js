@@ -225,7 +225,7 @@ const ApplicationDocument = () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => confirmDelete(item._id)}>
+                      {/* <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           id={`delete-${item._id}`}
@@ -233,7 +233,7 @@ const ApplicationDocument = () => {
                           icon='trash-fill'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>

@@ -53,6 +53,7 @@ const Gallery = () => {
     file: null,
     file2: null,
     altText: "",
+     removeFile2: false,
   });
 
   const {
@@ -175,6 +176,10 @@ const Gallery = () => {
       formPayload.append("file2", formData.file2);
     }
 
+    if (formData.removeFile2) {
+  formPayload.append("removeUrl2", "true"); // your backend supports this
+}
+
     try {
       if (editId) {
         const res = await putRequest(`/home/gallery/${editId}`, formPayload);
@@ -193,9 +198,12 @@ const Gallery = () => {
         }
       }
       toggleModal();
-      setSubmitting(false);
+      // setSubmitting(false);
     } catch (err) {
       toast.error("Operation failed. Please try again.");
+    }
+    finally {
+      setSubmitting(false);
     }
   };
 
@@ -463,7 +471,7 @@ const Gallery = () => {
                     <span className='invalid'>{errors.altText.message}</span>
                   )}
                 </Col>
-                <Col md='12' style={{ display: "flex", flexDirection: "column" }}>
+                {/* <Col md='12' style={{ display: "flex", flexDirection: "column" }}>
                   <label className='form-label'>Optional Video Upload</label>
                   {!formData.file2 ? (
                     <input
@@ -504,7 +512,52 @@ const Gallery = () => {
                       </div>
                     </div>
                   )}
-                </Col>
+                </Col> */}
+
+                <Col md='12' style={{ display: "flex", flexDirection: "column" }}>
+  <label className='form-label'>Optional Video Upload</label>
+  <input
+    className='form-control mb-2'
+    type='file'
+    accept='video/*'
+    onChange={(e) => {
+      handleFileChange2(e);
+      setFormData((prev) => ({ ...prev, removeFile2: false }));
+    }}
+  />
+
+  {formData.file2 && (
+    <div className='mt-2'>
+      <video
+        width='150'
+        controls
+        src={
+          formData.file2 instanceof File
+            ? URL.createObjectURL(formData.file2)
+            : formData.file2?.url || formData.file2
+        }
+      />
+    </div>
+  )}
+<div style={{width:"auto"}}>
+  <Button
+  type="button"
+    color='danger'
+    size='sm'
+    className='mt-2'
+    onClick={() =>
+      setFormData((prev) => ({
+        ...prev,
+        file2: null,
+        removeFile2: true,
+      }))
+    }
+  >
+    Remove Video
+  </Button>
+  </div>
+</Col>
+
 
                 <Col size='12'>
                   <ul className='align-center flex-wrap flex-sm-nowrap gx-4 gy-2'>

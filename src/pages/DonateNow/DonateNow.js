@@ -306,6 +306,7 @@ const DonateNow = () => {
                                     onChange={(e) =>
     setFormData({ ...formData, page: e.target.value })
   }
+  disabled={editId !== null}
                                   >
                                     <option value=''>Select Page</option>
                                     

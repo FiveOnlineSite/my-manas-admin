@@ -342,7 +342,7 @@ const AboutUs = () => {
                           text='Edit'
                         />
                       </li>
-                      <li
+                      {/* <li
                         onClick={() => confirmDelete(item._id)}
                       >
                         <TooltipComponent
@@ -353,7 +353,7 @@ const AboutUs = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>

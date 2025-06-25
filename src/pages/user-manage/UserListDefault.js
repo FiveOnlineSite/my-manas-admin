@@ -375,7 +375,7 @@ const HomeBanner = () => {
                           text='Edit'
                         />
                       </li>
-                      <li
+                      {/* <li
                       
                         onClick={() => confirmDelete(item._id)}
                       >
@@ -387,7 +387,7 @@ const HomeBanner = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>

@@ -455,7 +455,7 @@ const OurGoal = () => {
             text='Edit'
           />
         </li>
-        <li onClick={() => confirmDelete(item._id)}>
+        {/* <li onClick={() => confirmDelete(item._id)}>
           <TooltipComponent
             tag='a'
             containerClassName='btn btn-trigger btn-icon'
@@ -464,7 +464,7 @@ const OurGoal = () => {
             direction='top'
             text='Delete'
           />
-        </li>
+        </li> */}
       </ul>
     </DataTableRow>
   </DataTableItem>
@@ -664,6 +664,7 @@ const OurGoal = () => {
                       </Col>
 
                       <Button
+                      type="button"
                         color='danger'
                         size='sm'
                         onClick={() => removeAdditionalItem(index)}

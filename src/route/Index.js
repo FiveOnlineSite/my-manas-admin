@@ -56,6 +56,7 @@ import Login from "../pages/auth/Login";
 import PrivateRoute from "./PrivateRoute";
 import HomeBanner from "../pages/user-manage/UserListDefault";
 import ChangePassword from "../pages/auth/ChangePassword";
+import MasterMetaData from "../pages/MetaData/MetaData";
 
 const Router = () => {
   const location = useLocation();
@@ -144,6 +145,7 @@ const Router = () => {
             <Route path='quotes' element={<Quotes />}></Route>
             <Route path='donate-now' element={<DonateNow />}></Route>
             <Route path='socialMedia-links' element={<SocialMediaLinks />}></Route>
+            <Route path='meta-data' element={<MasterMetaData />}></Route>
 
           {/* Testimonials Page */}
             <Route path='testimonials' element={<Testimonials />}></Route>

@@ -45,6 +45,9 @@ const VidhyaVanamFacilities = () => {
   const [editId, setEditId] = useState(null);
   const [confirmModal, setConfirmModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [videoThumbnailError, setVideoThumbnailError] = useState("");
+  const [moreVideoErrors, setMoreVideoErrors] = useState([]);
+
   const [fieldErrors, setFieldErrors] = useState({
     image: "",
     video: "",
@@ -57,11 +60,13 @@ const VidhyaVanamFacilities = () => {
     imageAltText: "",
     videoAltText: "",
     featuredImage: null,
+    featuredVideoThumbnail: null,
     isFeatured: false,
     moreFeaturedImages: [], // new array for additional
     moreFeaturedVideos: [], // new array for additional
       removedImages: [],            
   removedVideos: [],   
+   sliderText: "", 
   });
 
   const {
@@ -100,6 +105,7 @@ const VidhyaVanamFacilities = () => {
         moreFeaturedVideos: resources.moreFeaturedVideos || [], // 🔁 fix here
         removedImages: [], // ✅ init empty
   removedVideos: [],
+  sliderText: editItem.sliderText || "",
       };
       setFormData(initialData);
       // setValue("title", initialData.title);
@@ -138,12 +144,16 @@ const VidhyaVanamFacilities = () => {
     setData(updated);
   };
 
-  const addMoreField = (type) => {
-    setFormData((prev) => ({
-      ...prev,
-      [type]: [...prev[type], null],
-    }));
-  };
+ const addMoreField = (type) => {
+  setFormData((prev) => ({
+    ...prev,
+    [type]:
+      type === "moreFeaturedVideos"
+        ? [...prev[type], { video: null, thumbnail: null }]
+        : [...prev[type], null],
+  }));
+};
+
 
  const removeMoreField = (type, index) => {
   setFormData((prev) => {
@@ -162,20 +172,41 @@ const VidhyaVanamFacilities = () => {
   });
 };
 
-  const updateMoreFile = (e, type, index) => {
-    const file = e.target.files[0];
-    setFormData((prev) => {
-      const updated = [...prev[type]];
+  const updateMoreFile = (e, type, index, key = "video") => {
+  const file = e.target.files[0];
+  setFormData((prev) => {
+    const updated = [...prev[type]];
+    if (type === "moreFeaturedVideos") {
+      updated[index] = {
+        ...updated[index],
+        [key]: file,
+      };
+    } else {
       updated[index] = file;
-      return { ...prev, [type]: updated };
+    }
+    return { ...prev, [type]: updated };
+  });
+   if (type === "moreFeaturedVideos" && key === "thumbnail") {
+    setMoreVideoErrors((prev) => {
+      const updated = [...prev];
+      updated[index] = ""; // Clear error for that index
+      return updated;
     });
-  };
+  }
+};
+
 
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
     setFormData((prev) => ({ ...prev, [type]: file }));
-    setValue(type, file, { shouldValidate: true });
-
+    // setValue(type, file, { shouldValidate: true });
+ if (type === "featuredVideoThumbnail") {
+    setVideoThumbnailError("");
+  }
+  if (type === "featuredImage") {
+      setValue("featuredImage", file, { shouldValidate: true });
+  trigger("featuredImage"); // clear error if valid
+}
     // Trigger validation manually
     trigger(type);
   };
@@ -184,6 +215,7 @@ const VidhyaVanamFacilities = () => {
     setSubmitting(true);
 
     const errors = {};
+    const videoErrors = [];
 
     // Manual file validations
     if (!formData.image) {
@@ -191,6 +223,32 @@ const VidhyaVanamFacilities = () => {
       setSubmitting(false);
       return;
     }
+
+     if (formData.video && !formData.featuredVideoThumbnail) {
+    setVideoThumbnailError("Thumbnail is required when a video is uploaded.");
+    // toast.error("Featured video thumbnail is required when uploading a video.");
+    setSubmitting(false);
+    return;
+  } else {
+    setVideoThumbnailError("");
+  }
+
+  formData.moreFeaturedVideos.forEach((item, i) => {
+  if (item?.video && !item?.thumbnail) {
+    videoErrors[i] = "Thumbnail is required when a video is uploaded.";
+  } else {
+    videoErrors[i] = ""; // clear any existing error for this index
+  }
+});
+
+const hasErrors = videoErrors.some((err) => err);
+setMoreVideoErrors(videoErrors);
+
+if (hasErrors) {
+  // toast.error("Please add a thumbnail for all uploaded videos in 'More Featured Videos'.");
+  setSubmitting(false);
+  return;
+}
     // if (!formData.video) {
     //   toast.error("Video is required");
     //   setSubmitting(false);
@@ -198,6 +256,7 @@ const VidhyaVanamFacilities = () => {
     // }
 
     const formPayload = new FormData();
+    formPayload.append("sliderText", formData.sliderText);
     // formPayload.append("title", formData.title);
     formPayload.append("imageAltText", formData.imageAltText);
     formPayload.append("videoAltText", formData.videoAltText);
@@ -209,18 +268,23 @@ const VidhyaVanamFacilities = () => {
       formPayload.append("video", formData.video);
     if (formData.featuredImage instanceof File)
       formPayload.append("featuredImage", formData.featuredImage);
+    if (formData.featuredVideoThumbnail instanceof File) {
+  formPayload.append("featuredVideoThumbnail", formData.featuredVideoThumbnail);
+}
 
     formData.moreFeaturedImages.forEach((file, i) => {
       if (file instanceof File) {
         formPayload.append(`moreFeaturedImages[${i}]`, file);
       }
     });
-
-    formData.moreFeaturedVideos.forEach((file, i) => {
-      if (file instanceof File) {
-        formPayload.append(`moreFeaturedVideos[${i}]`, file);
-      }
-    });
+formData.moreFeaturedVideos.forEach((obj, i) => {
+  if (obj.video instanceof File) {
+    formPayload.append(`moreFeaturedVideos[${i}][video]`, obj.video);
+  }
+  if (obj.thumbnail instanceof File) {
+    formPayload.append(`moreFeaturedVideos[${i}][thumbnail]`, obj.thumbnail);
+  }
+});
 
   formData.removedImages.forEach((file, i) => {
   const url = typeof file === "string" ? file : file?.url;
@@ -308,6 +372,9 @@ else {
                   <span>Title</span>
                 </DataTableRow> */}
                 <DataTableRow>
+  <span>Slider Text</span>
+</DataTableRow>
+                <DataTableRow>
                   <span>Image</span>
                 </DataTableRow>
                 <DataTableRow>
@@ -364,6 +431,9 @@ else {
 
               {data.map((item) => (
                 <DataTableItem key={item._id}>
+                  <DataTableRow>
+  <span>{item.sliderText || "-"}</span>
+</DataTableRow>
                   {/* <DataTableRow>
                     <span>{item.title}</span>
                   </DataTableRow> */}
@@ -487,25 +557,42 @@ else {
 
                   {/* More Featured Videos */}
                   <DataTableRow>
-                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                      {item.resources?.moreFeaturedVideos?.length > 0 ? (
-                        item.resources.moreFeaturedVideos.map((vid, idx) => (
-                          <video
-                            key={idx}
-                            width={60}
-                            height={40}
-                            controls
-                            style={{ borderRadius: "4px", objectFit: "cover", border: "1px solid #ccc" }}
-                          >
-                            <source src={vid.url} />
-                            Your browser does not support video playback.
-                          </video>
-                        ))
-                      ) : (
-                        <span>No additional videos</span>
-                      )}
-                    </div>
-                  </DataTableRow>
+  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+    {item.resources?.moreFeaturedVideos?.length > 0 ? (
+      item.resources.moreFeaturedVideos.map((vid, idx) => (
+        <div key={idx} style={{ textAlign: "center" }}>
+          <video
+            width={80}
+            height={50}
+            controls
+            style={{
+              borderRadius: "4px",
+              objectFit: "cover",
+              border: "1px solid #ccc",
+            }}
+          >
+            <source src={vid.video?.url} />
+          </video>
+          <img
+            src={vid.thumbnail?.url}
+            alt={`Thumb-${idx}`}
+            width={80}
+            height={50}
+            style={{
+              borderRadius: "4px",
+              objectFit: "cover",
+              border: "1px solid #ccc",
+              marginTop: "4px",
+            }}
+          />
+        </div>
+      ))
+    ) : (
+      <span>No additional videos</span>
+    )}
+  </div>
+</DataTableRow>
+
 
 
                   <DataTableRow className='nk-tb-col-tools'>
@@ -561,6 +648,17 @@ else {
             <div className='p-2'>
               <h5 className='title'>{editId ? "Edit" : "Add"} Upload Item</h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
+                <Col md="12">
+  <label className="form-label">Slider Text</label>
+  <input
+    type="text"
+    className="form-control"
+    value={formData.sliderText || ""}
+    onChange={(e) =>
+      setFormData({ ...formData, sliderText: e.target.value })
+    }
+  />
+</Col>
                 {/* <Col md='12'>
                   <label className='form-label'>Title</label>
                   <input
@@ -687,7 +785,7 @@ else {
                 </Col>
 
                 {/* Video Upload */}
-                <Col md='6'>
+                <Col md='4'>
                   <label className='form-label'>Upload Video (Max 10MB)</label>
                   {!formData.video ? (
                     <input
@@ -776,8 +874,33 @@ else {
                   )}
                 </Col>
 
+                <Col md="4">
+  <label className="form-label">Featured Video Thumbnail</label>
+  <input
+    type="file"
+    accept="image/*"
+    className="form-control"
+    onChange={(e) => handleFileChange(e, "featuredVideoThumbnail")}
+  />
+  {formData.featuredVideoThumbnail && (
+    <img
+      src={
+        formData.featuredVideoThumbnail instanceof File
+          ? URL.createObjectURL(formData.featuredVideoThumbnail)
+          : formData.featuredVideoThumbnail?.url || ""
+      }
+      alt="Thumbnail"
+      width={100}
+      className="mt-2"
+    />
+  )}
+  {videoThumbnailError && (
+    <span className="text-danger small">{videoThumbnailError}</span>
+  )}
+</Col>
+
                 {/* Video Alt Text */}
-                <Col md='6'>
+                <Col md='4'>
                   <label className='form-label'>Video Alt Text</label>
                   <input
                     className='form-control'
@@ -875,15 +998,15 @@ else {
                       </div>
                     </div>
                   )}
-                  <input
-                    type='hidden'
-                    {...register("featuredImage", {
-                      validate: () =>
-                        formData.featuredImage !== null && formData.featuredImage !== undefined
-                          ? true
-                          : "Featured image is required",
-                    })}
-                  />
+                 <input
+  type='hidden'
+  {...register("featuredImage", {
+    validate: (value) =>
+      value !== null && value !== undefined
+        ? true
+        : "Featured image is required",
+  })}
+/>
                   {errors.featuredImage && (
                     <span className='invalid'>
                       {errors.featuredImage.message}
@@ -975,69 +1098,81 @@ else {
 
                 {/* Additional Featured Videos */}
                 <Col md="12">
-                  <label className="form-label mt-2">More Featured Videos</label>
-                  {formData.moreFeaturedVideos.map((file, index) => (
-  <div key={index} className="d-flex align-items-center mb-2">
-    <div style={{ position: "relative", marginRight: "8px" }}>
-      <video
-        width={100}
-        height={60}
-        controls
-        style={{
-          borderRadius: 4,
-          border: "1px solid #ccc",
-          objectFit: "cover",
-        }}
-      >
-        <source
-          src={
-            file instanceof File
-              ? URL.createObjectURL(file)
-              : typeof file === "string"
-                ? file
-                : file?.url || ""
-          }
+  <label className="form-label mt-2">More Featured Videos</label>
+  {formData.moreFeaturedVideos.map((fileObj, index) => (
+    <div key={index} className="row align-items-center mb-2">
+      <div className="col-md-4">
+        <label>Video</label>
+        <input
+          type="file"
+          accept="video/*"
+          className="form-control"
+          onChange={(e) => updateMoreFile(e, "moreFeaturedVideos", index, "video")}
         />
-        Your browser does not support the video tag.
-      </video>
+        {fileObj.video && (
+          <video width={100} height={60} controls className="mt-1">
+            <source
+              src={
+                fileObj.video instanceof File
+                  ? URL.createObjectURL(fileObj.video)
+                  : fileObj.video?.url || ""
+              }
+            />
+          </video>
+        )}
+      </div>
+
+      <div className="col-md-4">
+        <label>Thumbnail</label>
+        <input
+          type="file"
+          accept="image/*"
+          className="form-control"
+          onChange={(e) => updateMoreFile(e, "moreFeaturedVideos", index, "thumbnail")}
+        />
+        {fileObj.thumbnail && (
+          <img
+            src={
+              fileObj.thumbnail instanceof File
+                ? URL.createObjectURL(fileObj.thumbnail)
+                : fileObj.thumbnail?.url || ""
+            }
+            width={80}
+            className="mt-1"
+            alt={`thumb-${index}`}
+          />
+        )}
+         {moreVideoErrors[index] && (
+    <span className="text-danger small">{moreVideoErrors[index]}</span>
+  )}
+      </div>
+
+      <div className="col-md-4">
+        <Button
+          size="sm"
+          color="danger"
+          type="button"
+          onClick={() => removeMoreField("moreFeaturedVideos", index)}
+        >
+          Remove
+        </Button>
+      </div>
     </div>
-    <input
-      type="file"
-      accept="video/*"
-      className="form-control me-2"
-      onChange={(e) => updateMoreFile(e, "moreFeaturedVideos", index)}
-    />
-    <Button
+  ))}
+
+<div>
+  <Button
+  style={{width:"auto"}}
     type="button"
-      size="sm"
-      color="danger"
-      onClick={() => removeMoreField("moreFeaturedVideos", index)}
-    >
-     Remove
-    </Button>
+    color="primary"
+    size="sm"
+    onClick={() => addMoreField("moreFeaturedVideos")}
+  >
+    Add More Video
+  </Button>
   </div>
-))}
+</Col>
 
-
-                  <div>
-                    <Button
-                      type="button"
-                      color='primary'
-                      size='sm'
-                      style={{ width: "auto" }}
-                      onClick={() => addMoreField("moreFeaturedVideos")}
-                    >
-                      Add More Item
-                    </Button>
-                  </div>
-                  {/* <Button
-                    color="secondary"
-                    size="sm"
-                    onClick={() => addMoreField("moreFeaturedVideos")}
-                  >
-                    + Add More Featured Video
-                  </Button> */}
-                </Col>
 
 
                 <Col size='12'>

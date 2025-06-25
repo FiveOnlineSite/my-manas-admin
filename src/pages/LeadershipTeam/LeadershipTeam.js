@@ -324,7 +324,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
             text='Edit'
           />
         </li>
-        <li onClick={() => confirmDelete(item._id)}>
+        {/* <li onClick={() => confirmDelete(item._id)}>
           <TooltipComponent
             tag='a'
             id={`delete-${item._id}`}
@@ -333,7 +333,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
             direction='top'
             text='Delete'
           />
-        </li>
+        </li> */}
       </ul>
     </DataTableRow>
   </DataTableItem>
@@ -472,6 +472,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
                     </Col>
 
                     <Button
+                    type="button"
                       color='danger'
                       size='sm'
                       onClick={() => removeMember(index)}

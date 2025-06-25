@@ -242,7 +242,7 @@ const HowToApply = () => {
                           text='Edit'
                         />
                       </li>
-                      <li
+                      {/* <li
                         onClick={() => confirmDelete(item._id)}
                       >
                         <TooltipComponent
@@ -253,7 +253,7 @@ const HowToApply = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>

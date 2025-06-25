@@ -326,7 +326,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               text='Edit'
             />
           </li>
-          <li onClick={() => confirmDelete(achievement._id)}>
+          {/* <li onClick={() => confirmDelete(achievement._id)}>
             <TooltipComponent
               tag='a'
               id={`delete-${achievement._id}`}
@@ -335,7 +335,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               direction='top'
               text='Delete'
             />
-          </li>
+          </li> */}
         </ul>
       </DataTableRow>
     </DataTableItem>
@@ -474,6 +474,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                       />
                     </Col>
                     <Button
+                    type="button"
                       size='sm'
                       color='danger'
                       onClick={() => removeItem(index)}

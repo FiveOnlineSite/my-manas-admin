@@ -241,7 +241,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                           text='Edit'
                         />
                       </li>
-                      <li
+                      {/* <li
                         className='nk-tb-action-hidden'
                         onClick={() => confirmDelete(item._id)}
                       >
@@ -253,7 +253,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>

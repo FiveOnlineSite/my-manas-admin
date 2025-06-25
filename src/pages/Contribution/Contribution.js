@@ -369,6 +369,7 @@ const Contribution = () => {
                        {formData.items.length > 1 && (
       <div className='d-flex justify-content-end mt-2'>
         <Button
+        type="button"
           color='danger'
           size='sm'
           onClick={() => removeItem(index)}

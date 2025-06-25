@@ -139,6 +139,16 @@ const OurMission = () => {
     });
   };
 
+
+  const removeAccordion = (index) => {
+  const updated = formData.accordions.filter((_, i) => i !== index);
+  setFormData({ ...formData, accordions: updated });
+  setAccordionErrors((prevErrors) =>
+    prevErrors.filter((_, i) => i !== index)
+  );
+};
+
+
   const validateAccordions = () => {
     const errors = formData.accordions.map((item) => ({
       title: !item.title,
@@ -293,7 +303,7 @@ const OurMission = () => {
                           text='Edit'
                         />
                       </li>
-                      <li
+                      {/* <li
 
                         onClick={() => confirmDelete(item._id)}
                       >
@@ -305,7 +315,7 @@ const OurMission = () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>
@@ -443,7 +453,7 @@ const OurMission = () => {
                 </Col>
                 <Col md='12'>
                   <label className='form-label'>Accordions</label>
-                  {formData.accordions.map((acc, index) => (
+                  {/* {formData.accordions.map((acc, index) => (
                     <div key={index} className='border rounded p-3 mb-3'>
                       <Row className='gy-2'>
                         <Col md='6'>
@@ -487,8 +497,55 @@ const OurMission = () => {
                           )}
                         </Col>
                       </Row>
+
+                      
                     </div>
-                  ))}
+                  ))} */}
+
+                  {formData.accordions.map((acc, index) => (
+  <div key={index} className='border rounded p-3 mb-3'>
+    <Row className='gy-2'>
+      <Col md='6'>
+        <input
+          className={`form-control ${accordionErrors[index]?.title ? "is-invalid" : ""}`}
+          placeholder='Accordion Title'
+          value={acc.title}
+          onChange={(e) =>
+            handleAccordionChange(index, "title", e.target.value)
+          }
+        />
+        {accordionErrors[index]?.title && (
+          <span className='invalid'>Title is required</span>
+        )}
+      </Col>
+      <Col md='6'>
+        <input
+          className={`form-control ${accordionErrors[index]?.description ? "is-invalid" : ""}`}
+          placeholder='Accordion Description'
+          value={acc.description}
+          onChange={(e) =>
+            handleAccordionChange(index, "description", e.target.value)
+          }
+        />
+        {accordionErrors[index]?.description && (
+          <span className='invalid'>Description is required</span>
+        )}
+      </Col>
+    </Row>
+
+    <div className="d-flex justify-content-end mt-2">
+      <Button
+        size="sm"
+        color="danger"
+        type="button"
+        onClick={() => removeAccordion(index)}
+      >
+        <Icon name="trash" /> Remove
+      </Button>
+    </div>
+  </div>
+))}
+
                   <Button size='sm' type="button" onClick={addAccordion}>
                     <Icon name='plus' /> Add More
                   </Button>

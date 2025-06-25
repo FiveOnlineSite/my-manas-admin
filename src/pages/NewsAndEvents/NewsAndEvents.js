@@ -154,6 +154,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     formPayload.append("content", values.content);
     formPayload.append("metaTitle", values.metaTitle);
     formPayload.append("metaDescription", values.metaDescription);
+    formPayload.append("pageUrl", values.title.toLowerCase().trim().replace(/\s+/g, "-"));
     if (formData.image instanceof File) {
       formPayload.append("image", values.image);
     }
@@ -185,6 +186,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     } catch (err) {
       toast.error("Something went wrong.");
     }
+    console.log("pageUrl",values.title.toLowerCase().trim().replace(/\s+/g, "-"))
   };
 
    const confirmDelete = (id) => {

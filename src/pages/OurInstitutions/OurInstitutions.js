@@ -203,13 +203,13 @@ const [confirmModal, setConfirmModal] = useState(false);
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              {/* <Button
+              <Button
                 color='primary'
                 className='btn-icon'
                 onClick={() => toggleModal()}
               >
                 <Icon name='plus' />
-              </Button> */}
+              </Button>
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
