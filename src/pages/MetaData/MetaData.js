@@ -115,9 +115,9 @@ const onDeleteClick = async () => {
               <BlockDes><p>Manage meta tags for pages.</p></BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
-              <Button color="primary" className="btn-icon" onClick={() => toggleModal()}>
+              {/* <Button color="primary" className="btn-icon" onClick={() => toggleModal()}>
                 <Icon name="plus" />
-              </Button>
+              </Button> */}
             </BlockHeadContent>
           </BlockBetween>
         </BlockHead>
@@ -181,7 +181,7 @@ const onDeleteClick = async () => {
                           text='Edit'
                         />
                       </li>
-                      <li onClick={() => confirmDelete(item._id)}>
+                      {/* <li onClick={() => confirmDelete(item._id)}>
                         <TooltipComponent
                           tag='a'
                           containerClassName='btn btn-trigger btn-icon'
@@ -190,7 +190,7 @@ const onDeleteClick = async () => {
                           direction='top'
                           text='Delete'
                         />
-                      </li>
+                      </li> */}
                     </ul>
                   </DataTableRow>
                 </DataTableItem>

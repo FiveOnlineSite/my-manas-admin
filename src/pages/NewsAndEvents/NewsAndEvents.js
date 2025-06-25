@@ -55,6 +55,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     content: "",
     metaTitle: "",
     metaDescription: "",
+    video: null,
   });
 
   const {
@@ -103,6 +104,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     setValue("metaTitle", updatedData.metaTitle);
     setValue("metaDescription", updatedData.metaDescription);
     setValue("image", updatedData.image);
+    setValue("video", updatedData.video);
   } else {
     resetForm();
     setEditId(null);
@@ -121,6 +123,7 @@ const [confirmModal, setConfirmModal] = useState(false);
       content: "",
       metaTitle: "",
       metaDescription: "",
+      video: null,
     });
     reset();
   };
@@ -158,6 +161,9 @@ const [confirmModal, setConfirmModal] = useState(false);
     if (formData.image instanceof File) {
       formPayload.append("image", values.image);
     }
+    if (formData.video instanceof File) {
+  formPayload.append("video", formData.video); // ✅ Add this
+}
 
     try {
       let res;
@@ -249,6 +255,9 @@ const [confirmModal, setConfirmModal] = useState(false);
                 <DataTableRow>
                   <span>Image</span>
                 </DataTableRow>
+                <DataTableRow>
+  <span>Video</span>
+</DataTableRow>
 
                 
                 <DataTableRow>
@@ -323,6 +332,18 @@ const [confirmModal, setConfirmModal] = useState(false);
                       <span>No Image</span>
                     )}
                   </DataTableRow>
+
+                  <DataTableRow>
+  {item.video?.url ? (
+    <video width="100" height="60" controls>
+      <source src={item.video.url} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  ) : (
+    <span>No Video</span>
+  )}
+</DataTableRow>
+
 
                  
                   <DataTableRow>
@@ -547,6 +568,98 @@ const [confirmModal, setConfirmModal] = useState(false);
                     <span className='invalid'>{errors.image.message}</span>
                   )}
                 </Col>
+
+                <Col
+  md="12"
+  style={{ display: "flex", flexDirection: "column" }}
+>
+  <label className="form-label">Video (optional)</label>
+
+  {!formData.video && (
+    <input
+      type="file"
+      accept="video/*"
+      className="form-control"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setFormData({ ...formData, video: file });
+          setValue("video", file, { shouldValidate: true });
+        }
+      }}
+    />
+  )}
+
+  {formData.video && (
+    <div
+      className="video-preview-wrapper"
+      style={{
+        display: "inline-flex",
+        alignItems: "flex-start",
+        gap: "12px",
+        marginTop: "8px",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          display: "inline-block",
+        }}
+      >
+        <video
+          src={
+            typeof formData.video === "string"
+              ? formData.video
+              : formData.video.url
+              ? formData.video.url
+              : URL.createObjectURL(formData.video)
+          }
+          width="150"
+          height="auto"
+          controls
+          style={{
+            objectFit: "contain",
+            borderRadius: "4px",
+            border: "1px solid #ddd",
+            padding: "4px",
+            backgroundColor: "#fff",
+          }}
+        ></video>
+
+        <Button
+          size="sm"
+          color="danger"
+          className="btn-icon"
+          style={{
+            position: "absolute",
+            top: "-8px",
+            right: "-8px",
+            borderRadius: "50%",
+            lineHeight: "1",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            zIndex: 10,
+            height: "20px",
+            width: "20px",
+          }}
+          onClick={() => {
+            setFormData({ ...formData, video: null });
+            setValue("video", null, { shouldValidate: true });
+          }}
+        >
+          <Icon name="cross" />
+        </Button>
+      </div>
+    </div>
+  )}
+
+  <input type="hidden" {...register("video")} />
+</Col>
+
+
+
 
                 
 
