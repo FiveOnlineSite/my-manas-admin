@@ -455,7 +455,7 @@ const addValue = () => {
             text="Edit"
           />
         </li>
-        <li onClick={() => confirmDelete(item._id)}>
+        {/* <li onClick={() => confirmDelete(item._id)}>
           <TooltipComponent
             tag="a"
             containerClassName="btn btn-trigger btn-icon"
@@ -464,7 +464,7 @@ const addValue = () => {
             direction="top"
             text="Delete"
           />
-        </li>
+        </li> */}
       </ul>
     </DataTableRow>
   </DataTableItem>
