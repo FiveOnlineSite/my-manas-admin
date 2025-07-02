@@ -47,6 +47,7 @@ const VidhyaVanamFacilities = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [videoThumbnailError, setVideoThumbnailError] = useState("");
   const [moreVideoErrors, setMoreVideoErrors] = useState([]);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [fieldErrors, setFieldErrors] = useState({
     image: "",
@@ -224,6 +225,7 @@ const VidhyaVanamFacilities = () => {
   };
 
   const onSubmit = async () => {
+        setFormSubmitted(true);
     setSubmitting(true);
     console.log("FormData Before Submit:", formData);
 
@@ -233,6 +235,7 @@ const VidhyaVanamFacilities = () => {
     // Manual file validations
     if (!formData.image) {
       toast.error("Image is required");
+      setFormSubmitted(false);
       setSubmitting(false);
       return;
     }
@@ -240,6 +243,8 @@ const VidhyaVanamFacilities = () => {
     if (formData.video && !formData.featuredVideoThumbnail) {
       setVideoThumbnailError("Thumbnail is required when a video is uploaded.");
       // toast.error("Featured video thumbnail is required when uploading a video.");
+             setFormSubmitted(false);
+
       setSubmitting(false);
       return;
     } else {
@@ -255,6 +260,7 @@ const VidhyaVanamFacilities = () => {
     });
 
     const hasErrors = videoErrors.some((err) => err);
+    setFormSubmitted(false);
     setMoreVideoErrors(videoErrors);
 
     if (hasErrors) {
@@ -350,7 +356,7 @@ const VidhyaVanamFacilities = () => {
     } catch {
       toast.error("An error occurred.");
     }
-
+setFormSubmitted(false);
     setSubmitting(false);
   };
 
@@ -937,8 +943,9 @@ const VidhyaVanamFacilities = () => {
                   {formData.moreFeaturedImages.map((file, index) => (
                     <div key={index} className="d-flex align-items-center mb-2">
                       <div style={{ position: "relative", marginRight: "8px" }}>
-                        <img
-                          src={file instanceof File ? URL.createObjectURL(file) : typeof file === "string" ? file : file?.url || ""}
+                         {file instanceof File && <img
+                          src={file instanceof File ? URL.createObjectURL(file) : typeof file === "string" ? 
+                            file : file?.url || ""}
                           alt={`preview-${index}`}
                           style={{
                             width: 80,
@@ -947,7 +954,7 @@ const VidhyaVanamFacilities = () => {
                             borderRadius: 4,
                             border: "1px solid #ccc",
                           }}
-                        />
+                        />}
                       </div>
                       <input
                         type="file"
@@ -992,6 +999,7 @@ const VidhyaVanamFacilities = () => {
                       size='sm'
                       style={{ width: "auto" }}
                       onClick={() => addMoreField("moreFeaturedImages")}
+                       disabled={formSubmitted}
                     >
                       Add More Images
                     </Button>
@@ -1220,6 +1228,7 @@ const VidhyaVanamFacilities = () => {
                       color="primary"
                       size="sm"
                       onClick={() => addMoreField("moreFeaturedVideos")}
+                       disabled={formSubmitted} 
                     >
                       Add More Videos
                     </Button>

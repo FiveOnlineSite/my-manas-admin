@@ -47,6 +47,8 @@ const Facilities = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [videoThumbnailError, setVideoThumbnailError] = useState("");
   const [moreVideoErrors, setMoreVideoErrors] = useState([]);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
 
   const [fieldErrors, setFieldErrors] = useState({
     image: "",
@@ -224,6 +226,7 @@ const Facilities = () => {
   };
 
   const onSubmit = async () => {
+    setFormSubmitted(true);
     setSubmitting(true);
     console.log("FormData Before Submit:", formData);
 
@@ -232,6 +235,7 @@ const Facilities = () => {
 
     // Manual file validations
     if (!formData.image) {
+      setFormSubmitted(false);
       toast.error("Image is required");
       setSubmitting(false);
       return;
@@ -239,6 +243,7 @@ const Facilities = () => {
 
     if (formData.video && !formData.featuredVideoThumbnail) {
       setVideoThumbnailError("Thumbnail is required when a video is uploaded.");
+       setFormSubmitted(false);
       // toast.error("Featured video thumbnail is required when uploading a video.");
       setSubmitting(false);
       return;
@@ -258,6 +263,7 @@ const Facilities = () => {
     setMoreVideoErrors(videoErrors);
 
     if (hasErrors) {
+      setFormSubmitted(false);
       // toast.error("Please add a thumbnail for all uploaded videos in 'More Featured Videos'.");
       setSubmitting(false);
       return;
@@ -350,6 +356,7 @@ const Facilities = () => {
     } catch {
       toast.error("An error occurred.");
     }
+     setFormSubmitted(false);
 
     setSubmitting(false);
   };
@@ -937,7 +944,7 @@ const Facilities = () => {
                   {formData.moreFeaturedImages.map((file, index) => (
                     <div key={index} className="d-flex align-items-center mb-2">
                       <div style={{ position: "relative", marginRight: "8px" }}>
-                        <img
+                        {file instanceof File && <img
                           src={file instanceof File ? URL.createObjectURL(file) : typeof file === "string" ? file : file?.url || ""}
                           alt={`preview-${index}`}
                           style={{
@@ -947,7 +954,7 @@ const Facilities = () => {
                             borderRadius: 4,
                             border: "1px solid #ccc",
                           }}
-                        />
+                        />}
                       </div>
                       <input
                         type="file"
@@ -992,6 +999,7 @@ const Facilities = () => {
                       size='sm'
                       style={{ width: "auto" }}
                       onClick={() => addMoreField("moreFeaturedImages")}
+                       disabled={formSubmitted} 
                     >
                       Add More Images
                     </Button>
@@ -1220,6 +1228,7 @@ const Facilities = () => {
                       color="primary"
                       size="sm"
                       onClick={() => addMoreField("moreFeaturedVideos")}
+                        disabled={formSubmitted}
                     >
                       Add More Videos
                     </Button>
