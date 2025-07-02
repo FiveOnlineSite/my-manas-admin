@@ -297,9 +297,11 @@ const VidhyaVanamFacilities = () => {
     }
 
     formData.moreFeaturedImages.forEach((file, i) => {
-      if (file instanceof File) {
+        if (file instanceof File) {
         formPayload.append(`moreFeaturedImages[${i}]`, file);
-        formPayload.append(`moreFeaturedImages[${i}][altText]`, file.altText);  // Append altText
+        if(file?.altText) {
+          formPayload.append(`moreFeaturedImages[${i}][altText]`, file.altText);  // Append altText
+        }
       }
     });
     formData.moreFeaturedVideos.forEach((obj, i) => {
@@ -943,9 +945,9 @@ setFormSubmitted(false);
                   {formData.moreFeaturedImages.map((file, index) => (
                     <div key={index} className="d-flex align-items-center mb-2">
                       <div style={{ position: "relative", marginRight: "8px" }}>
-                         {file instanceof File && <img
-                          src={file instanceof File ? URL.createObjectURL(file) : typeof file === "string" ? 
-                            file : file?.url || ""}
+                        {console.log('console_file', file)}
+                        {(file instanceof File || file?.url) && <img
+                          src={file instanceof File ? URL.createObjectURL(file) :  file?.url }
                           alt={`preview-${index}`}
                           style={{
                             width: 80,
@@ -961,6 +963,7 @@ setFormSubmitted(false);
                         accept="image/*"
                         className="form-control me-2"
                         onChange={(e) => updateMoreFile(e, "moreFeaturedImages", index)}
+                         disabled={file instanceof File || file?.url || formSubmitted}
                       />
                       <input
                         type="text"
