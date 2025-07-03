@@ -192,7 +192,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     } catch (err) {
       toast.error("Something went wrong.");
     }
-    console.log("pageUrl",values.title.toLowerCase().trim().replace(/\s+/g, "-"))
+    // console.log("pageUrl",values.title.toLowerCase().trim().replace(/\s+/g, "-"))
   };
 
    const confirmDelete = (id) => {

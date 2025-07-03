@@ -136,7 +136,7 @@ const FutureLeaders = () => {
 
   };
 
-  console.log("Submitting:", formData);
+  // console.log("Submitting:", formData);
 
   const onSubmit = async () => {
     setSubmitting(true);

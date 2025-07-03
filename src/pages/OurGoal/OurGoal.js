@@ -68,7 +68,7 @@ const OurGoal = () => {
     setLoading(true)
     const res = await getRequest("/scholarships/our-goal");
     if (res.success) {
-      console.log("goal created:", res.data);
+      // console.log("goal created:", res.data);
 
       setData(res.data);
     }

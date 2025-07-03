@@ -71,7 +71,7 @@ const [confirmModal, setConfirmModal] = useState(false);
 
     const res = await getRequest("/ourscope/overview");
     if (res.success) {
-      console.log("overview created:", res.data);
+      // console.log("overview created:", res.data);
 
       setData(res.data);
     } else {

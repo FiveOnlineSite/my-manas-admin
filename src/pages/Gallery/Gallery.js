@@ -140,7 +140,7 @@ const Gallery = () => {
 
     const res = await getRequest("/home/gallery");
     if (res.success) {
-      console.log("gallery created:", res.data);
+      // console.log("gallery created:", res.data);
 
       setData(res.data);
     } else {
@@ -536,6 +536,7 @@ const Gallery = () => {
             ? URL.createObjectURL(formData.file2)
             : formData.file2?.url || formData.file2
         }
+        
       />
     </div>
   )}

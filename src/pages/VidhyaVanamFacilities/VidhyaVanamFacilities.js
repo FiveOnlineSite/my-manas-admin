@@ -49,6 +49,7 @@ const VidhyaVanamFacilities = () => {
   const [moreVideoErrors, setMoreVideoErrors] = useState([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+
   const [fieldErrors, setFieldErrors] = useState({
     image: "",
     video: "",
@@ -74,6 +75,8 @@ const VidhyaVanamFacilities = () => {
   const {
     register,
     handleSubmit,
+    clearErrors,
+    setError,
     formState: { errors },
     reset,
     setValue,
@@ -209,42 +212,67 @@ const VidhyaVanamFacilities = () => {
   };
 
 
-  const handleFileChange = (e, type) => {
-    const file = e.target.files[0];
-    setFormData((prev) => ({ ...prev, [type]: file }));
-    // setValue(type, file, { shouldValidate: true });
-    if (type === "featuredVideoThumbnail") {
-      setVideoThumbnailError("");
+const handleFileChange = (e, type) => {
+  const file = e.target.files[0];
+
+  // Check if file exists
+  if (file) {
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {  // 10MB in bytes
+      // Set error if file is too large
+      setError(type, {
+        type: 'manual',
+        message: 'File size exceeds 10MB. Please upload a smaller file.',
+      });
+
+      // Clear the file input field in state if size is invalid
+      setFormData((prev) => ({ ...prev, [type]: null }));
+      setValue(type, null);  // Reset value in react-hook-form
+
+      return;  // Exit early if the file is too large
+    } else {
+      // If file size is valid, update the form state and clear any previous errors
+      setFormData((prev) => ({ ...prev, [type]: file }));
+      setValue(type, file, { shouldValidate: true });
+      clearErrors(type);  // Clear any previous error if file is valid
     }
+
+    // Specific handling for types like featuredVideoThumbnail and featuredImage
+    if (type === "featuredVideoThumbnail") {
+      setVideoThumbnailError("");  // Reset any custom errors
+    }
+
     if (type === "featuredImage") {
       setValue("featuredImage", file, { shouldValidate: true });
-      trigger("featuredImage"); // clear error if valid
+      trigger("featuredImage");  // Trigger validation for featuredImage field
     }
-    // Trigger validation manually
+
+    // Trigger validation manually for the current field
     trigger(type);
-  };
+  }
+};
+
 
   const onSubmit = async () => {
-        setFormSubmitted(true);
+    setFormSubmitted(true);
     setSubmitting(true);
-    console.log("FormData Before Submit:", formData);
+    // console.log("FormData Before Submit:", formData);
 
     const errors = {};
     const videoErrors = [];
 
     // Manual file validations
     if (!formData.image) {
-      toast.error("Image is required");
       setFormSubmitted(false);
+      toast.error("Image is required");
       setSubmitting(false);
       return;
     }
 
     if (formData.video && !formData.featuredVideoThumbnail) {
       setVideoThumbnailError("Thumbnail is required when a video is uploaded.");
+       setFormSubmitted(false);
       // toast.error("Featured video thumbnail is required when uploading a video.");
-             setFormSubmitted(false);
-
       setSubmitting(false);
       return;
     } else {
@@ -260,10 +288,10 @@ const VidhyaVanamFacilities = () => {
     });
 
     const hasErrors = videoErrors.some((err) => err);
-    setFormSubmitted(false);
     setMoreVideoErrors(videoErrors);
 
     if (hasErrors) {
+      setFormSubmitted(false);
       // toast.error("Please add a thumbnail for all uploaded videos in 'More Featured Videos'.");
       setSubmitting(false);
       return;
@@ -278,9 +306,9 @@ const VidhyaVanamFacilities = () => {
     formPayload.append("sliderText", formData.sliderText);
     // formPayload.append("title", formData.title);
     formPayload.append("imageAltText", formData.imageAltText);
-    console.log("FormData Entries Before Submit:");
+    // console.log("FormData Entries Before Submit:");
     for (let [key, value] of formPayload.entries()) {
-      console.log(key, value);
+      // console.log(key, value);
     }
     formPayload.append("videoAltText", formData.videoAltText);
     formPayload.append("featuredImageAltText", formData.featuredImageAltText);
@@ -297,7 +325,7 @@ const VidhyaVanamFacilities = () => {
     }
 
     formData.moreFeaturedImages.forEach((file, i) => {
-        if (file instanceof File) {
+      if (file instanceof File) {
         formPayload.append(`moreFeaturedImages[${i}]`, file);
         if(file?.altText) {
           formPayload.append(`moreFeaturedImages[${i}][altText]`, file.altText);  // Append altText
@@ -319,12 +347,12 @@ const VidhyaVanamFacilities = () => {
       if (url) formPayload.append(`removedImages[${i}]`, url);
     });
 
-    console.log("Attempting to append removedVideos");
+    // console.log("Attempting to append removedVideos");
 
     formData.removedVideos.forEach((video, i) => {
-      console.log(`removedVideos[${i}]:`, video);  // Log the entire video object
+      // console.log(`removedVideos[${i}]:`, video);  // Log the entire video object
       const url = video?.video?.url;  // Access the URL inside the 'video' object
-      console.log(`Video URL [${i}]:`, url);  // Log the URL being appended
+      // console.log(`Video URL [${i}]:`, url);  // Log the URL being appended
       if (url) {
         formPayload.append(`removedVideos[${i}]`, url);  // Append the correct URL to FormData
       }
@@ -333,7 +361,7 @@ const VidhyaVanamFacilities = () => {
 
 
 
-    console.log("Form Payload Before Submit:", formPayload);
+    // console.log("Form Payload Before Submit:", formPayload);
 
 
 
@@ -358,7 +386,8 @@ const VidhyaVanamFacilities = () => {
     } catch {
       toast.error("An error occurred.");
     }
-setFormSubmitted(false);
+     setFormSubmitted(false);
+
     setSubmitting(false);
   };
 
@@ -945,7 +974,7 @@ setFormSubmitted(false);
                   {formData.moreFeaturedImages.map((file, index) => (
                     <div key={index} className="d-flex align-items-center mb-2">
                       <div style={{ position: "relative", marginRight: "8px" }}>
-                        {console.log('console_file', file)}
+                        {/* {console.log('console_file', file)} */}
                         {(file instanceof File || file?.url) && <img
                           src={file instanceof File ? URL.createObjectURL(file) :  file?.url }
                           alt={`preview-${index}`}
@@ -963,7 +992,8 @@ setFormSubmitted(false);
                         accept="image/*"
                         className="form-control me-2"
                         onChange={(e) => updateMoreFile(e, "moreFeaturedImages", index)}
-                         disabled={file instanceof File || file?.url || formSubmitted}
+                        disabled={file instanceof File || file?.url || formSubmitted}
+                        
                       />
                       <input
                         type="text"
@@ -1002,7 +1032,8 @@ setFormSubmitted(false);
                       size='sm'
                       style={{ width: "auto" }}
                       onClick={() => addMoreField("moreFeaturedImages")}
-                       disabled={formSubmitted}
+                       disabled={formSubmitted} 
+                       
                     >
                       Add More Images
                     </Button>
@@ -1231,7 +1262,7 @@ setFormSubmitted(false);
                       color="primary"
                       size="sm"
                       onClick={() => addMoreField("moreFeaturedVideos")}
-                       disabled={formSubmitted} 
+                        disabled={formSubmitted}
                     >
                       Add More Videos
                     </Button>

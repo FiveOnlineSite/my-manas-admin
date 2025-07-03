@@ -79,7 +79,7 @@ const AppProcess = () => {
     setLoading(true)
     const res = await getRequest("/scholarships/application-process");
     if (res.success) {
-      console.log("appprocess created:", res.data);
+      // console.log("appprocess created:", res.data);
 
       setData(res.data);
     } else {

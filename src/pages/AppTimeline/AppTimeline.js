@@ -66,7 +66,7 @@ const AppTimeline = () => {
     setLoading(true)
     const res = await getRequest("/scholarships/application-timeline");
     if (res.success) {
-      console.log("Apptimeline created:", res.data);
+      // console.log("Apptimeline created:", res.data);
 
       setData(res.data);
     } else {

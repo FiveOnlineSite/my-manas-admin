@@ -69,7 +69,7 @@ const ScopeBanner = () => {
 
     const res = await getRequest("/ourscope/banner");
     if (res.success) {
-      console.log("scope created:", res.data);
+      // console.log("scope created:", res.data);
 
       setData(res.data);
     } else {

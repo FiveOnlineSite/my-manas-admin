@@ -124,7 +124,7 @@ const OurInspirations = () => {
 
     const res = await getRequest("/about/our-inspiration"); // Update with your API route
     if (res.success) {
-      console.log("inspiration created:", res.data);
+      // console.log("inspiration created:", res.data);
 
       setData(res.data);
     } else {

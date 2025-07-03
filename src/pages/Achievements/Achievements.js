@@ -68,7 +68,7 @@ const [confirmModal, setConfirmModal] = useState(false);
   const fetchData = async () => {
     setLoading(true)
     const res = await getRequest("/academy/achievements");
-    console.log(res.data.data, "resfdfdfdf");
+    // console.log(res.data.data, "resfdfdfdf");
 
     if (res.success) {
       setData(res?.data?.data);
@@ -158,12 +158,12 @@ const [confirmModal, setConfirmModal] = useState(false);
          hasNewImage: image instanceof File,
       })
     );
-    console.log(formData, itemsData, "itemsDataaaaaaa");
+    // console.log(formData, itemsData, "itemsDataaaaaaa");
 
     payload.append("items", JSON.stringify(itemsData));
     formData.items.forEach((item) => {
       if (item.image instanceof File) {
-        console.log(item.image, "feeeeeeeee");
+        // console.log(item.image, "feeeeeeeee");
 
         payload.append("images", item.image);
       }
@@ -254,7 +254,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   <span>Actions</span>
                 </DataTableRow>
               </DataTableHead>
-              {console.log(data, "datadddddddddd")}
+              {/* {console.log(data, "datadddddddddd")} */}
               {data &&
                 data?.length > 0 &&
                 data.map((achievement) => (

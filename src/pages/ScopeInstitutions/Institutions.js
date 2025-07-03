@@ -75,7 +75,7 @@ const Institutions = () => {
     setLoading(true)
     const res = await getRequest("/ourscope/institutions");
     if (res.success) {
-      console.log("instituion created:", res.data);
+      // console.log("instituion created:", res.data);
 
       setData(res.data);
     } else {
