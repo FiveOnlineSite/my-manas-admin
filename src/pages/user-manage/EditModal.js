@@ -31,12 +31,31 @@ const EditModal = ({
     }
   }, [formData, reset, setValue]);
 
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  //   setValue(name, value, { shouldValidate: true });
+  //   trigger(name);
+  // };
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setValue(name, value, { shouldValidate: true });
-    trigger(name);
-  };
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+    images: {
+      ...prev.images,
+      [name === "desktopAlt" ? "desktop" : "mobile"]: {
+        ...prev.images?.[name === "desktopAlt" ? "desktop" : "mobile"],
+        altText: value || "",
+      },
+    },
+  }));
+  setValue(name, value, { shouldValidate: true });
+  trigger(name);
+};
+
 
   const handleImageChange = (e, key) => {
   const file = e.target.files[0]; // Get the selected file
@@ -50,6 +69,8 @@ const EditModal = ({
         [key === "desktopImage" ? "desktop" : "mobile"]: {
           ...prev.images?.[key === "desktopImage" ? "desktop" : "mobile"],
           url,
+           altText: prev.images?.[key === "desktopImage" ? "desktop" : "mobile"]
+            ?.altText || "", 
         },
       },
     }));
@@ -336,12 +357,12 @@ const EditModal = ({
                   <li>
                     <Button
                       color='primary'
-                      disabled={submitting}
                       size='md'
                       type='submit'
+                      disabled={submitting}
                     >
                       Update{" "}
-                      {submitting ? <Spinner className='spinner-xs' /> : ""}
+                      {submitting && <Spinner className='spinner-xs' />}
                     </Button>
                   </li>
 

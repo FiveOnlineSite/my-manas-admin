@@ -153,6 +153,7 @@ const HomeBanner = () => {
   };
 
   const onEditSubmit = async () => {
+    setSubmitting(true); 
     const formDetail = new FormData();
     formDetail.append("title", editFormData.title);
     formDetail.append("description", editFormData.description);
@@ -426,6 +427,7 @@ const HomeBanner = () => {
           setFormData={setEditFormData}
           closeModal={closeEditModal}
           onSubmit={onEditSubmit}
+          submitting={submitting}
         />
         <Modal
           isOpen={confirmModal}
