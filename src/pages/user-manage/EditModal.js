@@ -39,24 +39,45 @@ const EditModal = ({
   };
 
   const handleImageChange = (e, key) => {
-    const file = e.target.files[0];
-    if (file && file.size <= 512000) {
-      const url = URL.createObjectURL(file);
-      setFormData((prev) => ({
-        ...prev,
-        [key]: file,
-        images: {
-          ...prev.images,
-          [key === "desktopImage" ? "desktop" : "mobile"]: {
-            ...prev.images?.[key === "desktopImage" ? "desktop" : "mobile"],
-            url,
-          },
+  const file = e.target.files[0]; // Get the selected file
+  if (file) { // If a file is selected
+    const url = URL.createObjectURL(file); // Create a URL for the file
+    setFormData((prev) => ({
+      ...prev,
+      [key]: file,
+      images: {
+        ...prev.images,
+        [key === "desktopImage" ? "desktop" : "mobile"]: {
+          ...prev.images?.[key === "desktopImage" ? "desktop" : "mobile"],
+          url,
         },
-      }));
-      setValue(key, file, { shouldValidate: true });
-      trigger(key);
-    }
-  };
+      },
+    }));
+    setValue(key, file, { shouldValidate: true }); // Update the form value
+    trigger(key); // Trigger validation (if needed)
+  }
+};
+
+
+  // const handleImageChange = (e, key) => {
+  //   const file = e.target.files[0];
+  //   if (file && file.size <= 512000) {
+  //     const url = URL.createObjectURL(file);
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       [key]: file,
+  //       images: {
+  //         ...prev.images,
+  //         [key === "desktopImage" ? "desktop" : "mobile"]: {
+  //           ...prev.images?.[key === "desktopImage" ? "desktop" : "mobile"],
+  //           url,
+  //         },
+  //       },
+  //     }));
+  //     setValue(key, file, { shouldValidate: true });
+  //     trigger(key);
+  //   }
+  // };
 
   const handleImageRemove = (key) => {
     setFormData((prev) => ({
