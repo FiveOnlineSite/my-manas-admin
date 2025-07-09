@@ -285,7 +285,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -298,7 +298,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <ReactQuill
                     theme='snow'
                     value={formData.description}

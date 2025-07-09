@@ -315,7 +315,7 @@ const Contribution = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title")}
@@ -330,12 +330,12 @@ const Contribution = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Contributions</label>
+                  <label className='form-label'>Contributions <span className="danger">*</span></label>
                   {formData.items.map((c, index) => (
                     <div key={index} className='border p-3 mb-2 rounded'>
                       <Row className='gx-3 gy-2'>
                         <Col md='5'>
-                          <label className='form-label'>Title</label>
+                          <label className='form-label'>Title <span className="danger">*</span></label>
                           <input
                             className='form-control'
                             placeholder='Contribution Title'
@@ -351,7 +351,7 @@ const Contribution = () => {
                           )}
                         </Col>
                         <Col md='7'>
-                          <label className='form-label'>Description</label>
+                          <label className='form-label'>Description <span className="danger">*</span></label>
                           <ReactQuill
                             theme='snow'
                             value={c.description}

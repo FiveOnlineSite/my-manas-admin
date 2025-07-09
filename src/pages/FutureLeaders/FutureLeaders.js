@@ -366,7 +366,7 @@ const FutureLeaders = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -380,7 +380,7 @@ const FutureLeaders = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <ReactQuill
                     theme='snow'
                     value={formData.description}
@@ -394,7 +394,7 @@ const FutureLeaders = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Image Upload (Max 500KB)</label>
+                  <label className='form-label'>Image Upload (Max 500KB) <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'
@@ -458,7 +458,7 @@ const FutureLeaders = () => {
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>Button Text</label>
+                  <label className='form-label'>Button Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     name='buttonText'
@@ -473,7 +473,7 @@ const FutureLeaders = () => {
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>Button Link</label>
+                  <label className='form-label'>Button Link <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     name='buttonLink'

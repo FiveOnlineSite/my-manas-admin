@@ -410,7 +410,7 @@ const OurModel = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -425,7 +425,7 @@ const OurModel = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <ReactQuill
                     theme='snow'
                     value={formData.description}
@@ -441,7 +441,7 @@ const OurModel = () => {
                 {formData.icons.map((iconItem, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Icon Title</label>
+                      <label className='form-label'>Icon Title <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={iconItem.title}
@@ -457,7 +457,7 @@ const OurModel = () => {
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Icon Description</label>
+                      <label className='form-label'>Icon Description <span className="danger">*</span></label>
                       <ReactQuill
                         theme='snow'
                         value={iconItem.description}
@@ -473,7 +473,7 @@ const OurModel = () => {
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Icon Image</label>
+                      <label className='form-label'>Icon Image <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         type='file'

@@ -411,7 +411,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Title is required" })}
@@ -426,7 +426,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>Upload Date</label>
+                  <label className='form-label'>Upload Date <span className="danger">*</span></label>
                   <input
                     type='date'
                     className='form-control'
@@ -444,7 +444,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>Type</label>
+                  <label className='form-label'>Type <span className="danger">*</span></label>
                   <select
                     className='form-control'
                     {...register("type", { required: "Type is required" })}
@@ -462,7 +462,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   md='12'
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  <label className='form-label'>Image (Max 500KB)</label>
+                  <label className='form-label'>Image (Max 500KB) <span className="danger">*</span></label>
 
                   {!formData.image ? (
                     <input
@@ -664,7 +664,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 
 
                 <Col md='12'>
-                  <label className='form-label'>Content</label>
+                  <label className='form-label'>Content <span className="danger">*</span></label>
                   <Controller
                     name='content'
                     control={control}
@@ -683,7 +683,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Meta Title</label>
+                  <label className='form-label'>Meta Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("metaTitle", {
@@ -700,7 +700,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Meta Description</label>
+                  <label className='form-label'>Meta Description <span className="danger">*</span></label>
                   <Controller
                     name='metaDescription'
                     control={control}

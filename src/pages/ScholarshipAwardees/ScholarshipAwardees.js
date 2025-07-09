@@ -433,7 +433,7 @@ image: !(a.image instanceof File) ? a.image : null,    }));
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -451,7 +451,7 @@ image: !(a.image instanceof File) ? a.image : null,    }));
                 {formData.awardees.map((awardee, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Name</label>
+                      <label className='form-label'>Name <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={awardee.name}
@@ -461,7 +461,7 @@ image: !(a.image instanceof File) ? a.image : null,    }));
                       />
                     </Col>
                     <Col md='12'>
-                      <label className='form-label'>Review</label>
+                      <label className='form-label'>Review <span className="danger">*</span></label>
                       <ReactQuill
                         theme='snow'
                         value={awardee.review}
@@ -474,7 +474,7 @@ image: !(a.image instanceof File) ? a.image : null,    }));
                       )}
                     </Col>
                     <Col md='6'>
-                      <label className='form-label'>Year</label>
+                      <label className='form-label'>Year <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={awardee.year}
@@ -484,7 +484,7 @@ image: !(a.image instanceof File) ? a.image : null,    }));
                       />
                     </Col>
                     <Col md='6'>
-                      <label className='form-label'>Institute Name</label>
+                      <label className='form-label'>Institute Name <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={awardee.institute}
@@ -502,7 +502,7 @@ image: !(a.image instanceof File) ? a.image : null,    }));
                       style={{ display: "flex", flexDirection: "column" }}
                     >
                       <label className='form-label'>
-                        Image Upload (Max 500KB)
+                        Image Upload (Max 500KB) <span className="danger">*</span>
                       </label>
                       {!awardee.image ? (
                         <input

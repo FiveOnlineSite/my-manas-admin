@@ -343,7 +343,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Name</label>
+                  <label className='form-label'>Name <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("name", { required: "Required" })}
@@ -357,7 +357,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Designation</label>
+                  <label className='form-label'>Designation <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("designation", { required: "Required" })}
@@ -373,7 +373,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Location</label>
+                  <label className='form-label'>Location <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("location", { required: "Required" })}
@@ -388,7 +388,7 @@ const [confirmModal, setConfirmModal] = useState(false);
 
                 {/* Image Upload Section */}
                 <Col md='12'>
-                  <label className='form-label'>Image Upload</label>
+                  <label className='form-label'>Image Upload <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'
@@ -454,7 +454,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Alt Text</label>
+                  <label className='form-label'>Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("altText", { required: "Required" })}
@@ -468,7 +468,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                  <Col md='12'>
-  <label className='form-label'>Description</label>
+  <label className='form-label'>Description <span className="danger">*</span></label>
   <ReactQuill
     value={formData.description}
     onChange={(value) => setFormData({ ...formData, description: value })}

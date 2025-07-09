@@ -387,7 +387,7 @@ const MasterBanner = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Page</label>
+                  <label className='form-label'>Page <span className="danger">*</span></label>
                   <select
                     className='form-control'
                     // {...register("page", { required: "Required" })}
@@ -455,7 +455,7 @@ const MasterBanner = () => {
 
                 {/* Image Upload Section */}
                 <Col md='12'>
-                  <label className='form-label'>Image Upload (Max 500KB)</label>
+                  <label className='form-label'>Image Upload (Max 500KB) <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'

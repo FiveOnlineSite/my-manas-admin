@@ -56,6 +56,8 @@ const [confirmModal, setConfirmModal] = useState(false);
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
+    clearErrors,
   } = useForm();
 
   useEffect(() => {
@@ -281,75 +283,89 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Icon Upload (Max 500KB)</label>
+                  <label className='form-label'>Icon Upload (Max 500KB) <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'
                     accept='image/*'
                     onChange={(e) => {
                       const file = e.target.files[0];
-                      if (file && file.size > 512000) {
-                        toast.error("Image must be less than 500KB");
-                        return;
-                      }
-                      setFormData({ ...formData, icon: file });
-                    }}
-                  />
-                  {formData.icon && (
-                    <div
-                      style={{
-                        position: "relative",
-                        display: "inline-block",
-                        marginTop: 10,
-                      }}
-                    >
-                      <img
-                        src={
-                          typeof formData.icon === "string"
-                            ? formData.icon
-                            : formData.icon.url
-                              ? formData.icon.url
-                              : URL.createObjectURL(formData.icon)
-                        }
-                        alt={formData.altText}
-                        style={{
-                          width: 60,
-                          height: 60,
-                          objectFit: "contain",
-                          borderRadius: "4px",
-                          border: "1px solid #ccc",
-                          padding: "4px",
-                          backgroundColor: "#fff",
-                        }}
-                      />
-                      <Button
-                        size='sm'
-                        color='danger'
-                        className='btn-icon'
-                        style={{
-                          position: "absolute",
-                          top: "-8px",
-                          right: "-8px",
-                          borderRadius: "50%",
-                          lineHeight: "1",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                          zIndex: 10,
-                          height: "20px",
-                          width: "20px",
-                        }}
-                        onClick={() => setFormData({ ...formData, icon: null })}
-                      >
-                        <Icon name='cross' />
-                      </Button>
-                    </div>
-                  )}
-                </Col>
+                       if (file) {
+          // Check the file size (Max 500KB)
+          if (file.size > 512000) {
+            // Set error for the field using React Hook Form
+            setError("icon", {
+              type: "manual",
+              message: "Image must be less than 500KB",
+            });
+          } else {
+            // Clear the error if the file is valid
+            clearErrors("icon");
+            setFormData({ ...formData, icon: file });
+          }
+        }
+      }}
+    />
+    
+    {errors.icon && (
+      <span className="text-danger small">{errors.icon.message}</span>
+    )}
+
+    {formData.icon && (
+      <div
+        style={{
+          position: "relative",
+          display: "inline-block",
+          marginTop: 10,
+        }}
+      >
+        <img
+          src={
+            typeof formData.icon === "string"
+              ? formData.icon
+              : formData.icon.url
+              ? formData.icon.url
+              : URL.createObjectURL(formData.icon)
+          }
+          alt={formData.altText}
+          style={{
+            width: 60,
+            height: 60,
+            objectFit: "contain",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            padding: "4px",
+            backgroundColor: "#fff",
+          }}
+        />
+        <Button
+          size="sm"
+          color="danger"
+          className="btn-icon"
+          style={{
+            position: "absolute",
+            top: "-8px",
+            right: "-8px",
+            borderRadius: "50%",
+            lineHeight: "1",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            zIndex: 10,
+            height: "20px",
+            width: "20px",
+          }}
+          onClick={() => setFormData({ ...formData, icon: null })}
+        >
+          <Icon name="cross" />
+        </Button>
+      </div>
+    )}
+  </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Link</label>
+                  <label className='form-label'>Link <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("link", { required: "Link is required" })}

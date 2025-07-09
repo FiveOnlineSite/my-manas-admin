@@ -291,7 +291,7 @@ const Quotes = () => {
               <h5 className='title'>{editId ? "Edit Quote" : "Add Quote"}</h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Page</label>
+                  <label className='form-label'>Page <span className="danger">*</span></label>
                   <select
                     className='form-control'
                     {...register("page", { required: "Required" })}
@@ -314,7 +314,7 @@ const Quotes = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Quote</label>
+                  <label className='form-label'>Quote <span className="danger">*</span></label>
                   <textarea
                     className='form-control'
                     {...register("quote", { required: "Required" })}

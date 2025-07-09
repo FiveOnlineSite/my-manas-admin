@@ -255,7 +255,7 @@ const ApplicationDocument = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Title is required" })}
@@ -270,7 +270,7 @@ const ApplicationDocument = () => {
 
                 {formData.contents.map((content, index) => (
                   <Col md='12' key={index}>
-                    <label className='form-label'>Content {index + 1}</label>
+                    <label className='form-label'>Content {index + 1} <span className="danger">*</span></label>
                     <ReactQuill
                       theme='snow'
                       value={content}

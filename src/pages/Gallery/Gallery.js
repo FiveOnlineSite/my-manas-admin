@@ -356,7 +356,7 @@ const Gallery = () => {
                   md='12'
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  <label className='form-label'>Upload File</label>
+                  <label className='form-label'>Upload File <span className="danger">*</span></label>
                   {!formData.file ? (
                     <input
                       className='form-control'
@@ -457,7 +457,7 @@ const Gallery = () => {
                   {fileError && <span className='invalid'>{fileError}</span>}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Alt Text</label>
+                  <label className='form-label'>Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("altText", {

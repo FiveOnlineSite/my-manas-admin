@@ -228,7 +228,7 @@ const onDeleteClick = async () => {
               <h5 className="title">{editId ? "Edit Meta Data" : "Add Meta Data"}</h5>
               <Form className="row gy-4" onSubmit={handleSubmit(onSubmit)}>
                 <Col md="12">
-                  <label className="form-label">Page</label>
+                  <label className="form-label">Page <span className="danger">*</span></label>
                   <select name="page" className="form-control" value={formData.page} onChange={handleInputChange} disabled={!!editId}>
                     <option value="">Select Page</option>
                     <option value="home">home</option>
@@ -244,15 +244,15 @@ const onDeleteClick = async () => {
                   </select>
                 </Col>
                 <Col md="12">
-                  <label className="form-label">Meta Title</label>
+                  <label className="form-label">Meta Title <span className="danger">*</span></label>
                   <input type="text" className="form-control" name="metaTitle" value={formData.metaTitle} onChange={handleInputChange} />
                 </Col>
                 <Col md="12">
-                  <label className="form-label">Meta Description</label>
+                  <label className="form-label">Meta Description <span className="danger">*</span></label>
                   <textarea className="form-control" name="metaDescription" value={formData.metaDescription} onChange={handleInputChange} />
                 </Col>
                 <Col md="12">
-                  <label className="form-label">Meta Keywords</label>
+                  <label className="form-label">Meta Keywords <span className="danger">*</span></label>
                   <input type="text" className="form-control" name="metaKeywords" value={formData.metaKeywords} onChange={handleInputChange} />
                 </Col>
                 <Col size="12">

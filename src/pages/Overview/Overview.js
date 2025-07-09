@@ -439,7 +439,7 @@ const Overview = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -454,7 +454,7 @@ const Overview = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Description 1</label>
+                  <label className='form-label'>Description 1 <span className="danger">*</span></label>
                   <Controller
                     control={control}
                     name='description1'
@@ -475,7 +475,7 @@ const Overview = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Description 2</label>
+                  <label className='form-label'>Description 2 <span className="danger">*</span></label>
                   <Controller
                     control={control}
                     name='description2'
@@ -496,7 +496,7 @@ const Overview = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>BOD Name</label>
+                  <label className='form-label'>BOD Name <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("bodName", { required: "Required" })}
@@ -510,7 +510,7 @@ const Overview = () => {
                 </Col>
                 <Col md='12'>
                   <label className='form-label'>
-                    BOD Image Upload (Max 500KB)
+                    BOD Image Upload (Max 500KB) <span className="danger">*</span>
                   </label>
                   <input
                     className='form-control'
@@ -573,7 +573,7 @@ const Overview = () => {
                 </Col>
                 <Col md='12'>
                   <label className='form-label'>
-                    BOD Signature Upload (Max 500KB)
+                    BOD Signature Upload (Max 500KB) <span className="danger">*</span>
                   </label>
                   <input
                     className='form-control'

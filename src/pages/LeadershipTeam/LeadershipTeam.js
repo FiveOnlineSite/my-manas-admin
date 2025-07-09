@@ -368,7 +368,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
                 {formData.members.map((member, index) => (
                   <div key={index} className='border p-3 rounded mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Name</label>
+                      <label className='form-label'>Name <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={member.name}
@@ -382,7 +382,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Description</label>
+                      <label className='form-label'>Description <span className="danger">*</span></label>
                       <ReactQuill
                         theme='snow'
                         value={member.description}
@@ -396,7 +396,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Image (Max 500KB)</label>
+                      <label className='form-label'>Image (Max 500KB) <span className="danger">*</span></label>
                       <input
                         type='file'
                         accept='image/*'
@@ -458,7 +458,7 @@ payload.append("members", JSON.stringify(membersWithFlag));
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Alt Text</label>
+                      <label className='form-label'>Alt Text <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={member.altText}

@@ -190,6 +190,32 @@ const Facilities = () => {
 
   const updateMoreFile = (e, type, index, key = "video") => {
     const file = e.target.files[0];
+    const fileSize = file ? file.size / 1024 / 1024 : 0;
+
+    let errorMessage = "";
+    if (key === "video" && fileSize > 10) {
+      errorMessage = "Video file size should be less than 10MB.";
+    }
+
+    if (key === "thumbnail" && fileSize > 0.5) {
+      errorMessage = "Thumbnail file size should be less than 500KB.";
+    }
+
+      if (key === "image" && fileSize * 1024 > 500) {  
+    errorMessage = "Image file size should be less than 500KB.";
+  }
+    
+    if (errorMessage) {
+      setError(`${type}[${index}].${key}`, {
+        type: "manual",
+        message: errorMessage,
+      });
+
+      return;
+    } else  {
+
+   
+    clearErrors(`${type}[${index}].${key}`);
     setFormData((prev) => {
       const updated = [...prev[type]];
       if (type === "moreFeaturedVideos") {
@@ -202,27 +228,84 @@ const Facilities = () => {
       }
       return { ...prev, [type]: updated };
     });
-    if (type === "moreFeaturedVideos" && key === "thumbnail") {
-      setMoreVideoErrors((prev) => {
-        const updated = [...prev];
-        updated[index] = ""; // Clear error for that index
-        return updated;
-      });
-    }
+ }
   };
 
+  // const handleFileChange = (e, type) => {
+  //   const file = e.target.files[0];
 
-const handleFileChange = (e, type) => {
+  //   // Check if file exists
+  //   if (file) {
+  //     // Validate file size (10MB limit)
+  //     if (file.size > 10 * 1024 * 1024) {  // 10MB in bytes
+  //       // Set error if file is too large
+  //       setError(type, {
+  //         type: 'manual',
+  //         message: 'File size exceeds 10MB. Please upload a smaller file.',
+  //       });
+
+  //       // Clear the file input field in state if size is invalid
+  //       setFormData((prev) => ({ ...prev, [type]: null }));
+  //       setValue(type, null);  // Reset value in react-hook-form
+
+  //       return;  // Exit early if the file is too large
+  //     } else {
+  //       // If file size is valid, update the form state and clear any previous errors
+  //       setFormData((prev) => ({ ...prev, [type]: file }));
+  //       setValue(type, file, { shouldValidate: true });
+  //       clearErrors(type);  // Clear any previous error if file is valid
+  //     }
+
+  //     // Specific handling for types like featuredVideoThumbnail and featuredImage
+  //     if (type === "featuredVideoThumbnail") {
+  //       setVideoThumbnailError("");  // Reset any custom errors
+  //     }
+
+  //     if (type === "featuredImage") {
+  //       setValue("featuredImage", file, { shouldValidate: true });
+  //       trigger("featuredImage");  // Trigger validation for featuredImage field
+  //     }
+
+  //     // Trigger validation manually for the current field
+  //     trigger(type);
+  //   }
+  // };
+
+  const handleFileChange = (e, type) => {
   const file = e.target.files[0];
 
   // Check if file exists
   if (file) {
-    // Validate file size (10MB limit)
+    let errorMessage = "";
+
+    // Validate file size (10MB limit for general files)
     if (file.size > 10 * 1024 * 1024) {  // 10MB in bytes
-      // Set error if file is too large
+      errorMessage = 'File size exceeds 10MB. Please upload a smaller file.';
+    }
+
+   if (type === "featuredVideoThumbnail") {
+      if (!file) {
+        errorMessage = 'Video thumbnail is required.';
+      } else if (file.size > 500 * 1024) {  // 500KB in bytes
+        errorMessage = 'Thumbnail size should be less than 500KB.';
+      }
+    }    
+
+    // Validate file size for featuredImage (500KB limit)
+    if (type === "image" && file.size > 500 * 1024) {  // 500KB in bytes
+      errorMessage = 'File size exceeds 500KB. Please upload a smaller image.';
+    }
+
+     if (type === "featuredImage" && file.size > 500 * 1024) {  // 500KB in bytes
+      errorMessage = 'File size exceeds 500KB. Please upload a smaller image.';
+    }
+
+    // If an error message is set, handle the error
+    if (errorMessage) {
+      // Set error for the field using react-hook-form
       setError(type, {
         type: 'manual',
-        message: 'File size exceeds 10MB. Please upload a smaller file.',
+        message: errorMessage,
       });
 
       // Clear the file input field in state if size is invalid
@@ -242,9 +325,10 @@ const handleFileChange = (e, type) => {
       setVideoThumbnailError("");  // Reset any custom errors
     }
 
-    if (type === "featuredImage") {
-      setValue("featuredImage", file, { shouldValidate: true });
-      trigger("featuredImage");  // Trigger validation for featuredImage field
+    if (type === "image") {
+      // Trigger validation for featuredImage field
+      setValue("image", file, { shouldValidate: true });
+      trigger("image");  // Trigger validation for featuredImage field
     }
 
     // Trigger validation manually for the current field
@@ -271,7 +355,7 @@ const handleFileChange = (e, type) => {
 
     if (formData.video && !formData.featuredVideoThumbnail) {
       setVideoThumbnailError("Thumbnail is required when a video is uploaded.");
-       setFormSubmitted(false);
+      setFormSubmitted(false);
       // toast.error("Featured video thumbnail is required when uploading a video.");
       setSubmitting(false);
       return;
@@ -327,7 +411,7 @@ const handleFileChange = (e, type) => {
     formData.moreFeaturedImages.forEach((file, i) => {
       if (file instanceof File) {
         formPayload.append(`moreFeaturedImages[${i}]`, file);
-        if(file?.altText) {
+        if (file?.altText) {
           formPayload.append(`moreFeaturedImages[${i}][altText]`, file.altText);  // Append altText
         }
       }
@@ -358,15 +442,6 @@ const handleFileChange = (e, type) => {
       }
     });
 
-
-
-
-    // console.log("Form Payload Before Submit:", formPayload);
-
-
-
-
-
     try {
       let res;
       if (editId) {
@@ -386,7 +461,7 @@ const handleFileChange = (e, type) => {
     } catch {
       toast.error("An error occurred.");
     }
-     setFormSubmitted(false);
+    setFormSubmitted(false);
 
     setSubmitting(false);
   };
@@ -501,7 +576,7 @@ const handleFileChange = (e, type) => {
                   <DataTableRow>
                     <span>{item.sliderText || "-"}</span>
                   </DataTableRow>
-                  
+
 
                   <DataTableRow>
                     {item.resources?.image ? (
@@ -595,7 +670,7 @@ const handleFileChange = (e, type) => {
                     </DataTableRow>
                   </DataTableRow> */}
 
-                 
+
                   {/* <DataTableRow>
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {item.resources?.moreFeaturedImages?.length > 0 ? (
@@ -708,15 +783,19 @@ const handleFileChange = (e, type) => {
               <h5 className='title'>{editId ? "Edit" : "Add"} Upload Item</h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md="12">
-                  <label className="form-label">Slider Text</label>
+                  <label className="form-label">Slider Text <span className="danger">*</span></label>
                   <input
                     type="text"
                     className="form-control"
+                    {...register("sliderText", { required: "Slider text is required" })}
                     value={formData.sliderText || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, sliderText: e.target.value })
                     }
                   />
+                   {errors.sliderText && (
+          <span className="text-danger small">{errors.sliderText.message}</span>
+        )}
                 </Col>
                 {/* <Col md='12'>
                   <label className='form-label'>Title</label>
@@ -735,7 +814,7 @@ const handleFileChange = (e, type) => {
 
                 {/* Image Upload */}
                 <Col md='6'>
-                  <label className='form-label'>Featured Image (Max 500KB)</label>
+                  <label className='form-label'>Featured Image (Max 500KB)<span className="danger">*</span></label>
                   {!formData.image ? (
                     <input
                       type='file'
@@ -823,7 +902,7 @@ const handleFileChange = (e, type) => {
 
                 {/* Image Alt Text */}
                 <Col md='6'>
-                  <label className='form-label'>Image Alt Text</label>
+                  <label className='form-label'>Image Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("imageAltText", {
@@ -846,7 +925,7 @@ const handleFileChange = (e, type) => {
                 {/* Featured Image Upload */}
                 <Col md='6'>
                   <label className='form-label'>
-                    Upload Modal Images (Max 500KB)
+                    Upload Modal Images (Max 500KB) <span className="danger">*</span>
                   </label>
                   {!formData.featuredImage ? (
                     <input
@@ -937,7 +1016,7 @@ const handleFileChange = (e, type) => {
                 </Col>
 
                 <Col md="6">
-                  <label className="form-label">Modal Image Alt Text</label>
+                  <label className="form-label">Modal Image Alt Text <span className="danger">*</span></label>
                   <input
                     className="form-control"
                     value={formData.featuredImageAltText || ""}
@@ -969,14 +1048,14 @@ const handleFileChange = (e, type) => {
                 </Col> */}
 
                 {/* Additional Featured Images */}
-                <Col md="12">
-                  {/* <label className="form-label mt-2">More Modal Images</label> */}
+                {/* <Col md="12">
+                  
                   {formData.moreFeaturedImages.map((file, index) => (
                     <div key={index} className="d-flex align-items-center mb-2">
                       <div style={{ position: "relative", marginRight: "8px" }}>
-                        {/* {console.log('console_file', file)} */}
+                      
                         {(file instanceof File || file?.url) && <img
-                          src={file instanceof File ? URL.createObjectURL(file) :  file?.url }
+                          src={file instanceof File ? URL.createObjectURL(file) : file?.url}
                           alt={`preview-${index}`}
                           style={{
                             width: 80,
@@ -991,9 +1070,9 @@ const handleFileChange = (e, type) => {
                         type="file"
                         accept="image/*"
                         className="form-control me-2"
-                        onChange={(e) => updateMoreFile(e, "moreFeaturedImages", index)}
+                        onChange={(e) => updateMoreFile(e, "moreFeaturedImages", index,"image")}
                         disabled={file instanceof File || file?.url || formSubmitted}
-                        
+
                       />
                       <input
                         type="text"
@@ -1018,13 +1097,7 @@ const handleFileChange = (e, type) => {
                   ))}
 
 
-                  {/* <Button
-                    color="secondary"
-                    size="sm"
-                    onClick={() => addMoreField("moreFeaturedImages")}
-                  >
-                    + Add More Featured Image
-                  </Button> */}
+                  
                   <div>
                     <Button
                       type="button"
@@ -1032,17 +1105,87 @@ const handleFileChange = (e, type) => {
                       size='sm'
                       style={{ width: "auto" }}
                       onClick={() => addMoreField("moreFeaturedImages")}
-                       disabled={formSubmitted} 
-                       
+                      disabled={formSubmitted}
+
                     >
                       Add More Images
                     </Button>
                   </div>
-                </Col>
+                </Col> */}
+
+                <Col md="12">
+  {formData.moreFeaturedImages.map((file, index) => (
+    <div key={index} className="d-flex align-items-center mb-2">
+      <div style={{ position: "relative", marginRight: "8px" }}>
+        {(file instanceof File || file?.url) && (
+          <img
+            src={file instanceof File ? URL.createObjectURL(file) : file?.url}
+            alt={`preview-${index}`}
+            style={{
+              width: 80,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 4,
+              border: "1px solid #ccc",
+            }}
+          />
+        )}
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        className={`form-control me-2 ${errors?.moreFeaturedImages?.[index]?.image ? 'is-invalid' : ''}`}
+        onChange={(e) => updateMoreFile(e, "moreFeaturedImages", index, "image")}
+        disabled={file instanceof File || file?.url || formSubmitted}
+      />
+
+      {errors?.moreFeaturedImages?.[index]?.image && (
+        <div className="invalid-feedback">
+          {errors?.moreFeaturedImages?.[index]?.image?.message}
+        </div>
+      )}
+
+      <input
+        type="text"
+        className="form-control me-2"
+        value={file.altText || ""}
+        onChange={(e) => {
+          const updated = [...formData.moreFeaturedImages];
+          updated[index].altText = e.target.value;
+          setFormData({ ...formData, moreFeaturedImages: updated });
+        }}
+        placeholder="Image Alt Text"
+      />
+      <Button
+        type="button"
+        size="sm"
+        color="danger"
+        onClick={() => removeMoreField("moreFeaturedImages", index)}
+      >
+        Remove
+      </Button>
+    </div>
+  ))}
+
+  <div>
+    <Button
+      type="button"
+      color="primary"
+      size="sm"
+      style={{ width: "auto" }}
+      onClick={() => addMoreField("moreFeaturedImages")}
+      disabled={formSubmitted}
+    >
+      Add More Images
+    </Button>
+  </div>
+</Col>
+
 
                 {/* Video Upload */}
                 <Col md='4'>
-                  <label className='form-label'>Modal Videos (Max 10MB)</label>
+                  <label className='form-label'>Modal Videos (Max 10MB) <span className="danger">*</span></label>
                   {!formData.video ? (
                     <input
                       type='file'
@@ -1128,10 +1271,11 @@ const handleFileChange = (e, type) => {
                   {errors.video && (
                     <span className='invalid'>{errors.video.message}</span>
                   )}
+                  
                 </Col>
 
                 <Col md="4">
-                  <label className="form-label">Modal Video Thumbnail</label>
+                  <label className="form-label">Modal Video Thumbnail <span className="danger">*</span></label>
                   <input
                     type="file"
                     accept="image/*"
@@ -1153,14 +1297,14 @@ const handleFileChange = (e, type) => {
                     />
                   )}
 
-                  {videoThumbnailError && (
-                    <span className="text-danger small">{videoThumbnailError}</span>
-                  )}
+                   {errors.featuredVideoThumbnail && (
+    <span className="text-danger small">{errors.featuredVideoThumbnail.message}</span>
+  )}
                 </Col>
 
                 {/* Video Alt Text */}
                 <Col md='4'>
-                  <label className='form-label'>Video Alt Text</label>
+                  <label className='form-label'>Video Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("videoAltText", {
@@ -1186,7 +1330,7 @@ const handleFileChange = (e, type) => {
                 <Col md="12">
                   {/* <label className="form-label mt-2">More Modal Videos</label> */}
                   {formData.moreFeaturedVideos.map((fileObj, index) => (
-                    <div key={index} className="row align-items-center mb-2">
+                    <div key={index} className="row align-items-start mb-2">
                       <div className="col-md-4">
                         <label>Video</label>
                         <input
@@ -1195,13 +1339,19 @@ const handleFileChange = (e, type) => {
                           className="form-control"
                           onChange={(e) => updateMoreFile(e, "moreFeaturedVideos", index, "video")}
                         />
-                        {fileObj.video && (
+                        {fileObj?.video && (
                           <video width={100} height={60} controls className="mt-1">
                             <source
                               src={fileObj.video instanceof File ? URL.createObjectURL(fileObj.video) : fileObj.video?.url || ""}
                             />
                           </video>
                         )}
+                        {errors.moreFeaturedVideos?.[index]?.video && (
+                          <span className='invalid'>
+                            {errors.moreFeaturedVideos?.[index].video.message}
+                          </span>
+                        )}
+                        {console.log('console_error', errors)}
                       </div>
 
                       <div className="col-md-4">
@@ -1212,7 +1362,7 @@ const handleFileChange = (e, type) => {
                           className="form-control"
                           onChange={(e) => updateMoreFile(e, "moreFeaturedVideos", index, "thumbnail")}
                         />
-                        {fileObj.thumbnail && (
+                        {fileObj?.thumbnail && (
                           <img
                             src={fileObj.thumbnail instanceof File ? URL.createObjectURL(fileObj.thumbnail) : fileObj.thumbnail?.url || ""}
                             width={80}
@@ -1220,8 +1370,10 @@ const handleFileChange = (e, type) => {
                             alt={`thumb-${index}`}
                           />
                         )}
-                        {moreVideoErrors[index] && (
-                          <span className="text-danger small">{moreVideoErrors[index]}</span>
+                        {errors.moreFeaturedVideos?.[index]?.thumbnail && (
+                          <span className='invalid'>
+                            {errors.moreFeaturedVideos?.[index].thumbnail.message}
+                          </span>
                         )}
                       </div>
                       <Col md='4'>
@@ -1262,7 +1414,7 @@ const handleFileChange = (e, type) => {
                       color="primary"
                       size="sm"
                       onClick={() => addMoreField("moreFeaturedVideos")}
-                        disabled={formSubmitted}
+                      disabled={formSubmitted}
                     >
                       Add More Videos
                     </Button>

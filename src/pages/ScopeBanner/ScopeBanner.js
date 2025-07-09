@@ -337,7 +337,7 @@ const ScopeBanner = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -351,7 +351,7 @@ const ScopeBanner = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Image Upload (Max 500KB)</label>
+                  <label className='form-label'>Image Upload (Max 500KB) <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'
@@ -415,7 +415,7 @@ const ScopeBanner = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Alt Text</label>
+                  <label className='form-label'>Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     name='altText'

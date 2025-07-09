@@ -406,7 +406,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Subtitle</label>
+                  <label className='form-label'>Subtitle <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("subtitle", { required: "Required" })}
@@ -419,7 +419,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -432,7 +432,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <Controller
                     control={control}
                     name='description'
@@ -456,7 +456,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Image 1 (Max 500KB)</label>
+                  <label className='form-label'>Image 1 (Max 500KB) <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'
@@ -524,7 +524,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Image 2 (Max 500KB)</label>
+                  <label className='form-label'>Image 2 (Max 500KB) <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     type='file'
@@ -592,7 +592,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>Button Text</label>
+                  <label className='form-label'>Button Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("buttonText", { required: "Required" })}
@@ -605,7 +605,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                   )}
                 </Col>
                 <Col md='6'>
-                  <label className='form-label'>Button Link</label>
+                  <label className='form-label'>Button Link <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("buttonLink", { required: "Required" })}

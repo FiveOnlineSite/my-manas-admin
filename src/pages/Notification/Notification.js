@@ -347,7 +347,7 @@ const Notification = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Title is required" })}
@@ -361,7 +361,7 @@ const Notification = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <ReactQuill
                     theme='snow'
                     value={formData.description}
@@ -377,7 +377,7 @@ const Notification = () => {
                 {formData.contents.map((content, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Content {index + 1}</label>
+                      <label className='form-label'>Content {index + 1} <span className="danger">*</span></label>
                       <ReactQuill
                         theme='snow'
                         value={content}

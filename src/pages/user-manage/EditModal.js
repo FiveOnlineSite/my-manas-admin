@@ -56,7 +56,7 @@ const EditModal = ({
   trigger(name);
 };
 
-
+// updated
   const handleImageChange = (e, key) => {
   const file = e.target.files[0]; // Get the selected file
   if (file) { // If a file is selected
@@ -140,7 +140,7 @@ const EditModal = ({
             <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
               {/* Title */}
               <Col md='12'>
-                <label className='form-label'>Title</label>
+                <label className='form-label'>Title <span className="danger">*</span></label>
                 <input
                   className='form-control'
                   {...register("title", { required: "Title is required" })}
@@ -155,7 +155,7 @@ const EditModal = ({
 
               {/* Description */}
               <Col md='12'>
-                <label className='form-label'>Description</label>
+                <label className='form-label'>Description <span className="danger">*</span></label>
                 <Controller
                   name='description'
                   control={control}
@@ -178,7 +178,7 @@ const EditModal = ({
 
               {/* Button Text & Link */}
               <Col md='6'>
-                <label className='form-label'>Button Text</label>
+                <label className='form-label'>Button Text <span className="danger">*</span></label>
                 <input
                   className='form-control'
                   {...register("buttonText", {
@@ -193,7 +193,7 @@ const EditModal = ({
                 )}
               </Col>
               <Col md='6'>
-                <label className='form-label'>Button Link</label>
+                <label className='form-label'>Button Link <span className="danger">*</span></label>
                 <input
                   className='form-control'
                   {...register("buttonLink", {
@@ -210,7 +210,7 @@ const EditModal = ({
 
               {/* Desktop Image Upload */}
               <Col md='6'>
-                <label className='form-label'>Desktop Image (Max 500KB)</label>
+                <label className='form-label'>Desktop Image (Max 500KB) <span className="danger">*</span></label>
                 <input
                   type='file'
                   className='form-control'
@@ -268,7 +268,7 @@ const EditModal = ({
 
               {/* Desktop Alt Text */}
               <Col md='6'>
-                <label className='form-label'>Alt Text (Desktop)</label>
+                <label className='form-label'>Alt Text (Desktop) <span className="danger">*</span></label>
                 <input
                   className='form-control'
                   name='desktopAlt'
@@ -282,7 +282,7 @@ const EditModal = ({
 
               {/* Mobile Image Upload */}
               <Col md='6'>
-                <label className='form-label'>Mobile Image (Max 500KB)</label>
+                <label className='form-label'>Mobile Image (Max 500KB) <span className="danger">*</span></label>
                 <input
                   type='file'
                   className='form-control'
@@ -339,7 +339,7 @@ const EditModal = ({
 
               {/* Mobile Alt Text */}
               <Col md='6'>
-                <label className='form-label'>Alt Text (Mobile)</label>
+                <label className='form-label'>Alt Text (Mobile) <span className="danger">*</span></label>
                 <input
                   className='form-control'
                   name='mobileAlt'

@@ -498,7 +498,7 @@ const OurGoal = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Main Title</label>
+                  <label className='form-label'>Main Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -513,7 +513,7 @@ const OurGoal = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Main Description</label>
+                  <label className='form-label'>Main Description <span className="danger">*</span></label>
                   <Controller
                     name='description'
                     control={control}
@@ -541,7 +541,7 @@ const OurGoal = () => {
                   <React.Fragment key={index}>
                     <div key={index} className='border rounded p-3 mb-3'>
                       <Col md='12'>
-                        <label className='form-label'>Additional Title</label>
+                        <label className='form-label'>Additional Title <span className="danger">*</span></label>
                         <input
                           className='form-control'
                           {...register(`additionalItems.${index}.title`, {
@@ -561,7 +561,7 @@ const OurGoal = () => {
 
                       <Col md='12'>
                         <label className='form-label'>
-                          Additional Description
+                          Additional Description <span className="danger">*</span>
                         </label>
                         <Controller
                           name={`additionalItems.${index}.description`}
@@ -590,7 +590,7 @@ const OurGoal = () => {
 
                       <Col md='12'>
                         <label className='form-label'>
-                          Additional Image (Max 500KB)
+                          Additional Image (Max 500KB) <span className="danger">*</span>
                         </label>
                         <input
                           className='form-control'

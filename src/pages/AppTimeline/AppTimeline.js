@@ -318,7 +318,7 @@ const AppTimeline = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -336,7 +336,7 @@ const AppTimeline = () => {
                 {formData.items.map((event, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='6'>
-                      <label className='form-label'>Date</label>
+                      <label className='form-label'>Date <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         {...register(`items[${index}].date`, {
@@ -349,7 +349,7 @@ const AppTimeline = () => {
                       />
                     </Col>
                     <Col md='6'>
-                      <label className='form-label'>Event Title</label>
+                      <label className='form-label'>Event Title <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         {...register(`items[${index}].title`, {

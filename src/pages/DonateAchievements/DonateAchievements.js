@@ -368,7 +368,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Main Title</label>
+                  <label className='form-label'>Main Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     value={formData.title}
@@ -381,7 +381,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 {formData.items.map((item, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Item Title</label>
+                      <label className='form-label'>Item Title <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={item.title}
@@ -391,7 +391,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                       />
                     </Col>
                     <Col md='12'>
-                      <label className='form-label'>Item Description</label>
+                      <label className='form-label'>Item Description <span className="danger">*</span></label>
                       <ReactQuill
                         theme='snow'
                         value={item.description}
@@ -401,7 +401,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                       />
                     </Col>
                     <Col md='12'>
-                      <label className='form-label'>Image</label>
+                      <label className='form-label'>Image <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         type='file'
@@ -464,7 +464,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Alt Text</label>
+                      <label className='form-label'>Alt Text <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={item.altText}

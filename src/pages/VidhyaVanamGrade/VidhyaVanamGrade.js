@@ -344,7 +344,7 @@ const VidhyaVanamGrade = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Title is required" })}
@@ -360,7 +360,7 @@ const VidhyaVanamGrade = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <Controller
                     name='description'
                     control={control}
@@ -387,7 +387,7 @@ const VidhyaVanamGrade = () => {
                   md='12'
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  <label className='form-label'>Icon (Max 100KB)</label>
+                  <label className='form-label'>Icon (Max 100KB) <span className="danger">*</span></label>
                   {!formData.icon ? (
                     <input
                       className='form-control'
@@ -488,7 +488,7 @@ const VidhyaVanamGrade = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Alt Text</label>
+                  <label className='form-label'>Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("altText", {

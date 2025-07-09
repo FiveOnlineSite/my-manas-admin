@@ -297,7 +297,7 @@ const DonateNow = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                                  <label className='form-label'>Page</label>
+                                  <label className='form-label'>Page <span className="danger">*</span></label>
                                   <select
                                     className='form-control'
                                     {...register("page", { required: "Required" })}
@@ -319,7 +319,7 @@ const DonateNow = () => {
                                   )}
                                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Title is required" })}
@@ -334,7 +334,7 @@ const DonateNow = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Button Text</label>
+                  <label className='form-label'>Button Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("buttonText", {
@@ -351,7 +351,7 @@ const DonateNow = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Button Link</label>
+                  <label className='form-label'>Button Link <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("buttonLink", {

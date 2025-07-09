@@ -307,7 +307,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Give Title</label>
+                  <label className='form-label'>Give Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", {
@@ -325,7 +325,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Email</label>
+                  <label className='form-label'>Email <span className="danger">*</span></label>
                   <input
                     type='email'
                     className='form-control'
@@ -348,7 +348,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Address</label>
+                  <label className='form-label'>Address <span className="danger">*</span></label>
                   <textarea
                     className='form-control'
                     {...register("address", {
@@ -366,7 +366,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Resume Link</label>
+                  <label className='form-label'>Resume Link <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("resumeLink", {

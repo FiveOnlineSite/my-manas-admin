@@ -498,7 +498,7 @@ const addValue = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -514,7 +514,7 @@ const addValue = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <ReactQuill
                     theme='snow'
                     value={formData.description}
@@ -530,7 +530,7 @@ const addValue = () => {
                 {formData.values.map((value, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Value Title</label>
+                      <label className='form-label'>Value Title <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         {...register(`values[${index}].title`, {
@@ -544,7 +544,7 @@ const addValue = () => {
                     </Col>
 
                     <Col md='12'>
-                      <label className='form-label'>Value Description</label>
+                      <label className='form-label'>Value Description <span className="danger">*</span></label>
                       <Controller
                         defaultValue={value.description || ""}
                         name={`values[${index}].description`}
@@ -573,7 +573,7 @@ const addValue = () => {
 
                     <Col md='12'>
                       <label className='form-label'>
-                        Value Icon (Max 100KB)
+                        Value Icon (Max 100KB) <span className="danger">*</span>
                       </label>
                       <input
                         className='form-control'

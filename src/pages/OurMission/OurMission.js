@@ -347,7 +347,7 @@ const OurMission = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Subtitle</label>
+                  <label className='form-label'>Subtitle <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("subtitle", { required: "Required" })}
@@ -361,7 +361,7 @@ const OurMission = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -378,7 +378,7 @@ const OurMission = () => {
                   md='12'
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  <label className='form-label'>Image Upload (Max 500KB)</label>
+                  <label className='form-label'>Image Upload (Max 500KB) <span className="danger">*</span></label>
                   {!formData.image || formData.image instanceof File ? (
                     <input
                       className='form-control'
@@ -452,7 +452,7 @@ const OurMission = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Accordions</label>
+                  <label className='form-label'>Accordions <span className="danger">*</span></label>
                   {/* {formData.accordions.map((acc, index) => (
                     <div key={index} className='border rounded p-3 mb-3'>
                       <Row className='gy-2'>

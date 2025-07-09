@@ -31,19 +31,22 @@ import TooltipComponent from "../../components/tooltip/Tooltip";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
+import {
+  deleteRequest,
+  getRequest,
+  postFormData,
+  putRequest,
+} from "../../api/api";
 import { Spinner } from "reactstrap";
-import { deleteRequest, getRequest, postFormData, putRequest } from "../../api/api";
-
 
 const VidhyaVanamAchievements = () => {
+  const [data, setData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 const [confirmModal, setConfirmModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null); 
-  const [data, setData] = useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
-
   const {
     register,
     handleSubmit,
@@ -68,8 +71,6 @@ const [confirmModal, setConfirmModal] = useState(false);
     // console.log(res.data.data, "resfdfdfdf");
 
     if (res.success) {
-      //  If it's an array, use as is; if it's an object, wrap in array
-      // const result = Array.isArray(res.data) ? res.data : [res.data];
       setData(res?.data?.data);
     } else {
       toast.error(res.message || "Failed to fetch data");
@@ -87,7 +88,7 @@ const [confirmModal, setConfirmModal] = useState(false);
           ? editItem.items.map((item) => ({
             title: item.title || "",
             description: item.description || "",
-            image: item.image?.url || "",
+            image: item.image?.url ? { url: item.image.url } : null,
             altText: item.image?.altText || "",
           }))
           : [],
@@ -154,7 +155,7 @@ const [confirmModal, setConfirmModal] = useState(false);
           altText,
           url: image instanceof File ? null : image?.url || image,
         },
-        hasNewImage: image instanceof File,
+         hasNewImage: image instanceof File,
       })
     );
     // console.log(formData, itemsData, "itemsDataaaaaaa");
@@ -189,6 +190,7 @@ const [confirmModal, setConfirmModal] = useState(false);
     setDeleteId(id);
     setConfirmModal(true);
   };
+
 
   const onDeleteClick = async (id) => {
     const res = await deleteRequest(`/vidhyavanam/achievements/${id}`);
@@ -254,79 +256,79 @@ const [confirmModal, setConfirmModal] = useState(false);
               </DataTableHead>
               {/* {console.log(data, "datadddddddddd")} */}
               {data &&
-  data.length > 0 &&
-  data.map((achievement) => (
-    <DataTableItem key={achievement._id}>
-      {/* Main Title */}
-      <DataTableRow>
-        <span>{achievement.title}</span>
-      </DataTableRow>
+                data?.length > 0 &&
+                data.map((achievement) => (
+  <DataTableItem key={achievement._id}>
+    {/* Main Title */}
+    <DataTableRow>
+      <span>{achievement.title}</span>
+    </DataTableRow>
 
-      {/* Item Titles */}
-      <DataTableRow>
-        <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
-          {achievement.items.map((item, idx) => (
-            <li key={idx}>{item.title}</li>
-          ))}
-        </ul>
-      </DataTableRow>
+    {/* Item Titles */}
+    <DataTableRow>
+      <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
+        {achievement.items.map((item, idx) => (
+          <li key={idx}>{item.title}</li>
+        ))}
+      </ul>
+    </DataTableRow>
 
-      {/* Descriptions */}
-      <DataTableRow>
-        <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
-          {achievement.items.map((item, idx) => (
-            <li key={idx}>
-              <div
-                dangerouslySetInnerHTML={{ __html: item.description }}
-              />
-            </li>
-          ))}
-        </ul>
-      </DataTableRow>
-
-      {/* Images */}
-      <DataTableRow>
-        <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
-          {achievement.items.map((item, idx) =>
-            item.image?.url ? (
-              <img
-                key={idx}
-                src={item.image.url}
-                alt={item.image.altText || "achievement"}
-                width={30}
-                height={30}
-                style={{ objectFit: "cover", borderRadius: "4px" }}
-              />
-            ) : (
-              <span key={idx}>No image</span>
-            )
-          )}
-        </div>
-      </DataTableRow>
-
-      {/* Alt Texts */}
-      <DataTableRow>
-        <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
-          {achievement.items.map((item, idx) => (
-            <li key={idx}>{item.image?.altText}</li>
-          ))}
-        </ul>
-      </DataTableRow>
-
-      {/* Actions */}
-      <DataTableRow className='nk-tb-col-tools'>
-        <ul className='nk-tb-actions gx-1'>
-          <li onClick={() => toggleModal(achievement)}>
-            <TooltipComponent
-              tag='a'
-              id={`edit-${achievement._id}`}
-              containerClassName='btn btn-trigger btn-icon'
-              icon='edit-alt-fill'
-              direction='top'
-              text='Edit'
+    {/* Descriptions */}
+    <DataTableRow>
+      <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
+        {achievement.items.map((item, idx) => (
+          <li key={idx}>
+            <div
+              dangerouslySetInnerHTML={{ __html: item.description }}
             />
           </li>
-          {/* <li onClick={() => confirmDelete(achievement._id)}>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    {/* Images */}
+    <DataTableRow>
+      <div style={{ display: "flex", gap: "10px", flexDirection:"column" }}>
+        {achievement.items.map((item, idx) =>
+          item.image?.url ? (
+            <img
+              key={idx}
+              src={item.image.url}
+              alt={item.image.altText || "achievement"}
+              width={30}
+              height={30}
+              style={{ objectFit: "cover", borderRadius: "4px" }}
+            />
+          ) : (
+            <span key={idx}>No image</span>
+          )
+        )}
+      </div>
+    </DataTableRow>
+
+    {/* Alt Texts */}
+    <DataTableRow>
+      <ul style={{ paddingLeft: "20px", listStyleType: "disc" }}>
+        {achievement.items.map((item, idx) => (
+          <li key={idx}>{item.image?.altText }</li>
+        ))}
+      </ul>
+    </DataTableRow>
+
+    {/* Actions */}
+    <DataTableRow className='nk-tb-col-tools'>
+      <ul className='nk-tb-actions gx-1'>
+        <li onClick={() => toggleModal(achievement)}>
+          <TooltipComponent
+            tag='a'
+            id={`edit-${achievement._id}`}
+            containerClassName='btn btn-trigger btn-icon'
+            icon='edit-alt-fill'
+            direction='top'
+            text='Edit'
+          />
+        </li>
+        {/* <li onClick={() => confirmDelete(achievement._id)}>
           <TooltipComponent
             tag='a'
             containerClassName='btn btn-trigger btn-icon'
@@ -336,11 +338,12 @@ const [confirmModal, setConfirmModal] = useState(false);
             text='Delete'
           />
         </li> */}
-        </ul>
-      </DataTableRow>
-    </DataTableItem>
-  ))}
+      </ul>
+    </DataTableRow>
+  </DataTableItem>
+))}
 
+                
             </div>
           )}
         </Block>
@@ -368,7 +371,7 @@ const [confirmModal, setConfirmModal] = useState(false);
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Main Title</label>
+                  <label className='form-label'>Main Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     value={formData.title}
@@ -381,7 +384,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                 {formData.items.map((item, index) => (
                   <div key={index} className='border rounded p-3 mb-3'>
                     <Col md='12'>
-                      <label className='form-label'>Item Title</label>
+                      <label className='form-label'>Item Title <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={item.title}
@@ -391,7 +394,7 @@ const [confirmModal, setConfirmModal] = useState(false);
                       />
                     </Col>
                     <Col md='12'>
-                      <label className='form-label'>Item Description</label>
+                      <label className='form-label'>Item Description <span className="danger">*</span></label>
                       <ReactQuill
                         theme='snow'
                         value={item.description}
@@ -400,17 +403,84 @@ const [confirmModal, setConfirmModal] = useState(false);
                         }
                       />
                     </Col>
-                    <Col md='12'>
-                      <label className='form-label'>Image</label>
-                      <input
-                        className='form-control'
-                        type='file'
-                        accept='image/*'
-                        onChange={(e) => handleImageChange(e, index)}
-                      />
+                    <Col
+                      md='12'
+                      style={{ display: "flex", flexDirection: "column" }}
+                    >
+                      <label className='form-label'>Image Upload <span className="danger">*</span></label>
+                      {!item.image ? (
+                        <input
+                          className='form-control'
+                          type='file'
+                          accept='image/*'
+                          onChange={(e) => handleImageChange(e, index)}
+                        />
+                      ) : (
+                        <div
+                          className='image-preview-wrapper'
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "flex-start",
+                            gap: "12px",
+                            marginTop: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: "relative",
+                              display: "inline-block",
+                            }}
+                          >
+                            <img
+                              src={
+                                item.image instanceof File
+                                  ? URL.createObjectURL(item.image)
+                                  : typeof item.image === "string"
+                                    ? item.image
+                                    : item.image?.url || ""
+                              }
+                              alt={item.altText || "Image"}
+                              style={{
+                                width: "150px",
+                                height: "auto",
+                                objectFit: "contain",
+                                borderRadius: "4px",
+                                border: "1px solid #ddd",
+                                padding: "4px",
+                                backgroundColor: "#fff",
+                              }}
+                            />
+                            <Button
+                              size='sm'
+                              color='danger'
+                              className='btn-icon'
+                              style={{
+                                position: "absolute",
+                                top: "-8px",
+                                right: "-8px",
+                                borderRadius: "50%",
+                                lineHeight: "1",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                zIndex: 10,
+                                height: "20px",
+                                width: "20px",
+                              }}
+                              onClick={() =>
+                                handleItemChange(index, "image", null)
+                              }
+                            >
+                              <Icon name='cross' />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </Col>
+
                     <Col md='12'>
-                      <label className='form-label'>Alt Text</label>
+                      <label className='form-label'>Alt Text <span className="danger">*</span></label>
                       <input
                         className='form-control'
                         value={item.altText}
@@ -432,9 +502,9 @@ const [confirmModal, setConfirmModal] = useState(false);
 
                 <div>
                   <Button
-                    style={{ width: "auto" }}
                     color='primary'
                     size='sm'
+                    style={{ width: "auto" }}
                     onClick={(e) => {
                       addItem(e);
                     }}

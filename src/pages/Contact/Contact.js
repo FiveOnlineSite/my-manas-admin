@@ -315,7 +315,7 @@ const Contact = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Give Title</label>
+                  <label className='form-label'>Give Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Title is required" })}
@@ -330,7 +330,7 @@ const Contact = () => {
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>India Email</label>
+                  <label className='form-label'>India Email <span className="danger">*</span></label>
                   <input
                     type='email'
                     className='form-control'
@@ -352,7 +352,7 @@ const Contact = () => {
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>India Address</label>
+                  <label className='form-label'>India Address <span className="danger">*</span></label>
                   <textarea
                     className='form-control'
                     {...register("indiaAddress", {
@@ -369,7 +369,7 @@ const Contact = () => {
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>USA Email</label>
+                  <label className='form-label'>USA Email <span className="danger">*</span></label>
                   <input
                     type='email'
                     className='form-control'
@@ -394,7 +394,7 @@ const Contact = () => {
                 </Col>
 
                 <Col md='6'>
-                  <label className='form-label'>USA Address</label>
+                  <label className='form-label'>USA Address <span className="danger">*</span></label>
                   <textarea
                     className='form-control'
                     {...register("usaAddress", {

@@ -345,7 +345,7 @@ const VidhyaVanamHistory = () => {
               </h5>
               <Form className='row gy-4' onSubmit={handleSubmit(onSubmit)}>
                 <Col md='12'>
-                  <label className='form-label'>Title</label>
+                  <label className='form-label'>Title <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("title", { required: "Required" })}
@@ -358,7 +358,7 @@ const VidhyaVanamHistory = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Logo (Max 500KB)</label>
+                  <label className='form-label'>Logo (Max 500KB) <span className="danger">*</span></label>
                   <Controller
                     name='logo'
                     control={control}
@@ -450,7 +450,7 @@ const VidhyaVanamHistory = () => {
                 </Col>
 
                 <Col md='12'>
-                  <label className='form-label'>Alt Text</label>
+                  <label className='form-label'>Alt Text <span className="danger">*</span></label>
                   <input
                     className='form-control'
                     {...register("altText", { required: "Required" })}
@@ -463,7 +463,7 @@ const VidhyaVanamHistory = () => {
                   )}
                 </Col>
                 <Col md='12'>
-                  <label className='form-label'>Description</label>
+                  <label className='form-label'>Description <span className="danger">*</span></label>
                   <Controller
                     name='description'
                     control={control}
