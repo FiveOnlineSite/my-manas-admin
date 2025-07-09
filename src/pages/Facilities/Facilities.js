@@ -1351,7 +1351,9 @@ const Facilities = () => {
                             {errors.moreFeaturedVideos?.[index].video.message}
                           </span>
                         )}
+{/* 
                         {console.log('console_error', errors)}
+                         */}
                       </div>
 
                       <div className="col-md-4">
